@@ -35,7 +35,7 @@ export default function Page(){
  function next(){if(!raceDone)return;if(idx<deck.length-1){setIdx(idx+1);setStage('intro');}else{setScreen('results');if(auth.current)saveResult();}}
  function home(){leaveRoom();epoch.current++;clearInterval(timer.current);auth.current=null;setRoom(null);setScreen('home');setStage('intro');setError('');setProgressError('');}
  useEffect(()=>{if(screen==='game')window.scrollTo({top:0,behavior:'instant'});},[idx,stage,screen]);
- return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top"><button className="brand" onClick={home}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 29</span></header>
+ return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top"><button className="brand" onClick={home}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 30</span></header>
  {screen==='home'&&<>
  <div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">
@@ -46,6 +46,7 @@ export default function Page(){
  <button className="primary home-play" disabled={!name.trim()} onClick={()=>begin(Math.floor(Math.random()*1e8))}>Pelaa <span aria-hidden="true">→</span></button>
  <div className="split home-multiplayer"><button disabled={!name.trim()||busy} onClick={()=>{setCode('');roomAction('create');}}>Haasta kaverit <span aria-hidden="true">＋</span></button><button disabled={!name.trim()} onClick={()=>{leaveRoom();auth.current=null;setRoom(null);setProgressError('');setScreen('join');}}>Liity koodilla <span aria-hidden="true">→</span></button></div>
  <button className="textbutton browse-games" onClick={()=>setScreen('library')}>Löydä oma suosikkipelisi →</button>
+ <div className="home-studio home-studio-bottom">MAMV Studio</div>
  <ParkTrim/>
  </section>
  </>}
@@ -64,6 +65,6 @@ export default function Page(){
  {room?.proposal&&['game','results'].includes(screen)&&<div className="rematch-overlay" role="dialog" aria-label="Uusi peli"><h2>Uusi peli samalla porukalla?</h2><p>Valitse mukaan 30 sekunnin kuluessa. Uusi peli alkaa vain mukaan ilmoittautuneille.</p><div className="players">{room.players.map((p:any)=><div key={p.id}><b>{p.name}</b><span>{room.proposal.choices[p.id]===true?'Mukana!':room.proposal.choices[p.id]===false?'Jää pois':'Miettii…'}</span></div>)}</div><button className="primary" disabled={busy||room.proposal.choices[room.me]===true} onClick={()=>roomAction('accept')}>{room.proposal.choices[room.me]===true?'Olet mukana!':'Lähden mukaan'}</button><button onClick={async()=>{await roomAction('decline');home();}}>Jään pois</button></div>}
  {progressError&&room&&<p className="error" role="status">{progressError} Pisteiden lähetystä yritetään uudelleen.</p>}
  {error&&<div className="error" role="status">{error}<button aria-label="Sulje ilmoitus" onClick={()=>setError('')}>×</button></div>}
- <footer>{screen==='home'&&<p className="home-bottom-description">{taskCatalog.length>100?'Yli sata erilaista peliä.':'Lähes sata erilaista peliä.'} Yksin tai yhdessä.</p>}HUPS! · PIENET PELIT, ISO ILO<small className="studio-credit">MAMV Studio <span>• Tehty iloksi</span></small></footer>
+ <footer>{screen==='home'&&<p className="home-bottom-description">{taskCatalog.length>100?'Yli sata erilaista peliä.':'Lähes sata erilaista peliä.'} Yksin tai yhdessä.</p>}HUPS! · PIENET PELIT, ISO ILO{screen!=='home'&&<small className="studio-credit">MAMV Studio <span>• Tehty iloksi</span></small>}</footer>
  </main>;
 }

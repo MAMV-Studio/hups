@@ -91,3 +91,6 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .scene-results .ceremony .podium-cast.single .podium-avatar>.character{width:86px;height:92px}
 .scene-results .ceremony .podium-cast.single .podium-block{height:58px}
 .scene-results .room-chat .chat-messages{height:200px;max-height:200px}
+
+/* 30: studio signature below the favourite-game link, above the trim. */
+.phone .home-studio-bottom{display:block;text-align:center;margin:18px 0 14px;font-size:12px;line-height:1.4;color:#d2b2e4;letter-spacing:1.5px;font-weight:900}

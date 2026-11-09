@@ -1,0 +1,7 @@
+HUPS VERSIO 30
+- MAMV Studio etusivulla keskellä suosikkipelilinkin ja koristekaaren välissä.
+- Muut version 29 muutokset säilyvät.
+
+Pura ZIP. Lataa SISÄLTÖ GitHubin hups-repositorioon.
+Odota Vercelissä Ready ja päivitä sivu: VERSIO 30.
+Supabaseen ei muutoksia. Version 29 huoneet toimivat edelleen.
