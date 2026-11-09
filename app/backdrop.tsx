@@ -1,0 +1,1 @@
+export function Backdrop(){return <div className="hups-backdrop" aria-hidden="true">{['lilac','cyan','pink','lime','peach'].map((c,i)=><span key={c} className={'splash splash-'+i} style={{'--splash-color':['#b69cff','#76dbea','#f6a5d3','#c8fa63','#ff986e'][i]} as React.CSSProperties}><i/><b/><em/></span>)}</div>;}

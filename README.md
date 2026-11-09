@@ -1,11 +1,11 @@
-# Hups! — Vercel-versio 21
+# Hups! — Vercel-versio 22
 
-Sama 100 tehtävän peli ja Hups-ulkoasu kuin 9.11.2026 tarkistetussa versiossa 21.
+99 pientä taitopeliä. Päivitys 9.11.2026: Hupsautin, voittajan juhla, keskitetty logo ja spläsh-taustat.
 Tämä on erillinen vientipaketti Verceliin. Nykyinen ChatGPT Sites -peli säilyy ennallaan.
 
 ## 1. Vie GitHubiin
 
-Pura ZIP koneella. Avaa tyhjä Veya-test/hups-repositorio ja paina
+Pura ZIP koneella. Avaa tyhjä MAMV-Studio/hups-repositorio ja paina
 **uploading an existing file**. Vedä tämän hakemiston SISÄLTÖ latausalueelle
 (app, public, server, supabase, tests sekä juuritason tiedostot).
 Älä lataa ZIP-tiedostoa sellaisenaan äläkä ylimääräistä hups-vercel-kansiota.
@@ -20,7 +20,7 @@ Koodi käyttää tietokantaa vain Vercelin palvelimelta. Pelaajan oma tunniste e
 
 ## 3. Tuo Verceliin
 
-Vercel > Add New > Project > Import Veya-test/hups.
+Vercel > Add New > Project > Import MAMV-Studio/hups.
 Project name: hups (tai vapaa nimi). Framework: Next.js. Root Directory: ./.
 Node.js: 22.x. Build Command: npm run build. Install Command: npm ci.
 Output Directory: oletus. Lisää Environment Variables -kohtaan:
@@ -65,7 +65,7 @@ Next.js App Router + React. Vinext/Cloudflare Workers -riippuvuudet poistettu.
 Kaveripelin tilat säilyvät Supabasen Postgres-tietokannassa, eivät Vercelin
 palvelimen muistissa. Rinnakkaiset pistepäivitykset käyttävät revision tarkistusta,
 jotta toisen pelaajan päivitys ei katoa. Huonekoodi kierrätetään vasta 24 tunnin jälkeen.
-Käyttöliittymän versio 21, yhteispeliprotokolla 18.
+Käyttöliittymän versio 22, yhteispeliprotokolla 19.
 
 Tuotantokäännös ja mukana olevat testit tarkistettu. Todellinen Supabase-yhteys
 ja kahden puhelimen käyttöönotto tarkistetaan, kun omat palveluasetukset on lisätty.

@@ -1,0 +1,44 @@
+HUPS VERSIO 22 — PÄIVITYS NYKYISEEN HUPS-REPOSITORIOON
+
+1. Pura Hups-Vercel-22.zip (Pura kaikki).
+2. Avaa oma GitHub-repositorio MAMV-Studio/hups.
+3. Valitse Add file > Upload files.
+4. Vedä puretun kansion SISÄLTÖ, älä ZIP-tiedostoa tai ympäröivää kansiota.
+5. Varmista, että package.json ja app-kansio tulevat repositorion juureen.
+6. Vahvista Commit changes. Vercel rakentaa uuden version automaattisesti.
+7. Odota Vercelissä Ready. Avaa pelin sama osoite uudelleen kaikilla laitteilla.
+8. Tarkista yläkulmasta VERSIO 22 ja luo uusi kaveripeli uudella koodilla.
+
+Nykyiset Vercel-ympäristömuuttujat ja Supabase-taulut sopivat tähän päivitykseen.
+Älä aja SQL:ää uudelleen äläkä luo uutta Vercel- tai Supabase-projektia.
+Uuden yhteispeliprotokollan takia vanhan version kaverihuoneet eivät kelpaa.
+Kaikkien pelaajien pitää päivittää sivu ennen uuden huoneen luomista.
+
+MUUTOKSET
+- Hups!-logo keskelle ja hillittyjä värispläshejä taustalle.
+- Aulan vaalean pallon tilalla valittu hahmo, nimi samalla keskiviivalla.
+- Radan tilalla Hupsautin: vaihtuvat vieterit, puhallus ja kuplat; pisteet nostavat
+  hahmoja. Hahmot pysyvät omilla paikoillaan. Johtaja merkitään kruunulla.
+- Lopputuloksessa voittajan nimi, hahmo ja tuuletus pääosaan. Erilaiset 1/2/3-pallit.
+  Pisteet pienesti hahmojen yhteydessä, ei suurta erillistä pistekorttia.
+- Varjon arvoitus poistettu valikoimasta ja arvonnasta. Pelimäärä nyt 99.
+- Etusivulla ei tarkkaa määrää: Lähes sata erilaista peliä.
+- Pelivaihtoehtojen ja tarkkuusalueiden pehmennys ja varjostus. Siniset poks -pelin
+  ulkoasu ja toiminta säilyvät.
+- Lähtölaskenta käyttää palvelimen aikaan synkronoitua monotonista kelloa.
+  Laitteen oman kellon ero ei enää siirrä aloitusta 15 sekunnilla.
+- Aktiivisilla naputusalueilla estetään selaimen vieritys/tekstivalinta tarpeen
+  mukaan. Janican tarkkaa kosketusongelmaa ei ole toistettu hänen laitteellaan.
+- MAMV Studio alatunnisteeseen.
+
+TESTAA
+1. Molemmilla laitteilla lähtölaskenta samaan aloitushetkeen (pieni verkkoviive mahdollinen).
+2. Kokeile Janican puhelimella nopeita napautuksia, piirtämistä ja pallopeliä.
+3. Pelaa kolmella pelaajalla kierros loppuun. Tarkista palkintopalli ja uusi kierros.
+4. Jos tietokannassa on vanha huone, luo uusi koodi.
+
+Tarkistukset: automaattiset pelilogiikan, kosketuspelien, yhteispelin ja kellon
+testit sekä tuotantokäännös. Kolmen pelaajan ulkoasu tarkistettu esikatselussa.
+Esikatselupalvelimen kehitysympäristö ei suorittanut selaimen JavaScriptiä,
+joten tämän version koko pelikulkua tai aitoa Supabase-yhteispeliä ei voitu
+vahvistaa selaimessa. Tee yllä oleva laitetesti päivityksen jälkeen.

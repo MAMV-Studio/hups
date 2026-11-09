@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {Task,shapes,arrows,pictureCards,colorCards,tapScore,sequenceScore,sequencePhase,speedAdjustedScore,answerTimeMs} from '../tasks';
-import {ShadowGame,DifferenceGame} from './picture-games';
+import {DifferenceGame} from './picture-games';
 import {BubbleHunt} from './park-games';
 import ExtraGame from './extra-games';
 import {Character} from './characters';
@@ -95,7 +95,6 @@ export default function Minigame({task,onFinish,avatar=0}:{task:Task,avatar?:num
  {['even','alphabet','animal','fruit'].includes(id)&&options(d.options,d.answer)}
  {['double','half'].includes(id)&&<><div className="math-question">{d.n} {id==='double'?'× 2':'÷ 2'} = ?</div>{options(d.options,d.answer)}</>}
  {id==='nextpattern'&&<><div className="missing-row">{[d.a,d.b,d.a,d.b,d.a].map((n,i)=><span key={i}>{shapes[n].symbol}</span>)}<span>?</span></div>{options(d.options,d.answer,n=>shapes[n].symbol)}</>}
- {id==='shadow'&&<ShadowGame data={d} choose={choose}/>}
  {id==='differences'&&<DifferenceGame key={mistakes} data={d} retry={retry} finish={()=>end(1000,'Kaikki kolme eroa löytyivät!',0,true)}/>}
  <div className={'play-buddy '+(notice?'try-again':'')}><div aria-hidden="true"><Character id={avatar} happy={!notice}/></div><p role="status">{notice||((sequence&&showing)||(['pictures','gridmemory','shape','digits','spot','hidepics','gone','line','dots'].includes(id)&&expose)?'Paina mieleen…':'Sinun vuorosi!')}</p><span aria-hidden="true">✦</span></div>
  </div>;
