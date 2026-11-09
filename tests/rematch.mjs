@@ -68,3 +68,11 @@ console.log('PASS: room JSON chat, idempotent retry, flood guard, token privacy,
 
 const [,finishedRoom]=await call(null,'create',{name:'Valmis',length:5});state.start=Date.now()-1;state.players[0].scores=Array(5).fill(900);await call(finishedRoom.token,'leave');assert.equal((await call(null,'join'))[0],409);assert.equal(state.players[0].left,true);assert.equal((await call(finishedRoom.token,'poll'))[1].state.players[0].disconnected,false);
 console.log('PASS: completed scores remain eligible even if the player leaves after finishing.');
+
+// Use a real keyed room map: an unknown/wrong code must never resolve to another room.
+const rooms=new Map();globalThis.__store={async create(code,data){if(rooms.has(code))return false;rooms.set(code,{data:structuredClone(data),revision:0});return true;},async read(code){return structuredClone(rooms.get(code)||null);},async save(code,data,revision){const row=rooms.get(code);if(!row||row.revision!==revision)return false;rooms.set(code,{data:structuredClone(data),revision:revision+1});return true;}};
+const [,one]=await call(null,'create',{name:'Ensimmäinen'}),[,two]=await call(null,'create',{name:'Toinen'});
+assert.notEqual(one.code,two.code);
+const [joinStatus,guest]=await call(null,'join',{code:' '+one.code.slice(0,2)+' '+one.code.slice(2)+' ',name:'Vieras'});assert.equal(joinStatus,200);assert.equal(guest.state.code,one.code);assert.equal(guest.state.players.length,2);assert.equal(rooms.get(two.code).data.players.length,1);
+assert.equal((await call(null,'join',{code:'0000'}))[0],404);
+console.log('PASS: newly created code is read back before showing; spaced code joins the exact keyed room and missing codes return 404 without joining another room.');
