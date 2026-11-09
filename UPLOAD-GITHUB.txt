@@ -1,8 +1,8 @@
-1. Pura Hups-Vercel-28.zip (Pura kaikki).
+1. Pura Hups-Vercel-29.zip (Pura kaikki).
 2. Avaa GitHubissa MAMV-Studio/hups.
 3. Add file > Upload files.
 4. Vedä puretun kansion SISÄLTÖ latausalueelle (app, public, package.json jne.).
 5. Commit changes.
-6. Odota Vercelissä Ready. Päivitä peli: VERSIO 28.
+6. Odota Vercelissä Ready. Päivitä peli: VERSIO 29.
 
 Supabaseen ei muutoksia.

@@ -68,3 +68,26 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .scene-game.phase-feedback .game{padding-top:0}
 .scene-game.phase-feedback .climb-feedback{padding-top:0}
 .players .lobby-avatar .char-art{display:block;background-image:url('/hups-cast.png');background-size:300% 200%;background-repeat:no-repeat}
+
+/* 29: compact celebration, more conversation, three quick replies. */
+.phone .chat-quips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;overflow:visible}
+.phone .chat-quips button{min-width:0;width:100%;padding:7px 3px;font-size:10px;white-space:normal;line-height:1.2;min-height:32px}
+.phone footer .home-bottom-description{font-size:11px;line-height:1.5;letter-spacing:0;text-transform:none;margin:0 0 12px;color:#bdabc9;min-height:0}
+.scene-results .ceremony .podium-cast{min-height:160px;padding-top:12px;margin-bottom:8px;gap:6px}
+.scene-results .ceremony .podium-avatar{height:65px}
+.scene-results .ceremony .podium-avatar>.character{width:68px;height:72px}
+.scene-results .ceremony .place-1 .podium-avatar{height:78px}
+.scene-results .ceremony .place-1 .podium-avatar>.character{width:78px;height:84px}
+.scene-results .ceremony .place-1 .podium-block{height:74px}
+.scene-results .ceremony .place-2 .podium-block{height:59px}
+.scene-results .ceremony .place-3 .podium-block{height:45px}
+.scene-results .ceremony .podium-block{padding:4px 3px}
+.scene-results .ceremony .podium-block>b{font-size:22px}
+.scene-results .ceremony .podium-block>span{font-size:10px}
+.scene-results .ceremony .podium-block>small{font-size:9px}
+.scene-results .ceremony .podium-crown{font-size:24px;top:-10px}
+.scene-results .ceremony .podium-cast.single .podium-player{width:115px;flex-basis:115px}
+.scene-results .ceremony .podium-cast.single .podium-avatar{height:88px}
+.scene-results .ceremony .podium-cast.single .podium-avatar>.character{width:86px;height:92px}
+.scene-results .ceremony .podium-cast.single .podium-block{height:58px}
+.scene-results .room-chat .chat-messages{height:200px;max-height:200px}

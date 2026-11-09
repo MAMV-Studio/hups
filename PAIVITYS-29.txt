@@ -1,0 +1,9 @@
+HUPS VERSIO 29
+- MAMV Studio ja pelimäärän esittelyteksti etusivun alareunassa.
+- Pienempi palkintopalli, enemmän tilaa chatille. Voittajan volttiesittely säilyy.
+- Kolme pikakommenttia koko chatin leveydellä, ei sivuttaisvieritystä.
+- Malliviivan liukuväri korjattu: myös suora vaakaviiva näkyy.
+
+Pura ZIP. Lataa SISÄLTÖ GitHubin hups-repositorioon.
+Odota Vercelissä Ready ja päivitä sivu: VERSIO 29.
+Supabaseen ei muutoksia. Version 28 huoneet toimivat edelleen.
