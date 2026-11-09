@@ -1,0 +1,6 @@
+import ts from 'typescript';import fs from 'node:fs';import assert from 'node:assert/strict';
+const src=ts.transpileModule(fs.readFileSync('libgame.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022}}).outputText;
+const {circleScore,accuracy}=await import('data:text/javascript;base64,'+Buffer.from(src).toString('base64'));
+const circle=Array.from({length:121},(_,i)=>({x:150+90*Math.cos(i/120*2*Math.PI),y:150+90*Math.sin(i/120*2*Math.PI)}));assert.ok(circleScore(circle)>970);assert.ok(circleScore(circle.slice(0,60))<500);assert.equal(circleScore([{x:5,y:5}]),0);assert.equal(accuracy(0,1.5),1000);assert.equal(accuracy(3,1.5),0);console.log('PASS: circle closure/coverage and score bounds.');
+const {validProgress}=await import('data:text/javascript;base64,'+Buffer.from(src).toString('base64'));
+assert.equal(validProgress([], [750]),true);assert.equal(validProgress([750],[750,980]),true);assert.equal(validProgress([750],[751,980]),false);assert.equal(validProgress([750,980],[750]),false);assert.equal(validProgress([],[1001]),false);assert.equal(validProgress([],[-1]),false);assert.equal(validProgress([],Array(8).fill(600),true),true);assert.equal(validProgress([],[700],true),false);console.log('PASS: partial standings accept append-only bounded scores; completed rounds cannot be rewritten.');

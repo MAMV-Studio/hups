@@ -1,0 +1,31 @@
+{
+  "name": "hups",
+  "version": "21.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "check": "tsc --noEmit",
+    "test": "node tests/rematch.mjs && node tests/storage.mjs && node tests/tasks.mjs && node tests/scoring.mjs && node tests/lanes.mjs && node tests/auto-answer.mjs && node tests/balloons.mjs && node tests/extra-games.mjs"
+  },
+  "dependencies": {
+    "@fontsource/lilita-one": "5.3.0",
+    "@fontsource/nunito": "5.3.0",
+    "next": "16.3.4",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,14 @@
+import ts from 'typescript';import fs from 'node:fs';import assert from 'node:assert/strict';import {createRequire} from 'node:module';import React from 'react';import {renderToStaticMarkup} from 'react-dom/server';
+const require=createRequire(import.meta.url),uri=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
+const compile=p=>ts.transpileModule(fs.readFileSync(p,'utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+const lib=uri(compile('libgame.ts')),extra=uri(compile('extra-tasks.ts').replace("'./libgame'",JSON.stringify(lib))),tasks=uri(compile('tasks.ts').replace("'./libgame'",JSON.stringify(lib)).replace("'./extra-tasks'",JSON.stringify(extra)));
+const {extraCatalog}=await import(extra),{makeTask,answerTimeMs,speedAdjustedScore}=await import(tasks);
+const component=uri(compile('app/extra-games.tsx').replace("'react'",JSON.stringify('file://'+require.resolve('react'))).replace('"react/jsx-runtime"',JSON.stringify('file://'+require.resolve('react/jsx-runtime'))).replace("'../tasks'",JSON.stringify(tasks)));
+const {default:ExtraGame}=await import(component);assert.equal(extraCatalog.length,38);
+for(let seed=0;seed<100;seed++)for(const meta of extraCatalog){const task=makeTask(meta.id,seed),d=task.data;assert.deepEqual(task,makeTask(meta.id,seed));assert.ok(d.extra&&d.options.length>=4,meta.id);assert.ok(task.instruction.length>20);if(d.mode==='sequence'){assert.equal(d.order.length,4);assert.ok(d.order.every(i=>i>=0&&i<4));assert.deepEqual(d.expected,meta.id==='reversecolors'?[...d.order].reverse():d.order);}else {assert.ok(Number.isInteger(d.answer)&&d.answer>=0&&d.answer<d.options.length,meta.id);if(!['grid','hunt'].includes(d.mode))assert.equal(new Set(d.options.map(v=>JSON.stringify(v))).size,4,meta.id);}
+assert.equal(answerTimeMs(meta.id,d.wait+1000,d),1000);assert.ok(speedAdjustedScore(1000,meta.id,d.wait+1000,d)>speedAdjustedScore(1000,meta.id,d.wait+9000,d));
+if(d.mode==='board'){const distances=d.options.map(p=>meta.id==='topmost'?p.y:meta.id==='bottommost'?-p.y:(meta.id==='nearcenter'?1:-1)*Math.hypot(p.x-50,p.y-50));assert.equal(distances.filter(v=>v===Math.min(...distances)).length,1);assert.equal(distances[d.answer],Math.min(...distances));}
+if(d.mode==='grid')assert.equal(d.options.filter(v=>v===d.options[d.answer]).length,1);
+if(seed===0){const html=ms=>renderToStaticMarkup(React.createElement(ExtraGame,{task,ms,mistakes:0,choose(){},canAnswer(){return true;}}));const answer=html(d.wait);assert.ok(answer.includes('<button'),meta.id+' answers render');if(d.wait){const reveal=html(0);assert.ok(!reveal.includes('<button'),meta.id+' no early answers');assert.ok(reveal.includes('Paina mieleen'));}}
+}
+console.log('PASS: all 38 new tasks across 100 seeds have deterministic playable data, valid unique answers, reveal gates and speed scoring; spatial targets have no ties.');
