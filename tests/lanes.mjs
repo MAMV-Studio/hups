@@ -14,3 +14,7 @@ assert.ok(result.includes('Janica'));assert.ok(result.includes('Voittajan kruunu
 const waiting=renderToStaticMarkup(React.createElement(ResultParty,{avatar:0,name:'Roope',scores:[700,800],players:players.map(p=>p.id==='b'?{...p,scores:[900]}:p),me:'a'}));
 assert.ok(waiting.includes('waiting-results'));assert.ok(!waiting.includes('Voittajan kruunu'));assert.ok(waiting.includes('Kaverit pelaavat vielä'));
 console.log('PASS: actual result component ranks totals, honors winner, keeps scores compact, and waits for unfinished players.');
+
+const departed=renderToStaticMarkup(React.createElement(ResultParty,{avatar:0,name:'Roope',scores:[700,800],players:players.map(p=>p.id==='b'?{...p,disconnected:true,scores:[900]}:p),me:'a'}));assert.ok(!departed.includes('waiting-results'));assert.ok(!departed.includes('Janica'));
+const {WinnerReveal}=await import('data:text/javascript;base64,'+Buffer.from(partySrc).toString('base64'));const finale=renderToStaticMarkup(React.createElement(WinnerReveal,{avatar:0,name:'Roope',scores:[700,800],players,me:'a',onDone(){}}));assert.ok(finale.includes('Janica'));assert.ok(finale.includes('winner-acrobat'));assert.ok(finale.includes('Palkintopallille'));
+console.log('PASS: unfinished departed players do not delay the ceremony; winner gets a separate acrobatic reveal.');

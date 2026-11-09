@@ -7,3 +7,5 @@ export const colorSymbols=['★','≈','ϟ','❧'];
 Object.assign(taskActions,Object.fromEntries(extraCatalog.map(t=>[t.id,t.action])));
 
 taskActions.colorhunt='Siniset poks!';
+
+taskActions.movinghunt='Poksauta siniset karkulaiset!';taskActions.movingcenter='Nappaa liikkuva napakymppi!';taskActions.movingspot='Mihin karkulainen katosi?';

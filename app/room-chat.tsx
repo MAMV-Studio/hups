@@ -1,0 +1,8 @@
+'use client';
+import {useState} from 'react';
+import {Character} from './characters';
+export function RoomChat({room,send}:{room:any,send:(text:string,messageId:string)=>Promise<void>}){
+ const [draft,setDraft]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ async function post(text:string){if(busy||!text.trim())return;setBusy(true);setError('');try{await send(text.trim(),crypto.randomUUID());setDraft('');}catch(e:any){setError(e.message||'Viesti ei lähtenyt. Kokeile uudelleen.');}finally{setBusy(false);}}
+ return <section className="room-chat" aria-label="Kaverichatti"><div className="chat-title"><b>Pientä pelipuhetta 💬</b><small>Vain tämän haasteen porukalle</small></div><div className="chat-messages" role="log" aria-live="polite" aria-relevant="additions">{(room.messages||[]).slice(-6).map((m:any)=><div key={m.id} className={m.playerId===room.me?'own-message':''}><Character id={m.avatar||0}/><p><b>{m.playerId===room.me?'Sinä':m.name}</b><span>{m.text}</span></p></div>)}{!room.messages?.length&&<p className="chat-empty">Kuka heittää ensimmäisen heiton?</p>}</div><div className="chat-quips">{['Jes, mä johdan!','Hyvä osuma!','Hupsista 😂','Kamalaa tuuria sulla!'].map(t=><button key={t} disabled={busy} onClick={()=>post(t)}>{t}</button>)}</div><form onSubmit={e=>{e.preventDefault();post(draft);}}><label className="sr-only" htmlFor="chat-text">Viesti kavereille</label><input id="chat-text" maxLength={160} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Heitä oma kommentti…" autoComplete="off"/><button disabled={busy||!draft.trim()} aria-label="Lähetä viesti">{busy?'…':'↑'}</button></form>{error&&<p role="status" className="chat-error">{error}</p>}</section>;
+}

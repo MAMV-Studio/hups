@@ -2,6 +2,7 @@ import {extraCatalog,makeExtra} from './extra-tasks';
 import {random,shuffle,pictureCards,colorCards} from './libgame';
 export type Task={id:string,title:string,icon:string,category:string,instruction:string,data:any};
 export const taskCatalog=[
+['movinghunt','Liikkuva värijahti','◉','NOPEUS'],['movingcenter','Liikkuva napakymppi','◎','TARKKUUS'],['movingspot','Katoava karkulainen','⌖','PAIKKAMUISTI'],
 ['timer','Ajantaju','◷','AJOITUS'],['circle','Täydellinen ympyrä','◯','PIIRTÄMINEN'],['pictures','Kuvamuisti','▧','MUISTI'],['odd','Etsi erilainen','★','TARKKA SILMÄ'],['colors','Värijono','▰','MUISTI'],['line','Viivamuisti','〰','TARKKUUS'],['reaction','Reaktio','ϟ','NOPEUS'],['dots','Pistelaskuri','⠿','HAVAINNOINTI'],['center','Täsmälleen keskelle','⊙','TARKKUUS'],['target','Nappiosuma','◎','TARKKUUS'],['sort','Numeropolku','123','JÄRJESTYS'],['biggest','Suurin luku','↗','NUMEROT'],['smallest','Pienin luku','↘','NUMEROT'],['more','Kummassa on enemmän?','••','ARVIOINTI'],['missing','Puuttuva numero','?','NUMEROT'],['add','Pieni pluslasku','＋','LASKEMINEN'],['subtract','Pieni miinuslasku','−','LASKEMINEN'],['shape','Muista muoto','△','MUISTI'],['spot','Missä piste oli?','⌖','PAIKKAMUISTI'],['longest','Pisin palkki','━','VERTAILU'],['shortest','Lyhin palkki','╸','VERTAILU'],['stars','Laske tähdet','★','HAVAINNOINTI'],['same','Sama muoto','◇','TARKKA SILMÄ'],['opposite','Vastakkainen suunta','↔','SUUNNAT'],['gone','Mikä kuva katosi?','▢','MUISTI'],['picorder','Kuvajono','▧','MUISTI'],['stop','Pysäytä keskelle','⏸','AJOITUS'],['bubbles','Poksahtavat kuplat','◌','NOPEUS'],['pair','Etsi oikea pari','♧','TARKKA SILMÄ'],['digits','Muista numero','42','MUISTI'],['taps','Kuusi napautusta','☝','NOPEUS'],['alternate','Vasen–oikea','↔','NOPEUS'],['descend','Numerot takaperin','321','JÄRJESTYS'],['middle','Keskimmäinen luku','↕','NUMEROT'],['near10','Lähimpänä kymppiä','10','NUMEROT'],['numsequence','Numerojono','123','MUISTI'],['shortword','Lyhin sana','Aa','VERTAILU'],['longword','Pisin sana','Aa','VERTAILU'],['triangles','Laske kolmiot','▲','HAVAINNOINTI'],['colorword','Värisana','▰','TARKKA SILMÄ'],['duplicate','Kuva kahdesti','♧','TARKKA SILMÄ'],['equal','Yhtä monta','＝','LUKUMÄÄRÄT'],['redcount','Laske punaiset','●','HAVAINNOINTI'],['sides','Montako kulmaa?','⬡','MUODOT'],['aimchain','Osumaputki','◎','TARKKUUS'],['smallball','Pienin pallo','◦','VERTAILU'],['bigball','Suurin pallo','●','VERTAILU'],['gridmemory','Muista ruudut','▦','MUISTI'],['flashes','Laske välähdykset','✦','KESKITTYMINEN'],['lettergap','Puuttuva kirjain','ABC','JÄRJESTYS'],
 ['hidepics','Missä kuva oli?','▧','MUISTI'],['ink','Musteen väri','▰','KESKITTYMINEN'],['even','Parillinen luku','2','NUMEROT'],['double','Tuplaa luku','×2','LASKEMINEN'],['half','Puolet luvusta','½','LASKEMINEN'],['nextpattern','Jatka kuviota','◆','PÄÄTTELY'],['alphabet','Aakkosten ensimmäinen','ABC','JÄRJESTYS'],['animal','Etsi eläin','🐱','HAVAINNOINTI'],['fruit','Etsi hedelmä','🍎','HAVAINNOINTI'],['reversepics','Kuvat takaperin','↶','MUISTI'],['differences','Kolme eroa','⌕','TARKKA SILMÄ']
 ].map(([id,title,icon,category])=>({id,title,icon,category})).concat(extraCatalog);
@@ -11,6 +12,8 @@ function choices(correct:number,r:()=>number,min=0,max=Infinity){const set=new S
 export function makeTask(id:string,seed:number):Task{
  const meta=taskCatalog.find(t=>t.id===id)!;if(!meta)throw Error('Unknown task');if(extraCatalog.some(t=>t.id===id))return {...meta,...makeExtra(id,seed)};const r=random(seed),int=(a:number,b:number)=>a+Math.floor(r()*(b-a+1));let d:any={},instruction='';const pics=shuffle(pictureCards,r);
  switch(id){
+ case 'movinghunt':d={...makeTask('colorhunt',seed).data};instruction='Pallot liikkuvat! Poksauta vain siniset ja jätä muut ehjiksi.';break;
+ case 'movingcenter':case 'movingspot':d.point={x:150,y:150};d.phase=r()*Math.PI*2;d.speed=int(850,1250);instruction=id==='movingcenter'?'Kohde liikkuu. Napauta sen keskelle mahdollisimman tarkasti!':'Seuraa liikkuvaa pistettä 3 sekuntia. Kun piste katoaa, napauta sen viimeistä paikkaa.';break;
  case 'timer':d.seconds=int(3,5);instruction=`Pysäytä ajastin mahdollisimman tarkasti ${d.seconds} sekunnin kohdalla. Kello ei näy.`;break;
  case 'circle':instruction='Piirrä yhdellä vedolla mahdollisimman pyöreä ympyrä. Yhdistä viivan päät ja käytä reilusti tilaa. Nosta sormi, kun olet piirtänyt — vastaus tarkistetaan heti.';break;
  case 'pictures':d.first=pics.slice(0,6);d.second=shuffle([...shuffle(d.first,r).slice(0,3),...pics.slice(6,9)],r);instruction='Katso kuutta kuvaa 3 sekuntia. Valitse sitten ne kolme kuvaa, jotka näit äsken.';break;
@@ -34,7 +37,7 @@ export function makeTask(id:string,seed:number):Task{
  case 'gone':d.first=pics.slice(0,4);d.answer=int(0,3);d.remaining=d.first.filter((_:any,i:number)=>i!==d.answer);d.options=shuffle(d.first,r);instruction='Muista neljä kuvaa. Kolmen sekunnin jälkeen yksi katoaa. Valitse alhaalta kadonnut kuva.';break;
  case 'picorder':d.order=shuffle([0,1,2,3],r).slice(0,3);d.pictures=pics.slice(0,4);instruction='Näet kolme kuvaa peräkkäin. Muista järjestys ja napauta sitten kuvat samassa järjestyksessä.';break;
  case 'stop':d.speed=1400;instruction='Merkki liikkuu edestakaisin. Paina STOP, kun se on mahdollisimman keskellä vihreää aluetta.';break;
- case 'bubbles':d.positions=positions(6,r);instruction='Napauta kuusi kuplaa rikki. Uusi kupla ilmestyy aina eri kohtaan. Kuinka nopeasti saat kaikki?';break;
+ case 'bubbles':d.positions=shuffle(positions(9,r),r).slice(0,6);instruction='Poksauta iso yllätyspallo! Sen sisältä vapautuu kuusi liikkuvaa pikkupalloa. Puhkaise ne kaikki.';break;
  case 'pair':d.answer=int(0,3);d.pairs=Array.from({length:4},(_,i)=>i===d.answer?[pics[i],pics[i]]:[pics[i],pics[i+4]]);instruction='Missä parissa on kaksi samaa kuvaa? Napauta oikeaa paria.';break;
  case 'digits':d.answer=int(100,999);d.options=choices(d.answer,r,100,999);instruction='Katso kolminumeroista lukua 3 sekuntia. Se katoaa. Valitse sitten sama luku.';break;
  case 'taps':instruction='Napauta isoa aluetta 6 kertaa niin nopeasti kuin pystyt. Jokainen napautus lasketaan!';break;
@@ -68,7 +71,7 @@ export function makeTask(id:string,seed:number):Task{
 }
 export function positions(n:number,r:()=>number){return Array.from({length:n},(_,i)=>({x:35+(i%4)*75+r()*12,y:35+Math.floor(i/4)*75+r()*12}));}
 export const calculationTasks=['add','subtract','double','half'];
-export const handsOnTasks=['timer','circle','line','reaction','center','target','spot','stop','bubbles','taps','alternate','aimchain','differences','colorhunt'];
+export const handsOnTasks=['movinghunt','movingcenter','movingspot','timer','circle','line','reaction','center','target','spot','stop','bubbles','taps','alternate','aimchain','differences','colorhunt'];
 export function taskDeck(seed:number,length=8):Task[]{
  const r=random(seed),count=Math.max(5,Math.min(20,Math.round(length)));
  const active=shuffle(handsOnTasks,r).slice(0,Math.ceil(count*.6));
@@ -83,5 +86,8 @@ export function sequenceScore(given:number[],expected:number[]){return Math.roun
 export {pictureCards,colorCards};
 export function sequencePhase(elapsed:number,length:number){return {showing:elapsed<length*1000,index:Math.min(length-1,Math.floor(Math.max(0,elapsed)/1000))};}
 
-export function answerTimeMs(id:string,elapsed:number,data:any={}){const wait=data.extra?Number(data.wait)||0:id==='colors'?4000:['pictures','shape','spot','gone','dots','digits','line','gridmemory','picorder','numsequence','hidepics','reversepics'].includes(id)?3000:id==='flashes'?Math.max(0,Number(data.count)||0)*700:0;return Math.max(0,elapsed-wait);}
+export function motionPoint(data:any,ms:number){const t=Math.max(0,ms)/(data.speed||1000),p=data.phase||0;return {x:150+86*Math.sin(t+p),y:150+80*Math.sin(t*.73+p*.7)};}
+export const ANSWER_LIMIT_MS=10000;
+export function revealTimeMs(id:string,data:any={}){return data.extra?Math.max(0,Number(data.wait)||0):id==='reaction'?Number(data.delay)||0:id==='colors'?4000:['pictures','shape','spot','movingspot','gone','dots','digits','line','gridmemory','picorder','numsequence','hidepics','reversepics'].includes(id)?3000:id==='flashes'?Math.max(0,Number(data.count)||0)*700:0;}
+export function answerTimeMs(id:string,elapsed:number,data:any={}){return Math.max(0,elapsed-revealTimeMs(id,data));}
 export function speedAdjustedScore(base:number,id:string,elapsed:number,data:any={}){const quality=Math.max(0,Math.min(1000,Number.isFinite(base)?base:0));if(['timer','reaction','bubbles'].includes(id))return Math.round(quality);const time=answerTimeMs(id,Number.isFinite(elapsed)?elapsed:30000,data);return Math.round(quality/(1+time/12000));}

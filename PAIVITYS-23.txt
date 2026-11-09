@@ -1,0 +1,53 @@
+HUPS! VERSIO 23 — MAMV STUDIO
+
+PÄIVITYS (sama Hups-projekti kuin aiemmin)
+1. Pura Hups-Vercel-23.zip.
+2. Avaa GitHubissa MAMV-Studio/hups.
+3. Add file > Upload files. Vedä puretun kansion SISÄLTÖ repositorion juureen.
+   package.json ja app-kansio kuuluvat suoraan juureen. Älä lataa ZIPiä.
+4. Commit changes. Vercel rakentaa päivityksen automaattisesti.
+5. Odota Ready. Avaa peli kaikilla laitteilla uudelleen: VERSIO 23.
+6. Luo UUSI haastekoodi. Versioiden 22 ja 23 tehtävät eivät ole yhteensopivia.
+
+SUPABASEEN EI TARVITA MUUTOKSIA
+Nykyinen hups_challenges-taulu ja nykyiset Vercel-ympäristömuuttujat riittävät.
+Älä aja SQL:ää uudelleen, muuta avaimia tai luo uutta projektia.
+Chatti ja pelaajan viimeisin yhteys tallentuvat huoneen olemassa olevaan
+JSON-tietoon. Viestit ovat vain huoneeseen liittyneille, enintään 160 merkkiä,
+ja huoneessa säilytetään 40 uusinta viestiä. Uusi yhteinen kierros tyhjentää chatin.
+
+MUKANA
+- 10 sekuntia vastausaikaa. Muistettavan sisällön näyttöaikaa ei lasketa mukaan.
+  Jos ei onnistu: Hupsista! Tällä kertaa ei onnistunut. 0 pistettä ja jatkoon.
+- Muistitehtävässä saa katsoa sisällön yhden kerran uudelleen. Sama sisältö,
+  sama jäljellä oleva vastausaika, uusintakatselulla enintään 500 pistettä.
+- Laske punaiset -pelin pallojen oikeat punaiset/siniset värit korjattu.
+- Reaktiopeli: pienempi punainen pallo spläsähtää vihreäksi.
+- Kolme uutta liikkuvaa peliä: värijahti, napakymppi ja katoava piste.
+- Iso yllätysilmapallo vapauttaa kuusi liikkuvaa pikkupalloa. Paikat vaihtelevat.
+- Värikäs piirtojälki viiva- ja ympyrätehtävissä.
+- Liity koodilla -näkymässä numeropallot 0–9, korjaus ja tyhjennys.
+- Kaverichatti tehtävien välissä ja lopussa: pikaviestit ja oma vapaa teksti.
+- Kesken poistunut tunnistetaan noin 45 sekunnin yhteyskatkon jälkeen.
+  Takaisin/oma kierros -toiminnolla poistuminen ilmoitetaan heti. Muiden peli
+  jatkuu. Palannut pelaaja voi jatkaa samaa kierrosta, jos se on vielä käynnissä.
+  Jo loppuun pelatut pisteet säilyvät tuloksissa, vaikka pelaaja poistuu.
+- Ensin voittajan oma juhlahetki ja voltti, sitten palkintopalli.
+  Jos muut pelaavat vielä, odotetaan ensin lopullista voittajaa.
+- Lisää hempeää väriä reunoilla oleviin spläsheihin. MAMV Studio alatunnisteessa.
+
+Rekisteröitymistä tai hahmojen varusteiden muokkausta ei vielä lisätty.
+
+TARKISTUKSET
+Automaattiset testit: tehtävät, 10 sekunnin aikaraja, uusintakatselu, pisteytys,
+pallojen poksautus, chatin tallennus/rajoitus/uusintalähetys, poistuminen,
+palaaminen ja uusi kierros. TypeScript ja tuotantokäännös.
+Esikatselussa numeropallojen syöttö ja tehtävän päättyminen nollapisteisiin.
+Oikeaa Supabase-yhteyttä ei voitu testata ilman projektin avaimia.
+
+KOKEILKAA PÄIVITYKSEN JÄLKEEN
+1. Kaksi laitetta, molemmissa VERSIO 23, uusi huone.
+2. Lähettäkää molempiin suuntiin pikaviesti ja itse kirjoitettu viesti.
+3. Jättäkää muistitehtävä vastaamatta: loppuu 10 vastaussekunnin jälkeen.
+4. Toinen sulkee pelin kesken: noin 45 sekunnin jälkeen Keskeytti.
+5. Pelaa loppuun: voittaja tuulettaa ensin, sitten näkyy palkintopalli.
