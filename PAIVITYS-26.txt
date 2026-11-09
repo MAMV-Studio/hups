@@ -1,0 +1,13 @@
+HUPS VERSIO 26
+- Isompi, näytön korkeuteen mukautuva chatin viestialue. Tyhjä tila säilyy.
+- Aloitusheitto poistettu. Vieritys uusimpaan viestiin säilyy.
+- Hahmoille pomppuja ja pyörähdyksiä. Vähennetyn liikkeen asetus huomioidaan.
+- Kahden pelaajan hahmot keskitetty kahteen sarakkeeseen.
+- MAMV Studio etusivulla heti yläpalkin alla.
+- Jatkopainike säilyy chatin alla. Pienellä ruudulla tai näppäimistön ollessa
+  auki vieritystä voi edelleen tarvita.
+- Uusintakatselun aikaa ei enää lasketa tulostekstin vastausaikaan.
+
+Pura ZIP. Lataa SISÄLTÖ samaan GitHub-repositorioon. Odota Vercelissä Ready.
+Päivittäkää sivu: VERSIO 26. Supabaseen ei muutoksia.
+Version 25 huoneet sopivat edelleen tähän versioon.
