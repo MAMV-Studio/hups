@@ -35,7 +35,7 @@ export default function Page(){
  function next(){if(!raceDone)return;if(idx<deck.length-1){setIdx(idx+1);setStage('intro');}else{setScreen('results');if(auth.current)saveResult();}}
  function home(){leaveRoom();epoch.current++;clearInterval(timer.current);auth.current=null;setRoom(null);setScreen('home');setStage('intro');setError('');setProgressError('');}
  useEffect(()=>{if(screen==='game')window.scrollTo({top:0,behavior:'instant'});},[idx,stage,screen]);
- return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top"><button className="brand" onClick={home}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 26</span></header>
+ return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top"><button className="brand" onClick={home}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 27</span></header>
  {screen==='home'&&<>
  <div className="home-studio">MAMV Studio <span>esittää</span></div><div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1><p>{taskCatalog.length>100?'Yli sata erilaista peliä.':'Lähes sata erilaista peliä.'} Yksin tai yhdessä.</p></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">

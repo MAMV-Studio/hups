@@ -1,0 +1,25 @@
+{
+  "name": "Hups!",
+  "short_name": "Hups!",
+  "lang": "fi",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1b1523",
+  "theme_color": "#141418",
+  "icons": [
+    {
+      "src": "/hups-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/hups-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

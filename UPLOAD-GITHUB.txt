@@ -1,9 +1,8 @@
-1. Pura Hups-Vercel-26.zip koneelle (Pura kaikki / Extract all).
-2. Avaa purettu kansio, jossa näkyvät app, public ja package.json.
-3. GitHubin tyhjässä hups-repositoriossa paina uploading an existing file.
-4. Vedä puretun kansion SISÄLTÖ latausalueelle.
-5. Tarkista että package.json on juuritasolla, ei ylimääräisen kansion alla.
-6. Paina Commit changes ja lähetä kuva avautuvasta tiedostolistasta.
+1. Pura Hups-Vercel-27.zip (Pura kaikki).
+2. Avaa GitHubissa MAMV-Studio/hups.
+3. Add file > Upload files.
+4. Vedä puretun kansion SISÄLTÖ latausalueelle (app, public, package.json jne.).
+5. Commit changes.
+6. Odota Vercelissä Ready. Päivitä peli: VERSIO 27.
 
-Seuraavaksi luodaan Hupsin oma Supabase-tietokanta ja tuodaan repositorio Verceliin.
-Yksinpeli toimii ilman tietokantaa. Kaveripeli tarvitsee README.md:n asetukset.
+Supabaseen ei muutoksia.

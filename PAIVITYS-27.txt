@@ -1,0 +1,10 @@
+HUPS VERSIO 27
+- Oma Hups-kuvake selaimen välilehdelle ja kotinäytölle.
+- Chatista pois noin 20 px korkeutta, jotta jatkopainike mahtuu paremmin.
+- Supabaseen ei muutoksia. Huoneet ovat yhteensopivia version 26 kanssa.
+
+Pura ZIP ja lataa SISÄLTÖ GitHubin hups-repositorioon.
+Odota Vercelissä Ready ja päivitä sivu: VERSIO 27.
+
+Kotinäytön kuvake: poista tarvittaessa vanha pikakuvake ja lisää sivu
+uudelleen selaimen Lisää kotinäyttöön -toiminnolla.
