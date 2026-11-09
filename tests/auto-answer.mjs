@@ -29,7 +29,7 @@ for(const id of ['colors','picorder','numsequence','reversepics']){
 }
 init('pictures');
 const good=task.data.second.filter(p=>task.data.first.some(v=>v.name===p.name)),bad=task.data.second.filter(p=>!task.data.first.some(v=>v.name===p.name));
-bad.forEach(p=>click(n=>n.props['aria-label']===p.name));assert.equal(calls.length,0);assert.deepEqual(h.states[2],[]);
+[bad[0],...good.slice(0,2)].forEach(p=>click(n=>n.props['aria-label']===p.name));assert.equal(calls.length,0);assert.deepEqual(h.states[2],[]);
 clock+=1000;good.forEach(p=>click(n=>n.props['aria-label']===p.name));assert.equal(calls.length,1);
 init('gridmemory');const cells=task.data.cells,badCell=[0,1,2,3,4,5,6,7,8].find(i=>!cells.includes(i));
 [cells[0],cells[1],badCell].forEach(i=>click(n=>n.props['aria-label']===`Ruutu ${i+1}`));assert.equal(calls.length,0);assert.deepEqual(h.states[1],[]);
@@ -69,3 +69,4 @@ init('redcount');const reds=render().filter(n=>n.type==='i'&&n.props['aria-label
 const css=fs.readFileSync('app/hups.css','utf8');assert.match(css,/color-count i\{background:[^}]*var\(--orb-color\)!important/);
 globalThis.setInterval=realInterval;globalThis.clearInterval=realClear;
 console.log('PASS: actual task timer gives 10 answer seconds after reveals, completes once with zero, replay shows same sequence once with 500 cap, and red counting preserves per-ball colour and accepts the count.');
+init('timer');task.data.seconds=4;const startButton=render().find(n=>n.type==='button'&&text(n).includes('ALOITA'));assert.ok(startButton);startButton.props.onClick();assert.equal(calls.length,0);clock+=4000;click(n=>text(n).includes('PYSÄYTÄ'));assert.equal(calls.length,1);assert.equal(calls[0][0],1000);console.log('PASS: Ajantaju starts only from the explicit start press and measures stop from that press.');

@@ -16,7 +16,7 @@ export function makeTask(id:string,seed:number):Task{
  case 'movingcenter':case 'movingspot':d.point={x:150,y:150};d.phase=r()*Math.PI*2;d.speed=int(850,1250);instruction=id==='movingcenter'?'Kohde liikkuu. Napauta sen keskelle mahdollisimman tarkasti!':'Seuraa liikkuvaa pistettä 3 sekuntia. Kun piste katoaa, napauta sen viimeistä paikkaa.';break;
  case 'timer':d.seconds=int(3,5);instruction=`Pysäytä ajastin mahdollisimman tarkasti ${d.seconds} sekunnin kohdalla. Kello ei näy.`;break;
  case 'circle':instruction='Piirrä yhdellä vedolla mahdollisimman pyöreä ympyrä. Yhdistä viivan päät ja käytä reilusti tilaa. Nosta sormi, kun olet piirtänyt — vastaus tarkistetaan heti.';break;
- case 'pictures':d.first=pics.slice(0,6);d.second=shuffle([...shuffle(d.first,r).slice(0,3),...pics.slice(6,9)],r);instruction='Katso kuutta kuvaa 3 sekuntia. Valitse sitten ne kolme kuvaa, jotka näit äsken.';break;
+ case 'pictures':d.first=pics.slice(0,4);d.second=shuffle([...shuffle(d.first,r).slice(0,3),pics[4]],r);instruction='Katso neljää kuvaa 3 sekuntia. Valitse sitten ne kolme kuvaa, jotka näit äsken.';break;
  case 'odd':d.pair=shuffle([['🍎','🍐'],['🐱','🐶'],['⚽','🏀'],['🌼','🌻']],r)[0];d.answer=int(0,8);instruction='Yksi yhdeksästä kuvasta on erilainen. Löydä ja napauta sitä.';break;
  case 'colors':d.order=Array.from({length:4},()=>int(0,3));instruction='Näet 4 väriä peräkkäin, yhden sekunnin kutakin. Muista järjestys ja napauta sitten värit samassa järjestyksessä. Sama väri voi toistua.';break;
  case 'line':d.length=int(110,200);instruction='Katso malliviivaa 3 sekuntia. Se katoaa. Piirrä sen jälkeen yhtä pitkä viiva. Nosta sormi lopuksi — vastaus tarkistetaan heti.';break;

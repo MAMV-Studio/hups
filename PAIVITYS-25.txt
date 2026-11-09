@@ -1,0 +1,15 @@
+VERSIO 25
+- Alukset, putket ja nostolavat poistettu. Vain hahmot, nimet, pisteet ja sijoitukset.
+- Neljä pelaajaa näkyvät kahdella rivillä, ilman vaakavieritystä.
+- Chatti tiiviimpänä hahmojen alla. Uusi viesti vierittää vain viestilistan alas.
+- Seuraava tehtävä -painikkeelle enemmän tilaa. Hyvin pienellä ruudulla tai
+  näppäimistön ollessa auki sivua voi edelleen joutua vierittämään.
+- Ajantaju alkaa vasta ALOITA-painalluksesta lähtölaskennan jälkeen.
+- Kuvamuistissa neljä mallikuvaa ja neljä vastausvaihtoehtoa, kolme tuttua valitaan.
+- Tehtävän numero näkyy aloitus- ja pelinäkymässä.
+- Voittajan voltti säilyy ennallaan.
+
+Pura Hups-Vercel-25.zip. Lataa SISÄLTÖ samaan GitHub-repositorioon.
+Vercelin Ready-tilan jälkeen päivittäkää kaikki sivu: VERSIO 25.
+Luo uusi haastekoodi. Tehtävien muutos edellyttää samaa versiota kaikille.
+Supabaseen tai ympäristömuuttujiin ei tarvita muutoksia.

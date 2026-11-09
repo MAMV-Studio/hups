@@ -1,4 +1,4 @@
-# Hups! — Vercel-versio 24
+# Hups! — Vercel-versio 25
 
 102 pientä taitopeliä. Versio 23: 10 sekunnin vastausaika, muistitehtävien uusinta, liikkuvat pallot ja kohteet, yllätysilmapallo, numeropallot, kaverichatti ja voittajan voltti.
 Tämä on erillinen vientipaketti Verceliin. Nykyinen ChatGPT Sites -peli säilyy ennallaan.
@@ -65,7 +65,7 @@ Next.js App Router + React. Vinext/Cloudflare Workers -riippuvuudet poistettu.
 Kaveripelin tilat säilyvät Supabasen Postgres-tietokannassa, eivät Vercelin
 palvelimen muistissa. Rinnakkaiset pistepäivitykset käyttävät revision tarkistusta,
 jotta toisen pelaajan päivitys ei katoa. Huonekoodi kierrätetään vasta 24 tunnin jälkeen.
-Käyttöliittymän versio 24, yhteispeliprotokolla 20. Katso PAIVITYS-24.txt.
+Käyttöliittymän versio 25, yhteispeliprotokolla 20. Katso PAIVITYS-25.txt.
 
 Tuotantokäännös ja mukana olevat testit tarkistettu. Todellinen Supabase-yhteys
 ja kahden puhelimen käyttöönotto tarkistetaan, kun omat palveluasetukset on lisätty.
