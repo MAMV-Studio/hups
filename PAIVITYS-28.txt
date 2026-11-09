@@ -1,0 +1,9 @@
+HUPS VERSIO 28
+- Odotusaulan hahmot takaisin näkyviin pelaajien nimien viereen.
+- SAIT-osio 16 px ylemmäksi.
+- Chatin viestialue vielä 10 px matalammaksi.
+- Oma Hups-kuvake säilyy.
+
+Pura ZIP. Lataa SISÄLTÖ GitHubin hups-repositorioon.
+Odota Vercelissä Ready ja päivitä sivu: VERSIO 28.
+Supabaseen ei muutoksia. Version 27 huoneet toimivat edelleen.
