@@ -1,6 +1,5 @@
-Pura Hups-Vercel-37.zip.
-Lataa ZIPin sisältö GitHubin hups-repositorion juureen.
-Add file → Upload files → Commit changes.
-Odota Vercel Ready ja päivitä kaikki laitteet VERSIO 37.
-Luo uusi haastekoodi. Ei Supabase- tai ympäristömuuttujamuutoksia.
-Katso PAIVITYS-37.txt.
+Pura Hups-Vercel-38.zip.
+Lataa sen sisältö GitHubin hups-repositorion juureen kuten ennen.
+Odota Vercel Ready ja päivitä kaikki laitteet VERSIO 38.
+Ei Supabase- tai ympäristömuuttujamuutoksia.
+Katso PAIVITYS-38.txt.

@@ -1,0 +1,16 @@
+HUPS — VERSIO 38
+
+VALOPELIN KORJAUS
+Näkyvä valo ja painalluksen tarkistus käyttävät nyt samaa odottavaa valoa.
+Aiemmin näytettiin uusinta syttynyttä valoa, vaikka tarkistus odotti aiempaa; tämä saattoi
+hylätä oikealta näyttävän toisen painalluksen.
+Oikea painallus sammuttaa valon 120 millisekunniksi. Näin sama väri erottuu myös peräkkäin.
+Pimeän väliajan kaksoispainallukset ohitetaan. Väärän aktiivisen valon painaminen päättää
+pelin kuten ennen, ja kerätyt pisteet säilyvät. Kokonaisaika 30 sekuntia.
+
+Kaikki version 37 uudistukset säilyvät. Ei tietokanta- tai ympäristömuuttujamuutoksia.
+Lataa sisältö GitHubiin kuten ennen ja odota Vercel Ready. Päivitä kaikki laitteet versioon 38.
+
+Tarkistus: oikeat komponenttipainallukset, myöhäinen ensimmäinen painallus, kymmenen
+peräkkäistä näkyvää valoa, sammutusväli, kaksoispainallusten ohitus ja väärän valon pisteet.
+Pulmapelien testit sekä tuotantokäännös ja TypeScript läpäisty.
