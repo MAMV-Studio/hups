@@ -25,3 +25,9 @@
 @keyframes party-scatter{0%,42%{opacity:0;transform:rotate(var(--angle)) translateX(0) scale(.3)}52%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateX(150px) rotate(150deg) scale(1)}}
 @media(max-height:740px){.little-hero{display:none}.little-picker .little-character{height:57px}.little-welcome>p{display:none}.little-hups .little-start{margin-top:14px}.scene-home .home-welcome{margin:12px 0}.scene-home .home-welcome h1{font-size:30px}.scene-home .character-picker{margin-bottom:12px}.scene-home .home-launch>input{min-height:42px;padding:9px 15px}.scene-home .home-multiplayer>button{min-height:46px;padding:9px}.scene-home .little-entry{margin-top:12px}}
 @media(prefers-reduced-motion:reduce){.character-party *,.character-party:after,.catch-spark,.parent-balloon{animation:none!important}.party-confetti{display:none}.party-friend-0:after{display:none}}
+
+/* Version 33: give the three welcome characters the spotlight. */
+.little-welcome .little-hero{display:flex;height:150px;margin:10px 0 14px;align-items:flex-end;justify-content:center}
+.little-welcome .little-hero>.little-character{width:29%;height:118px}
+.little-welcome .little-hero>.little-character:nth-child(2){width:40%;height:150px}
+@media(max-height:740px){.little-welcome .little-hero{display:flex;height:130px;margin:8px 0 12px}.little-welcome .little-hero>.little-character{height:103px}.little-welcome .little-hero>.little-character:nth-child(2){height:130px}}

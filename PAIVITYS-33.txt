@@ -1,0 +1,5 @@
+Versio 33
+
+Ainoa käyttöliittymämuutos: Pikkuhupsin etusivun kolme yläosan hahmoa suuremmiksi. Valittu hahmo on keskellä suurimpana. Leikitään-painike on edelleen hahmovalinnan jälkeen ja kategoriat sen alapuolella vieritettävissä. Myös matalilla näytöillä hahmot näkyvät.
+
+Ei muita toiminnallisia muutoksia. Supabaseen ei muutoksia.
