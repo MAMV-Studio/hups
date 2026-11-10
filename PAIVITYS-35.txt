@@ -1,0 +1,11 @@
+Hups / Pikkuhups – versio 35
+
+- Pikkuhupsin yläosan kolme hahmoa hieman suuremmiksi.
+- Leikkikategorioiden väkäset pois; valinnan näyttää kehys.
+- Hahmojen työnimistä kertova teksti poistettu.
+- Kaikki pallot poks -tehtävästä punainen mallipallo kehyksineen pois.
+- Kuuden pallon alue sovitettu puhelimen korkeuteen. Sinisten pallojen tehtävän värimalli säilyy pienenä.
+
+Laskuri ja muut toiminnot säilyvät versiosta 34.
+Jos tilastot on jo otettu käyttöön, SQL:ää ei tarvitse suorittaa eikä Vercelin asetuksia muuttaa.
+Pura ZIP ja lataa kansion sisältö GitHubiin. Odota Ready ja päivitä VERSIO 35.

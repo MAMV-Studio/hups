@@ -1,3 +1,3 @@
-# Hups versio 34 – oma pelilaskuri
+# Hups versio 35
 
-Käyttöönotto: PAIVITYS-34.txt. Uusi Supabase-taulu ja Vercelin HUPS_ADMIN_PASSWORD tarvitaan laskuriin. Pelin muu toiminta säilyy. Tilastot /tilastot.
+Pikkuhupsin ulkoasukorjaukset: PAIVITYS-35.txt. Laskurin ensimmäinen käyttöönotto: PAIVITYS-34.txt.

@@ -31,3 +31,20 @@
 .little-welcome .little-hero>.little-character{width:29%;height:118px}
 .little-welcome .little-hero>.little-character:nth-child(2){width:40%;height:150px}
 @media(max-height:740px){.little-welcome .little-hero{display:flex;height:130px;margin:8px 0 12px}.little-welcome .little-hero>.little-character{height:103px}.little-welcome .little-hero>.little-character:nth-child(2){height:130px}}
+
+/* Version 35: welcome characters and a compact balloon playground. */
+.little-welcome .little-hero{height:175px;margin:10px 0 14px}
+.little-welcome .little-hero>.little-character{height:140px;width:30%}
+.little-welcome .little-hero>.little-character:nth-child(2){height:175px;width:40%}
+.little-packs button{flex-direction:column;flex-wrap:nowrap;gap:5px;text-align:center;justify-content:center}
+.little-packs button>span{line-height:1.1}
+.little-task-popall .little-balloon-mat,.little-task-popblue .little-balloon-mat{height:clamp(240px,calc(100svh - 330px),440px);grid-template-rows:repeat(3,minmax(0,1fr));gap:12px 24px;padding:16px 18px 25px;margin:12px 0}
+.little-task-popall .little-balloon-mat button,.little-task-popblue .little-balloon-mat button{height:100%;width:auto;max-width:100%;aspect-ratio:1/.95;justify-self:center}
+.little-task-popall h1,.little-task-popblue h1{font-size:30px;margin:8px 0}
+.little-task-popall .little-buddy,.little-task-popblue .little-buddy{margin:4px 0}
+.little-task-popall .little-buddy>.little-character,.little-task-popblue .little-buddy>.little-character{height:60px;width:60px}
+.little-task-popall .little-hint,.little-task-popblue .little-hint{margin:8px 0!important;font-size:15px!important}
+.little-task-popblue .little-example{width:45px;height:45px;font-size:28px;margin:8px auto}
+@media(max-height:740px){.little-welcome .little-hero{height:150px}.little-welcome .little-hero>.little-character{height:120px}.little-welcome .little-hero>.little-character:nth-child(2){height:150px}}
+
+.little-start-view{min-height:calc(100svh - 130px)}
