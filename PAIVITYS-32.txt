@@ -1,0 +1,13 @@
+Hups / Pikkuhups – versio 32
+
+- Pikkuhupsin Leikitään-painike on hahmojen jälkeen, kategoriat alempana. Kaikkea kivaa oletuksena.
+- Pomppu-pupun korvaa Räyhä-dino.
+- Raaputus peittää kuvan aluksi kokonaan. Pyöreä yhtenäinen jälki, sprayn reunat häivytetty.
+- Kokotehtävissä selvästi erikokoiset pallot; norsu ja hiiri poistettu.
+- Viiden leikin jälkeen hahmon oma animaatio; Valitse uusi kaveri palauttaa Pikkuhupsin etusivulle.
+- Iso yllätyspallo vapauttaa kuusi pientä palloa Pikkuhupsissa.
+- Kolopeli on kukkuu-puutarha; kukkia, multakoloja ja osumaroiske.
+- Hupsin etusivu tiiviimpi, Pikkuhups-painike ennen suosikkipelilinkkiä.
+
+Ei ääniä, rekisteröitymistä tai lapsilukkoa. Supabaseen ei muutoksia.
+Moninpeliprotokolla säilyy 22:ssa. Päivittäkää kaikki samaan versioon.

@@ -1,9 +1,9 @@
-1. Pura Hups-Vercel-31.zip (Pura kaikki).
+1. Pura Hups-Vercel-32.zip (Pura kaikki).
 2. Avaa GitHubissa MAMV-Studio/hups.
 3. Add file > Upload files.
 4. Vedä puretun kansion SISÄLTÖ latausalueelle (app, public, package.json jne.).
 5. Commit changes.
-6. Odota Vercelissä Ready ja päivitä peli: VERSIO 31.
+6. Odota Vercelissä Ready ja päivitä peli: VERSIO 32.
 7. Kaveripelissä KAIKKI päivittävät ja luodaan uusi haastekoodi.
 
 Supabaseen ei muutoksia. Pikkuhups toimii ilman rekisteröitymistä.
