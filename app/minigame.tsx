@@ -4,6 +4,7 @@ import {Task,shapes,arrows,pictureCards,colorCards,tapScore,sequenceScore,sequen
 import {DifferenceGame} from './picture-games';
 import {BubbleHunt,BalloonSurprise} from './park-games';
 import ExtraGame from './extra-games';
+import {TactileGame} from './tactile-games';
 import {Character} from './characters';
 import {colorSymbols} from './task-look';
 import {accuracy,circleScore} from '../libgame';
@@ -57,6 +58,7 @@ export default function Minigame({task,onFinish,avatar=0}:{task:Task,avatar?:num
  return <div className={'minigame task-'+id}>
 
  {id!=='timer'&&id!=='reaction'&&visualTimer}
+ {['scratch','spray','peek'].includes(id)&&<TactileGame kind={id as 'scratch'|'spray'|'peek'} seed={d.seed} avatar={avatar} canPlay={canAnswer} onComplete={quality=>end(quality,id==='scratch'?'Kukkuu! Yllätys raaputettu esiin.':id==='spray'?'Taulu maalattu - hupsista, maalia tassuissa!':'Kurkistelijat napattu!')}/>} 
  {d.extra&&!['colorhunt','movinghunt'].includes(id)&&<ExtraGame task={task} key={replayAt} ms={timeline} mistakes={mistakes} choose={choose} canAnswer={canAnswer}/>}
  {['colorhunt','movinghunt'].includes(id)&&<BubbleHunt ms={ms} moving={id==='movinghunt'} data={d} canAnswer={canAnswer} onWrong={retry} onComplete={()=>end(1000,'Kaikki siniset poks! Muut pallot jäivät ehjiksi.',600)}/>}
  {id==='timer'&&<><p className="play-prompt">Tavoite <b>{d.seconds} sekuntia</b></p><button className="timing" onClick={()=>{if(!timerStarted.current){timerStarted.current=true;start.current=performance.now();attemptStart.current=start.current;setTimerRunning(true);return;}const sec=(performance.now()-attemptStart.current)/1000;end(accuracy(Math.abs(sec-d.seconds),2),`Aikasi ${sec.toFixed(2)} s · tavoite ${d.seconds} s`);}}><span>◷</span>{timerRunning?'PYSÄYTÄ':'ALOITA'}</button></>}

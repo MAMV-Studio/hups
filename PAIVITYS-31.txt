@@ -1,0 +1,32 @@
+HUPS VERSIO 31 - PIKKUHUPS
+
+Hupsiin kolme uutta tehtävää:
+- Raaputa esiin: raaputa 90 % pinnasta ja paljasta hahmo.
+- Suihki väriä: valitse mallin maali ja maalaa 90 % taulusta.
+- Kukkuu - nappaa: kuusi koloa, neljä osumaa, varo naamiohuijaria.
+
+Pikkuhups etusivun Siirry Pikkuhupsiin -painikkeesta:
+- Kuusi omaa hahmoa: kettu Kuje, kissa Kieppi, lohikäärme Hupsu,
+  pupu Pomppu, nalle Tassu ja koiranpentu Hauva. Nimet ovat työnimiä.
+- 14 tehtävätyyppiä, neljä valintaa (sekoitus ja kolme leikkipakettia).
+- Ei laskuja, aikarajaa, pisteitä tai kaverichattia.
+- Oikean kuvan, värin ja muodon etsiminen, ilmapallot sekä
+  raaputuksen, maalauksen ja kurkistelun helpot versiot.
+- Rauhallinen uusintayritys, kuvamalli ja kannustava hahmo.
+- Viiden tehtävän välein juhlistetaan ja voi jatkaa leikkiä.
+- Ei vielä ääniä, puhetta tai vanhemman lukitusta.
+
+Lisäksi kotipainike kaikissa näkymissä. Kesken Hups-kierroksen
+poistuminen varmistetaan; muut kaveripelin pelaajat voivat jatkaa.
+
+Pura ZIP. Lataa kansion SISÄLTÖ GitHubin hups-repositorioon.
+Odota Vercelissä Ready ja päivitä sivu: VERSIO 31.
+Supabaseen ei muutoksia.
+TÄRKEÄÄ: kaikkien on päivitettävä versioon 31 ja luotava UUSI
+haastekoodi, koska tehtävävalikoima on muuttunut.
+
+Testattu ohjelmallisesti ja selaimessa: lapsen raaputus valmistuu,
+väärän kuvan jälkeen voi yrittää uudelleen, mansikan valinta
+valmistuu ja keskeytysvahvistuksesta pääsee etusivulle.
+Fyysiset iPhone/Android-kosketustestit ja aito Supabase-moninpeli
+on vielä kokeiltava omilla laitteilla.

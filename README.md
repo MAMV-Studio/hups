@@ -1,4 +1,11 @@
-# Hups! — Vercel-versio 30
+# Hups! / Pikkuhups - versio 31
+
+Katso PAIVITYS-31.txt ja UPLOAD-GITHUB.txt.
+Pikkuhups sisältää 14 helppoa tehtävätyyppiä ja kuusi hahmoa.
+Hups sisältää 105 tehtävää. Kaikkien kaveripelaajien on päivitettävä
+versioon 31 ja luotava uusi haaste. Ei SQL-muutoksia.
+
+# Hups! — Vercel-versio 31
 
 102 pientä taitopeliä. Versio 23: 10 sekunnin vastausaika, muistitehtävien uusinta, liikkuvat pallot ja kohteet, yllätysilmapallo, numeropallot, kaverichatti ja voittajan voltti.
 Tämä on erillinen vientipaketti Verceliin. Nykyinen ChatGPT Sites -peli säilyy ennallaan.
@@ -65,7 +72,7 @@ Next.js App Router + React. Vinext/Cloudflare Workers -riippuvuudet poistettu.
 Kaveripelin tilat säilyvät Supabasen Postgres-tietokannassa, eivät Vercelin
 palvelimen muistissa. Rinnakkaiset pistepäivitykset käyttävät revision tarkistusta,
 jotta toisen pelaajan päivitys ei katoa. Huonekoodi kierrätetään vasta 24 tunnin jälkeen.
-Käyttöliittymän versio 30, yhteispeliprotokolla 20. Katso PAIVITYS-26.txt.
+Käyttöliittymän versio 31, yhteispeliprotokolla 20. Katso PAIVITYS-26.txt.
 
 Tuotantokäännös ja mukana olevat testit tarkistettu. Todellinen Supabase-yhteys
 ja kahden puhelimen käyttöönotto tarkistetaan, kun omat palveluasetukset on lisätty.
