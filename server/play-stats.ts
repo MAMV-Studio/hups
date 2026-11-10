@@ -1,0 +1,8 @@
+import {createHash,createHmac,timingSafeEqual} from 'node:crypto';
+export function sign(value:string){return createHmac('sha256',process.env.HUPS_ADMIN_PASSWORD||'disabled').update(value).digest('hex');}
+export function equal(a:string,b:string){const x=createHash('sha256').update(a).digest(),y=createHash('sha256').update(b).digest();return timingSafeEqual(x,y);}
+export function adminReady(){return (process.env.HUPS_ADMIN_PASSWORD?.length||0)>=12;}
+export function adminValid(req:Request){if(!adminReady())return false;const c=req.headers.get('cookie')?.split(';').map(v=>v.trim()).find(v=>v.startsWith('hups_admin='))?.slice(11)||'';const [expires,mac]=c.split('.');return /^\d+$/.test(expires)&&Number(expires)>Date.now()&&Number(expires)<Date.now()+9*3600000&&equal(mac||'',sign('admin:'+expires));}
+export function sameOrigin(req:Request){const origin=req.headers.get('origin');return !origin||origin===new URL(req.url).origin;}
+export async function statsRpc(fn:string,body:unknown){const url=process.env.SUPABASE_URL?.replace(/\/$/,''),key=process.env.SUPABASE_SECRET_KEY;if(!url||!key)throw Error('Tilastotietokanta puuttuu.');const headers:Record<string,string>={apikey:key,'Content-Type':'application/json'};if(!key.startsWith('sb_secret_'))headers.Authorization='Bearer '+key;const r=await fetch(url+'/rest/v1/rpc/'+fn,{method:'POST',headers,body:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('Tilastotaulu ei vastaa. Tarkista käyttöönotto-ohje.');return r.json();}
+export function roundUuid(value:string){const h=createHash('sha256').update(value).digest('hex');return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20,32)}`;}

@@ -6,6 +6,7 @@ import {WobblyText} from './wobbly-text';
 import {Character,characters,ParkRace,ParkTrim} from './characters';
 import {taskDeck,taskCatalog,makeTask} from '../tasks';
 import Minigame from './minigame';
+import {beginCount,countShared} from './play-counter';
 import {LittleHups} from './little-hups';
 import {taskActions} from './task-look';
 import {RoomChat} from './room-chat';
@@ -14,6 +15,7 @@ import {LaunchScene,ResultParty,WinnerReveal} from './arcade';
 const total=(a:number[])=>a.reduce((x,y)=>x+y,0);
 export default function Page(){
  const [screen,setScreen]=useState('home'),[name,setName]=useState(''),[code,setCode]=useState(''),[seed,setSeed]=useState(1),[idx,setIdx]=useState(0),[stage,setStage]=useState('intro'),[scores,setScores]=useState<number[]>([]),[detail,setDetail]=useState(''),[elapsed,setElapsed]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[room,setRoom]=useState<any>(null),[saved,setSaved]=useState(false),[avatar,setAvatar]=useState(0),[count,setCount]=useState(3),[progressError,setProgressError]=useState(''),[canReady,setCanReady]=useState(false),[raceDone,setRaceDone]=useState(false),[practiceId,setPracticeId]=useState<string|null>(null);
+ const counter=useRef<ReturnType<typeof beginCount>|null>(null);
  const [showPodium,setShowPodium]=useState(false);
  const [length,setLength]=useState(10);
  const clock=useRef(createGameClock());
@@ -25,19 +27,19 @@ export default function Page(){
  async function roomAction(action:string){if(busy)return;setBusy(true);setError('');try{const v=await api(action,{name,avatar,length,code:action==='create'?undefined:action==='join'?code.trim():auth.current?.code,token:action==='join'||action==='create'?undefined:auth.current?.token});if(v.token)auth.current={token:v.token,code:v.code};setRoom(v.state);setLength(v.state.length||8);if(!['rematch','accept','decline'].includes(action)){setSeed(v.state.seed);setScreen('lobby');}}catch(e:any){setError(e.message);}finally{setBusy(false);}}
  useEffect(()=>{if(!['lobby','results','game'].includes(screen))return;if(!auth.current)return;let live=true;const t=setInterval(async()=>{try{const values=scoreRef.current;const v=await api(values.length&&screen!=='lobby'?'progress':'poll',values.length&&screen!=='lobby'?{scores:values,seed}:{});if(live){setRoom(v.state);setLength(v.state.length||8);setProgressError('');if(values.length===length)setSaved(true);}}catch(e:any){if(live)setProgressError(e.message);}},1200);return()=>{live=false;clearInterval(t);};},[screen,stage,seed,length]);
  useEffect(()=>{if(screen!=='lobby'||!room?.start)return;const t=setInterval(()=>{setElapsed(clock.current.now());if(clock.current.now()>=room.start){clearInterval(t);begin(room.seed,true);}},100);return()=>clearInterval(t);},[screen,room?.start]);
- function begin(v:number,shared=false,single:string|null=null){setShowPodium(false);setPracticeId(single);if(!shared){leaveRoom();auth.current=null;setRoom(null);}try{localStorage.setItem('pt-name',name);localStorage.setItem('pt-avatar',String(avatar));}catch{}epoch.current++;setSeed(v);setIdx(0);setScores([]);scoreRef.current=[];setSaved(false);setScreen('game');setStage('intro');setError('');}
- function finish(score:number,text:string){if(finished.current)return;finished.current=true;clearInterval(timer.current);const value=Math.max(0,Math.min(1000,Math.round(score)));scoreRef.current=[...scoreRef.current,value];setScores(scoreRef.current);setDetail(text);setRaceDone(false);setStage('feedback');if(auth.current)sendProgress(scoreRef.current);}
+ function begin(v:number,shared=false,single:string|null=null){if(shared&&auth.current){counter.current=null;countShared({...auth.current});}else counter.current=beginCount('hups',!!single);setShowPodium(false);setPracticeId(single);if(!shared){leaveRoom();auth.current=null;setRoom(null);}try{localStorage.setItem('pt-name',name);localStorage.setItem('pt-avatar',String(avatar));}catch{}epoch.current++;setSeed(v);setIdx(0);setScores([]);scoreRef.current=[];setSaved(false);setScreen('game');setStage('intro');setError('');}
+ function finish(score:number,text:string){if(finished.current)return;finished.current=true;clearInterval(timer.current);const value=Math.max(0,Math.min(1000,Math.round(score)));scoreRef.current=[...scoreRef.current,value];setScores(scoreRef.current);setDetail(text);setRaceDone(false);setStage('feedback');if(auth.current){sendProgress(scoreRef.current);}else if(scoreRef.current.length===deck.length)counter.current?.complete();}
  useEffect(()=>{setCanReady(false);if(screen!=='game'||stage!=='intro')return;const t=setTimeout(()=>setCanReady(true),660);return()=>clearTimeout(t);},[screen,stage,idx]);
  function play(){if(stage!=='intro'||!canReady)return;setCount(3);setStage('countdown');}
  useEffect(()=>{if(screen!=='game'||stage!=='countdown')return;let n=3;const t=setInterval(()=>{n--;setCount(n);if(n===0){clearInterval(t);startTask();}},1000);return()=>clearInterval(t);},[stage,screen]);
  function startTask(){finished.current=false;setStage('play');}
- async function sendProgress(values:number[]){const turn=epoch.current;setProgressError('');try{const v=await api('progress',{scores:values,seed});if(turn!==epoch.current||!auth.current)return;setRoom(v.state);setLength(v.state.length||8);}catch{if(turn!==epoch.current||!auth.current)return;setProgressError('Pisteiden lähetys ei onnistunut. Yritä uudelleen.');}}
- async function saveResult(){const turn=epoch.current;try{await api('finish',{scores:scoreRef.current,seed});if(turn!==epoch.current||!auth.current)return;setSaved(true);setError('');}catch(e:any){setError(e.message+' Voit yrittää tuloksen tallennusta uudelleen.');}}
+ async function sendProgress(values:number[]){const turn=epoch.current;setProgressError('');try{const v=await api('progress',{scores:values,seed});if(turn!==epoch.current||!auth.current)return;setRoom(v.state);setLength(v.state.length||8);if(values.length===deck.length)countShared({...auth.current});}catch{if(turn!==epoch.current||!auth.current)return;setProgressError('Pisteiden lähetys ei onnistunut. Yritä uudelleen.');}}
+ async function saveResult(){const turn=epoch.current;try{await api('finish',{scores:scoreRef.current,seed});if(turn!==epoch.current||!auth.current)return;setSaved(true);countShared({...auth.current});setError('');}catch(e:any){setError(e.message+' Voit yrittää tuloksen tallennusta uudelleen.');}}
  function next(){if(!raceDone)return;if(idx<deck.length-1){setIdx(idx+1);setStage('intro');}else{setScreen('results');if(auth.current)saveResult();}}
  function askHome(){if(screen==='game'&&!window.confirm('Keskeytetäänkö peli ja palataan etusivulle?'))return;home();}
  function home(){leaveRoom();epoch.current++;clearInterval(timer.current);auth.current=null;setRoom(null);setScreen('home');setStage('intro');setError('');setProgressError('');}
  useEffect(()=>{if(screen==='game')window.scrollTo({top:0,behavior:'instant'});},[idx,stage,screen]);
- return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 33</span></header>
+ return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 34</span></header>
  {screen==='home'&&<>
  <div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">
@@ -49,7 +51,7 @@ export default function Page(){
  <div className="split home-multiplayer"><button disabled={!name.trim()||busy} onClick={()=>{setCode('');roomAction('create');}}>Haasta kaverit <span aria-hidden="true">＋</span></button><button disabled={!name.trim()} onClick={()=>{leaveRoom();auth.current=null;setRoom(null);setProgressError('');setScreen('join');}}>Liity koodilla <span aria-hidden="true">→</span></button></div>
  <button className="little-entry" onClick={()=>{leaveRoom();auth.current=null;setRoom(null);setScreen('kids');window.scrollTo({top:0,behavior:'instant'});}}>🎈 Siirry Pikkuhupsiin →</button>
  <button className="textbutton browse-games" onClick={()=>setScreen('library')}>Löydä oma suosikkipelisi →</button>
- <div className="home-studio home-studio-bottom">MAMV Studio</div>
+ <div className="home-studio home-studio-bottom">MAMV Studio</div><a className="owner-stats-link" href="/tilastot">Omat pelitilastot</a>
  <ParkTrim/>
  </section>
  </>}

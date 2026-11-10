@@ -1,6 +1,6 @@
 {
   "name": "hups",
-  "version": "33.0.0",
+  "version": "34.0.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -11,7 +11,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "check": "tsc --noEmit",
-    "test": "node tests/clock.mjs && node tests/rematch.mjs && node tests/storage.mjs && node tests/tasks.mjs && node tests/scoring.mjs && node tests/lanes.mjs && node tests/auto-answer.mjs && node tests/balloons.mjs && node tests/extra-games.mjs && node tests/little-hups.mjs"
+    "test": "node tests/clock.mjs && node tests/rematch.mjs && node tests/storage.mjs && node tests/tasks.mjs && node tests/scoring.mjs && node tests/lanes.mjs && node tests/auto-answer.mjs && node tests/balloons.mjs && node tests/extra-games.mjs && node tests/little-hups.mjs && node tests/play-stats.mjs"
   },
   "dependencies": {
     "@fontsource/lilita-one": "5.3.0",

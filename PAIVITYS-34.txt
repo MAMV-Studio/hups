@@ -1,0 +1,36 @@
+Hups – versio 34. Oma pelilaskuri.
+
+KÄYTTÖÖNOTTO (kaksi uutta vaihetta ennen testaamista)
+1. Avaa Hupsin Supabase-projekti (ei Veya/Emilai).
+2. SQL Editor > New query. Kopioi paketin supabase/tilastot.sql kokonaan ja paina Run.
+   SQL luo vain tilastotaulun ja sen palvelinfunktiot. Haasteet säilyvät.
+3. Vercel > hups > Settings > Environment Variables > Add.
+   Key: HUPS_ADMIN_PASSWORD
+   Value: valitse itse oma pitkä salasana, vähintään 12 merkkiä.
+   Ota käyttöön Production (ja Preview jos testaat esikatseluita). Tallenna.
+   Älä lisää NEXT_PUBLIC_-alkua. Salasana ei kuulu GitHubiin tai chattiin.
+4. Pura ZIP ja lataa sisältö GitHubiin kuten aiemmin. Odota Vercel Ready.
+   Jos asetit salasanan vasta koonnin jälkeen, tee Vercel > Deployments > Redeploy.
+5. Avaa peli, varmista VERSIO 34. Kaikkien pelaajien pitää päivittää laskuriversioon.
+6. Etusivun alaosasta Omat pelitilastot tai peliosoitteen loppuun /tilastot.
+7. Kirjaudu kohdassa 3 itse valitsemallasi salasanalla.
+
+Tilastot päivittyvät 30 sekunnin välein. Laskenta alkaa käyttöönotosta.
+Tänään / 7 päivää / Yhteensä. Päivänvaihto Suomen ajassa.
+Hups yksin, Hups kavereiden kanssa, Pikkuhups erikseen.
+Yksi Pikkuhups-kierros = 5 leikkiä. Keskeytys näkyy aloitettuna, ei valmiina.
+Yhteinen kaverikierros = yksi kierros ja N pelaajan osallistumista.
+Kaverikierros on valmis, kun kaikki alkuperäiset osallistujat ovat valmiita;
+jos joku luovuttaa, se jää aloitettuihin. Muut saavat jatkaa peliään.
+Yksittäiset suosikkipelien kokeilut ovat omalla rivillään, eivät kierrosten yhteissummassa.
+
+Laskenta ei kerää nimiä, viestejä, IP-osoitteita tai pysyvää laitetunnistetta tietokantaan.
+Tilapäinen palvelinmuistissa oleva IP-rajoitus suojaa kirjautumisyrityksiä.
+Salasana suojataan palvelinpuolella; selain saa 8 tunnin HttpOnly-istunnon.
+Tilastotaulu ei ole avoinna tavallisille Supabase-asiakkaille.
+Verkkokatkos tai selaimen estämä pyyntö voi jättää pelikerran laskematta.
+Vanhoja pelikertoja ei lasketa jälkikäteen. Myös vanha peliversio jää laskennan ulkopuolelle.
+Jos käyttöönotto puuttuu, peli toimii edelleen mutta laskuri ei kirjaa pelejä.
+
+Tarkistus: pelaa yksi yksinkierros ja yksi 5 leikin Pikkuhups-kierros loppuun;
+avaa tilastot ja paina Päivitä nyt. Molemmilla tulee olla aloitettu 1 / valmis 1.

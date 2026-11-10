@@ -1,9 +1,11 @@
-1. Pura Hups-Vercel-33.zip (Pura kaikki).
+Lue ensin PAIVITYS-34.txt: suorita tilastot.sql Hupsin Supabasessa ja aseta HUPS_ADMIN_PASSWORD Verceliin.
+
+1. Pura Hups-Vercel-34.zip (Pura kaikki).
 2. Avaa GitHubissa MAMV-Studio/hups.
 3. Add file > Upload files.
 4. Vedä puretun kansion SISÄLTÖ latausalueelle (app, public, package.json jne.).
 5. Commit changes.
-6. Odota Vercelissä Ready ja päivitä peli: VERSIO 33.
+6. Odota Vercelissä Ready ja päivitä peli: VERSIO 34.
 7. Kaveripelissä KAIKKI päivittävät ja luodaan uusi haastekoodi.
 
-Supabaseen ei muutoksia. Pikkuhups toimii ilman rekisteröitymistä.
+Supabaseen lisätään vain tilastot: katso PAIVITYS-34.txt. Pikkuhups toimii ilman rekisteröitymistä.

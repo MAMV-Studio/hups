@@ -1,18 +1,20 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
+import {beginCount} from './play-counter';
 import {TactileGame} from './tactile-games';
 import {kidChallenge,kidDeck,kidCatalog} from '../little-tasks';
 export const littleFriends=[{name:'Kuje',color:'#ffac71'},{name:'Kieppi',color:'#c5a0ee'},{name:'Hupsu',color:'#98e1b2'},{name:'Räyhä',color:'#8fdbb3'},{name:'Tassu',color:'#8edeea'},{name:'Hauva',color:'#f5d37d'}];
 export function LittleCharacter({id=0}:{id?:number}){return <span className="little-character" role="img" aria-label={littleFriends[id%6].name} style={{backgroundImage:`url('/little-friend-${id%6}.png')`}}/>;}
 export function LittleHups({onExit}:{onExit:()=>void}){
  const [friend,setFriend]=useState(0),[group,setGroup]=useState('all'),[playing,setPlaying]=useState(false),[seed,setSeed]=useState(1),[turn,setTurn]=useState(0),[celebrate,setCelebrate]=useState(false),[hint,setHint]=useState(''),[popped,setPopped]=useState<number[]>([]),[hatched,setHatched]=useState(false);
+ const counter=useRef<ReturnType<typeof beginCount>|null>(null);
  const completed=useRef(false),poppedRef=useRef<number[]>([]);
  useEffect(()=>{try{const n=Number(localStorage.getItem('little-friend'));if(n>=0&&n<6)setFriend(n);}catch{}},[]);
  useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});},[playing,turn,celebrate]);
  const deck=kidDeck(seed,group),id=deck[turn%deck.length],task=kidChallenge(id,seed+turn*73),meta=kidCatalog.find(t=>t.id===id)!;
- function win(){if(completed.current)return;completed.current=true;setCelebrate(true);setHint('');}
+ function win(){if(completed.current)return;completed.current=true;if(turn%5===4)counter.current?.complete();setCelebrate(true);setHint('');}
  function next(){setHatched(false);completed.current=false;poppedRef.current=[];setPopped([]);setHint('');setCelebrate(false);setTurn(t=>t+1);}
- function start(){setHatched(false);completed.current=false;poppedRef.current=[];setPopped([]);setSeed(Math.floor(Math.random()*1e8));setTurn(0);setHint('');setCelebrate(false);setPlaying(true);}
+ function start(){counter.current=beginCount('pikkuhups');setHatched(false);completed.current=false;poppedRef.current=[];setPopped([]);setSeed(Math.floor(Math.random()*1e8));setTurn(0);setHint('');setCelebrate(false);setPlaying(true);}
  const mascot=<LittleCharacter id={friend}/>;
  return <div className="little-hups"><div className="little-nav"><button onClick={()=>{setPlaying(false);setCelebrate(false);}}>⌂ Pikkuhups</button><button onClick={onExit}>Hupsiin →</button></div>
  {!playing?<><div className="little-welcome"><h1>Pikkuhups</h1><p>Pienille pelaajille</p><div className="little-hero"><LittleCharacter id={(friend+5)%6}/>{mascot}<LittleCharacter id={(friend+1)%6}/></div></div><h2>Kuka leikkii mukana?</h2><div className="little-picker">{littleFriends.map((f,i)=><button key={f.name} aria-label={`Valitse ${f.name}`} aria-pressed={friend===i} style={{'--friend-color':f.color} as React.CSSProperties} onClick={()=>{setFriend(i);try{localStorage.setItem('little-friend',String(i));}catch{}}}><LittleCharacter id={i}/><span>{f.name}</span></button>)}</div><button className="primary little-start" onClick={start}>Leikitään! →</button><p className="little-selected">{group==='all'?'✨ Kaikkea kivaa':group==='pop'?'🎈 Poksautellaan':group==='colors'?'🎨 Värit ja muodot':'🍓 Etsi ja löydä'}</p><h2>Mitä leikitään?</h2><div className="little-packs">{[{id:'all',icon:'✨',label:'Kaikkea kivaa'},{id:'pop',icon:'🎈',label:'Poksautellaan'},{id:'colors',icon:'🎨',label:'Värit ja muodot'},{id:'find',icon:'🍓',label:'Etsi ja löydä'}].map(g=><button key={g.id} className={'pack-'+g.id} aria-pressed={group===g.id} onClick={()=>setGroup(g.id)}><span>{g.icon}</span>{g.label}{group===g.id&&<b>✓</b>}</button>)}</div><p className="little-parent-note">Ei kiirettä. Aikuinen voi lukea lyhyen ohjeen.<br/>Hahmojen nimet ovat vielä työnimiä.</p></>:
