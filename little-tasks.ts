@@ -1,5 +1,7 @@
 import {random,shuffle} from './libgame';
 export const kidCatalog=[
+ {id:'memorypairs',title:'Etsi kuvaparit!',group:'find'},
+ {id:'parcel',title:'Kenelle yllätys?',group:'find'},
  {id:'popall',title:'Kaikki pallot poks!',group:'pop'},
  {id:'popblue',title:'Siniset pallot poks!',group:'pop'},
  {id:'peek',title:'Kukkuu! Kuka siellä?',group:'pop'},

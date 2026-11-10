@@ -1,0 +1,39 @@
+Hups / Pikkuhups – versio 36
+
+KAVERI HAASTEET
+Haasta kaverit > Helpommat tehtävät / Normaalit tehtävät > Luo haastekoodi.
+Helpompi joukko sopii noin 6–9-vuotiaille: ei laskuja tai lukemiseen perustuvia tehtäviä.
+Taso tallentuu haasteeseen, näkyy odotushuoneessa ja säilyy uusintakierroksella.
+Kaikille sama tehtävävalikoima, kuvat, pulmien lähtötilanne ja valosarja.
+Yksin pelattava Pelaa ja suosikkipelien kokeilut käyttävät normaalia tasoa.
+
+UUDET PELIT (suosikkipelien valikossa ensimmäisenä)
+1. Hahmomuistipeli: normaali 16 korttia, helpompi 12, Pikkuhups 8. Pari = sama kuva.
+2. Kenelle yllätys: seuraa paketin narua ja napauta hahmoa. Normaali 4, helpompi 3, Pikkuhups 2.
+3. Hups-vauhti: 4 valonappia. Jatkuva kiihtyvä sarja 30 s. Väärä painallus lopettaa; pisteet säilyvät.
+4. Maaliputket: käännä 4x4 putkiruudukkoa napauttamalla. Ratkaistava reitti, 30 s.
+5. Enemmistön valta: arvioi mitä väriä on eniten, 5 s. Ei tasapelejä.
+6. Pois tieltä: 4x4 liukupalikat. Valitse palikka ja napauta nuolta. 30 s, vähät siirrot palkitaan.
+7. Yhdellä vedolla: kulje kaikki viivat kerran nostamatta sormea, 30 s. Uusi veto aloittaa yrityksen alusta.
+8. Missä pallo piilee: näytä pallo 1,5 s, sekoita 5 s, vastaa 5 s. Kupit pysähtyvät ennen vastausta.
+9. Puoliksi: yksi suora leikkaus, pinta-alojen suhde ratkaisee. 15 s.
+10. Kuula karkuteillä: kallistus tai nuolipainikkeet/näppäimistö. 30 s alkaa omasta Aloita-painikkeesta.
+Kallistus pyytää tarvittaessa liikeluvan. Pidä puhelin mukavasti aloituksessa.
+Jos kallistus ei toimi, nuolet ovat aina käytettävissä. Putoamisesta paluu alkuun.
+Pikkuhupsin uudet leikit ovat ilman aikarajaa, pisteitä ja kilpailupainetta.
+
+ULKOASU
+Pikkuhupsin etusivulta poistettu ylimääräiset Pikkuhups- ja Hupsiin-painikkeet.
+Yläpalkin mökki vie edelleen Hupsin etusivulle. Pelin aikana Pikkuhups-paluu säilyy.
+
+ASENNUS
+1. Pura ZIP. Lataa KANSION SISÄLTÖ GitHubiin > Add file > Upload files > Commit changes.
+2. Odota Vercel Ready. Päivitä kaikki laitteet: VERSIO 36.
+3. Luo uusi haastekoodi. Vanhoihin versioihin ei voi liittyä.
+Supabaseen tai Vercelin asetuksiin ei muutoksia. Tilastot säilyvät.
+Ääniä, rekisteröitymistä tai Pikkuhupsin lukitusta ei lisätty.
+
+TARKISTUKSET
+Testit ja tuotantokoonti läpäisty; pulmien ratkeavuus tarkistettu 150 siemenellä.
+Selaintarkistus estyi työkalun käyttörajaan. Kallistus ja lopullinen puhelinasettelu
+pitää kokeilla fyysisellä iPhonella / Androidilla. Live-Supabase-kaveripeliä ei kokeiltu täältä.

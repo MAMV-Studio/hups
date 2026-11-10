@@ -9,3 +9,5 @@ Object.assign(taskActions,Object.fromEntries(extraCatalog.map(t=>[t.id,t.action]
 taskActions.colorhunt='Siniset poks!';
 
 taskActions.movinghunt='Poksauta siniset karkulaiset!';taskActions.movingcenter='Nappaa liikkuva napakymppi!';taskActions.movingspot='Mihin karkulainen katosi?';
+
+Object.assign(taskActions,{memorypairs:'Etsi samat kuvaparit!',parcel:'Kenelle paketti kuuluu?',speedlights:'Pysy valojen vauhdissa!',pipes:'Maali virtaamaan!',majority:'Mitä on eniten?',slide:'Punainen palikka ulos!',onestroke:'Koko kuvio yhdellä vedolla!',cups:'Missä pallo piilee?',bisect:'Jaa kuvio puoliksi!',tilt:'Kuula maaliin!'});

@@ -1,7 +1,7 @@
-Lue PAIVITYS-35.txt.
-1. Pura Hups-Vercel-35.zip.
-2. GitHub > MAMV-Studio/hups > Add file > Upload files.
-3. Vedä kansion sisältö ja Commit changes.
-4. Odota Vercel Ready ja päivitä peli VERSIO 35.
-
-Jo käyttöön otettuun laskuriin tai Supabaseen ei muutoksia. Ensimmäinen laskurin käyttöönotto: PAIVITYS-34.txt.
+Pura Hups-Vercel-36.zip.
+GitHub > MAMV-Studio/hups > Add file > Upload files.
+Vedä puretun kansion sisältö, Commit changes.
+Odota Vercel Ready ja päivitä kaikki laitteet VERSIO 36.
+Luo uusi haastekoodi.
+Ei SQL- tai ympäristömuuttujamuutoksia.
+Katso PAIVITYS-36.txt.
