@@ -8,12 +8,12 @@ function view(s:any,token:string){return {...s,host:s.players.find((p:any)=>!awa
 export async function POST(req:Request){try{
  const b:any=await req.json(),db=challengeStore();
  b.code=String(b.code??'').normalize('NFKC').replace(/\s/g,'');
- if(b.version!==23)return reply({error:'Pelin versio on vanhentunut. Päivitä sivu ja liity uudelleen.',updateRequired:true},426);
+ if(b.version!==24)return reply({error:'Pelin versio on vanhentunut. Päivitä sivu ja liity uudelleen.',updateRequired:true},426);
  if(!db)return reply({error:'Haastepalvelu ei ole käytettävissä.'},503);
  if(b.action==='create'){
   for(let attempt=0;attempt<30;attempt++){
    const code=String(1000+crypto.getRandomValues(new Uint32Array(1))[0]%9000),token=crypto.randomUUID();
-   const s={code,version:23,level:b.level==='easy'?'easy':'normal',length:Number.isInteger(b.length)&&b.length>=5&&b.length<=20?b.length:8,seed:Math.floor(Math.random()*1e8),created:Date.now(),start:0,players:[{id:crypto.randomUUID(),token,name:String(b.name||'Pelaaja').slice(0,18),lastSeen:Date.now(),avatar:Number.isInteger(b.avatar)&&b.avatar>=0&&b.avatar<6?b.avatar:0,scores:[]}]};
+   const s={code,version:24,level:b.level==='easy'?'easy':'normal',length:Number.isInteger(b.length)&&b.length>=5&&b.length<=20?b.length:8,seed:Math.floor(Math.random()*1e8),created:Date.now(),start:0,players:[{id:crypto.randomUUID(),token,name:String(b.name||'Pelaaja').slice(0,18),lastSeen:Date.now(),avatar:Number.isInteger(b.avatar)&&b.avatar>=0&&b.avatar<6?b.avatar:0,scores:[]}]};
    if(await db.create(code,s,Date.now()-86400000)){const saved=await db.read(code);if(!saved||saved.data.code!==code)return reply({error:'Haasteen tallennusta ei voitu vahvistaa. Kokeile luoda uusi haaste.'},503);return reply({token,code,state:view(saved.data,token)});}
   }return reply({error:'Koodeissa on ruuhkaa. Yritä uudelleen.'},503);
  }
@@ -21,7 +21,7 @@ export async function POST(req:Request){try{
   const row=await db.read(String(b.code).toUpperCase());
   if(!row)return reply({error:`Haastekoodia ${b.code} ei löytynyt. Pyydä luojalta uusi koodi tai Kopioi pelilinkki -linkki. Avaa sama peliosoite kuin luoja.`},404);
   let s=row.data,token=b.token;
-  if(s.version!==23)return reply({error:'Luo uusi nelinumeroinen peli. Tämä haaste on vanhasta versiosta.'},409);
+  if(s.version!==24)return reply({error:'Luo uusi nelinumeroinen peli. Tämä haaste on vanhasta versiosta.'},409);
   if(Date.now()-s.created>86400000)return reply({error:'Haaste vanheni. Luo uusi kierros.'},410);
   let p=s.players.find((p:any)=>p.token===token);
   if(b.action==='join'&&!p){

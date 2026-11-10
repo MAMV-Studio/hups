@@ -1,3 +1,3 @@
-# Hups / Pikkuhups – versio 36
+# Hups / Pikkuhups – versio 37
 
-115 Hups-tehtävätyyppiä, 16 Pikkuhups-leikkityyppiä. 10 uutta peliä ja kaverihaasteen tasovalinta. Katso PAIVITYS-36.txt. Laskurin alkuperäinen käyttöönotto: PAIVITYS-34.txt.
+115 Hups-tehtävätyyppiä, 16 Pikkuhups-leikkityyppiä. Palikoiden suora sormiohjaus, vaihtelevat pulmat, uudistettu kuulalabyrintti ja useita yhden vedon kuvioita. Katso PAIVITYS-37.txt. Tilastolaskurin alkuperäinen käyttöönotto: PAIVITYS-34.txt.

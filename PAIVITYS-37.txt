@@ -1,0 +1,36 @@
+HUPS / PIKKUHUPS — VERSIO 37
+
+Pois tieltä! -palikkapeli:
+- Vedä palikoita suoraan sormella. Palikka seuraa sormea ja napsahtaa ruudukkoon irrotettaessa.
+- Nuolet poistettu; näppäimistön nuolet toimivat yhä esteettömänä vaihtoehtona.
+- Enemmän esteitä ja siemenluvulla vaihtuvat, ratkaisun tarkistavat lähtöasetelmat.
+- Hahmon mittasuhteet korjattu neliömäiseen kuvatilaan.
+- Samalla siemenluvulla kaikille kavereille sama pulma.
+
+Kuula karkuteillä:
+- Vain yksi reikä maalissa; ei muita putoamisreikiä.
+- Helpommassa 5x5, haastavammassa 6x6 sokkelo. Valitaan mutkikkaampia, vaihtelevia reittejä.
+- Isompi kiiltävä kuula, kevyt liikevana, sykkivä maalirengas ja onnistumisen väripisarat.
+- Isomman kuulan seinä- ja kulmatörmäykset tarkistettu.
+- Kallistusluvan kysyminen ja oma Aloita-painike säilytetty. Vaihtoehtona nuoliohjaus.
+
+Yhdellä vedolla:
+- Kuusi erilaista kuvioperhettä ja käännetyt versiot.
+- Jokainen kuvio on yhtenäinen ja ratkaistavissa yhdellä vedolla, kukin viiva kerran.
+
+Kaverihaaste:
+- Valinnat Helpommat tehtävät / Haastavammat tehtävät.
+
+ASENNUS
+Pura Hups-Vercel-37.zip. Lataa sen sisältö GitHubin hups-repositorion juureen kuten aiemmin.
+Odota Vercelin Ready. Päivitä kaikkien laitteiden sivut VERSIO 37 ja luo uusi haastekoodi.
+Versio 37 käyttää peliprotokollaa 24, jotta eri versiot eivät saa erilaisia pulmia samassa huoneessa.
+Ei uusia Supabase-SQL-muutoksia tai ympäristömuuttujia. Tilastolaskuri säilyy.
+
+TARKISTUKSET
+Automaattitestit: aiemmat pelit, moninpeli ja tilastot; palikoiden sormivetojen käsittelijät;
+150 siemenen ratkaistavuus; kuvioperheiden yhtenäisyys ja Eulerin reitti;
+uusien ratojen kuljettavuus isommalla kuulalla ja seinätörmäykset; 30/15/5 sekunnin aikarajat.
+Next.js-tuotantokäännös ja TypeScript-tarkistus läpäisty.
+Selaimessa tarkistettu palikkapelin ulkoasu ja palikan veto.
+Puhelimen kallistusanturia ei voida fyysisesti testata tässä ympäristössä; aiempi lupapolku säilyy.

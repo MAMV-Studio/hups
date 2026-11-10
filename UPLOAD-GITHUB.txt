@@ -1,7 +1,6 @@
-Pura Hups-Vercel-36.zip.
-GitHub > MAMV-Studio/hups > Add file > Upload files.
-Vedä puretun kansion sisältö, Commit changes.
-Odota Vercel Ready ja päivitä kaikki laitteet VERSIO 36.
-Luo uusi haastekoodi.
-Ei SQL- tai ympäristömuuttujamuutoksia.
-Katso PAIVITYS-36.txt.
+Pura Hups-Vercel-37.zip.
+Lataa ZIPin sisältö GitHubin hups-repositorion juureen.
+Add file → Upload files → Commit changes.
+Odota Vercel Ready ja päivitä kaikki laitteet VERSIO 37.
+Luo uusi haastekoodi. Ei Supabase- tai ympäristömuuttujamuutoksia.
+Katso PAIVITYS-37.txt.
