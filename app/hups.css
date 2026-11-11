@@ -95,14 +95,47 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 /* 30: studio signature below the favourite-game link, above the trim. */
 .phone .home-studio-bottom{display:block;text-align:center;margin:18px 0 14px;font-size:12px;line-height:1.4;color:#d2b2e4;letter-spacing:1.5px;font-weight:900}
 
-.name-with-music{align-items:center;margin-bottom:12px}
-.name-with-music #name{grid-column:span 3;min-width:0;width:100%;height:43px;margin:0;box-sizing:border-box;padding:10px 16px}
+.name-with-music{--name-row-height:43px;align-items:stretch;margin-bottom:12px}
+.name-with-music #name{grid-column:span 3;min-width:0;width:100%;height:var(--name-row-height);min-height:var(--name-row-height);margin:0;box-sizing:border-box;padding:10px 16px}
 .theme-toggle{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid #9476aa;border-radius:50%;background:#392a45;color:#d2b9df;font-size:24px;line-height:1}
-.name-with-music .theme-toggle{width:100%;height:43px;box-sizing:border-box;font-size:23px}
-.name-with-music .theme-toggle[aria-pressed=true]{color:#2a1e35;border-color:#ffe6b4}
-.name-with-music .theme-toggle[aria-pressed=false]{opacity:.65}
+.name-with-music .theme-toggle {
+  width:100%;
+  height:var(--name-row-height);
+  min-height:var(--name-row-height);
+  box-sizing:border-box;
+  font-size:23px;
+  background:#f6a5d3;
+  border-color:#ffd6ef;
+  color:#39213b;
+  box-shadow:inset 0 2px #fff5,inset 0 -4px #9d4c733b;
+}
+.name-with-music .theme-toggle[aria-pressed=true]{color:#39213b;border-color:#ffd6ef}
+.theme-note{position:relative;display:inline-grid;place-items:center;width:1.15em;height:1em}
+.theme-toggle[aria-pressed=false] .theme-note::after{
+  content:"";
+  position:absolute;
+  width:1.15em;
+  height:2px;
+  border-radius:2px;
+  background:currentColor;
+  transform:rotate(-48deg);
+}
 .theme-toggle[aria-pressed=true]{border-color:#c8fa63;color:#c8fa63}
 .theme-toggle:focus-visible{outline:2px solid #c8fa63;outline-offset:3px}
 .theme-in-game{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2}
 .top:has(.theme-in-game) .version{right:50px}
 @media(max-width:360px){.top:has(.theme-in-game) .version{right:48px;font-size:6px;letter-spacing:0}}
+
+.code .share-challenge {
+  display: block;
+  margin: 0 auto 12px;
+  min-height: 44px;
+  padding: 8px 18px;
+  border-color: #e0ffa2;
+  border-radius: 24px;
+  background: #ceef7f;
+  color: #252038;
+  box-shadow: inset 0 2px #fff5, 0 4px #6a813e;
+  font-size: 15px;
+  font-weight: 900;
+}

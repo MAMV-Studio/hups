@@ -8,7 +8,8 @@ export function useThemeMusic(duringPlay: boolean) {
   const audio = useRef<HTMLAudioElement>(null);
   const sound = useRef<{context: AudioContext; gain: GainNode} | null>(null);
   const enabled = useRef(true);
-  const [muted, setMuted] = useState(false);
+  const playing = useRef(false);
+  const [audible, setAudible] = useState(false);
   const volume = duringPlay ? 0.18 : 0.40;
   const currentVolume = useRef(volume);
   currentVolume.current = volume;
@@ -36,7 +37,7 @@ export function useThemeMusic(duringPlay: boolean) {
     if (graph && graph.context.state !== 'running') {
       void graph.context.resume().catch(() => {});
     }
-    if (track.paused) void track.play().catch(() => {});
+    if (!playing.current || track.paused) void track.play().catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -50,7 +51,6 @@ export function useThemeMusic(duringPlay: boolean) {
     try {
       enabled.current = localStorage.getItem(MUSIC_PREFERENCE) !== '1';
     } catch {}
-    setMuted(!enabled.current);
     play(false);
 
     function onInteraction(event: Event) {
@@ -59,9 +59,11 @@ export function useThemeMusic(duringPlay: boolean) {
       play(true);
     }
 
+    document.addEventListener('touchend', onInteraction, true);
     document.addEventListener('click', onInteraction, true);
     document.addEventListener('keydown', onInteraction, true);
     return () => {
+      document.removeEventListener('touchend', onInteraction, true);
       document.removeEventListener('click', onInteraction, true);
       document.removeEventListener('keydown', onInteraction, true);
       track?.pause();
@@ -70,21 +72,35 @@ export function useThemeMusic(duringPlay: boolean) {
     };
   }, [play]);
 
+  function updatePlayback(active: boolean) {
+    playing.current = active && enabled.current;
+    setAudible(playing.current);
+  }
+
   function toggle() {
-    enabled.current = !enabled.current;
-    setMuted(!enabled.current);
+    const track = audio.current;
+    if (!track) return;
+    // A browser can block the initial autoplay while the preference is enabled.
+    // In that state the note is a play button.
+    enabled.current = !(playing.current && !track.paused);
     try {
       localStorage.setItem(MUSIC_PREFERENCE, enabled.current ? '0' : '1');
     } catch {}
-    if (enabled.current) play(true);
-    else audio.current?.pause();
+    if (enabled.current) {
+      play(true);
+    } else {
+      track.pause();
+      updatePlayback(false);
+    }
   }
 
   return {
-    audio: <audio ref={audio} src="/hups-tunnari.mp3" preload="none" loop />,
+    audio: <audio ref={audio} src="/hups-tunnari.mp3" preload="none" loop
+      onPlaying={() => updatePlayback(true)} onPause={() => updatePlayback(false)}
+      onError={() => updatePlayback(false)} />,
     button: <button type="button" className="theme-toggle" aria-label="Musiikki"
-      aria-pressed={!muted} title={muted ? 'Musiikki päälle' : 'Musiikki pois'} onClick={toggle}>
-      <span aria-hidden="true">{muted ? '♪' : '♫'}</span>
+      aria-pressed={audible} title={audible ? 'Musiikki pois' : 'Musiikki päälle'} onClick={toggle}>
+      <span className="theme-note" aria-hidden="true">♫</span>
     </button>,
   };
 }
