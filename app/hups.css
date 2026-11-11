@@ -188,14 +188,9 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .scene-home .round-picker>p{margin-top:17px}
 .game-toolbar{display:block}
 .game-toolbar .task-position{margin:0 auto}
-.task-finish{position:absolute;inset:0 0 auto;z-index:6;display:grid;place-items:center;min-height:42px;color:#fff3e5;text-shadow:0 2px 8px #17111f;pointer-events:none;font:22px 'Lilita One',sans-serif}
-.task-finish-star{inset:50% auto auto 50%;width:min(3cm,32vw);aspect-ratio:1;min-height:0;font-size:0;transform:translate(-50%,-72%);filter:drop-shadow(0 4px 10px #17111f);animation:finish-star .56s .12s both}
-.task-finish-star::before{content:"";width:100%;height:100%;background:#c8fa63;clip-path:polygon(50% 0,65% 35%,100% 50%,65% 65%,50% 100%,35% 65%,0 50%,35% 35%)}
-.play-stage:has(.play-buddy)>.task-finish-star{top:calc(50% - 28px)}
-@keyframes finish-star{from{opacity:0;transform:translate(-50%,-50%) scale(.35)}to{opacity:1;transform:translate(-50%,-72%) scale(1)}}
 .puzzle-onestroke.puzzle-solved .one-stroke-board{animation:finish-glow .8s ease-out}
 @keyframes finish-glow{50%{box-shadow:0 0 20px #a8f8e9}}
-@media(prefers-reduced-motion:reduce){.task-finish-star,.puzzle-onestroke.puzzle-solved .one-stroke-board{animation:none}}
+@media(prefers-reduced-motion:reduce){.puzzle-onestroke.puzzle-solved .one-stroke-board{animation:none}}
 .scene-join .join-panel>.tag,.scene-join .balloon-keypad>label{font-size:10px}
 .scene-join .join-panel>h1{font-size:clamp(29px,8vw,36px)}
 .scene-join .balloon-keypad{max-width:260px}
@@ -222,3 +217,15 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 
 .scene-results .solo-ceremony .podium-crown{top:0}
 .little-start-view>.music-below-header{margin-top:14px}
+
+.exit-dialog{width:min(400px,calc(100% - 36px));max-height:calc(100% - 36px);padding:24px;border:2px solid #a889be;border-radius:26px;background:#362644;color:#fff3e5;text-align:center;box-shadow:0 8px #1c1226}
+.exit-dialog::backdrop{background:#130c1bbd}
+.exit-dialog h2{margin:0;font:clamp(25px,7vw,32px) 'Lilita One',sans-serif}
+.exit-dialog p{margin:12px 0 20px;color:#e1caec}
+.exit-actions{display:grid;gap:12px}
+.exit-actions .primary{margin:0;min-height:52px}
+.exit-actions .textbutton{min-height:44px}
+.mirror-arrow{display:block;width:34px;height:34px;margin:auto}
+.extra-model.mirror-frame{width:min(135px,48%);min-height:0;aspect-ratio:1;margin:18px auto 24px;border:3px solid #af9bdb;border-radius:30px;background:linear-gradient(145deg,#554368,#30263f);color:#f3deff;box-shadow:0 5px #22182e,inset 0 2px #ffffff30,0 0 20px #b89cff24}
+.mirror-frame .mirror-arrow{width:60%;height:auto}
+.extra-model.mirror-frame.mirror-solved{border-color:#c8fa63;box-shadow:0 0 25px #c8fa6380}

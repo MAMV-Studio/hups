@@ -16,6 +16,7 @@ import {LaunchScene,ResultParty,WinnerReveal} from './arcade';
 const total=(a:number[])=>a.reduce((x,y)=>x+y,0);
 export default function Page(){
  const [screen,setScreen]=useState('home'),[name,setName]=useState(''),[code,setCode]=useState(''),[seed,setSeed]=useState(1),[idx,setIdx]=useState(0),[stage,setStage]=useState('intro'),[scores,setScores]=useState<number[]>([]),[detail,setDetail]=useState(''),[elapsed,setElapsed]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[room,setRoom]=useState<any>(null),[saved,setSaved]=useState(false),[avatar,setAvatar]=useState(0),[count,setCount]=useState(3),[progressError,setProgressError]=useState(''),[raceDone,setRaceDone]=useState(false),[practiceId,setPracticeId]=useState<string|null>(null);
+ const exitDialog=useRef<HTMLDialogElement>(null);
  const counter=useRef<ReturnType<typeof beginCount>|null>(null);
  const [showPodium,setShowPodium]=useState(false);
  const [taskResult,setTaskResult]=useState<{score:number,text:string}|null>(null);
@@ -24,9 +25,9 @@ export default function Page(){
  const clock=useRef(createGameClock());
  const auth=useRef<any>(null),finished=useRef(false),timer=useRef<any>(null),scoreRef=useRef<number[]>([]),epoch=useRef(0);const deck=useMemo(()=>practiceId?[makeTask(practiceId,seed)]:taskDeck(seed,length,level),[seed,practiceId,length,level]),task=deck[idx];
  useEffect(()=>{const invite=new URLSearchParams(window.location.search).get('haaste');if(invite&&/^\d{4}$/.test(invite)){setCode(invite);setScreen('join');}try{setName(localStorage.getItem('pt-name')||'');setAvatar(Number(localStorage.getItem('pt-avatar'))||0);}catch{}},[]);
- const api=async(action:string,extra:any={})=>{const sent=performance.now();const r=await fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({...auth.current,action,version:24,...extra})});const v:any=await r.json();clock.current.sync(v.serverNow,sent,performance.now());if(!r.ok){if(v.updateRequired)setError(v.error);if(v.left){auth.current=null;setRoom(null);setScreen('home');setError(v.error);}throw Error(v.error);}return v;};
+ const api=async(action:string,extra:any={})=>{const sent=performance.now();const r=await fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({...auth.current,action,version:25,...extra})});const v:any=await r.json();clock.current.sync(v.serverNow,sent,performance.now());if(!r.ok){if(v.updateRequired)setError(v.error);if(v.left){auth.current=null;setRoom(null);setScreen('home');setError(v.error);}throw Error(v.error);}return v;};
  useEffect(()=>{if(['results','game'].includes(screen)&&room&&room.seed!==seed){setSeed(room.seed);setScores([]);scoreRef.current=[];setSaved(false);setScreen('lobby');}},[room,screen,seed]);
- function leaveRoom(){if(!auth.current)return;const payload=JSON.stringify({...auth.current,action:'leave',version:24});void fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true}).catch(()=>{});}
+ function leaveRoom(){if(!auth.current)return;const payload=JSON.stringify({...auth.current,action:'leave',version:25});void fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true}).catch(()=>{});}
  async function roomAction(action:string){if(busy)return;setBusy(true);setError('');try{const v=await api(action,{name,avatar,length,level,code:action==='create'?undefined:action==='join'?code.trim():auth.current?.code,token:action==='join'||action==='create'?undefined:auth.current?.token});if(v.token)auth.current={token:v.token,code:v.code};setRoom(v.state);setLength(v.state.length||8);setLevel(v.state.level==='easy'?'easy':'normal');if(!['rematch','accept','decline'].includes(action)){setSeed(v.state.seed);setScreen('lobby');}}catch(e:any){setError(e.message);}finally{setBusy(false);}}
  useEffect(()=>{if(!['lobby','results','game'].includes(screen))return;if(!auth.current)return;let live=true;const t=setInterval(async()=>{try{const values=scoreRef.current;const v=await api(values.length&&screen!=='lobby'?'progress':'poll',values.length&&screen!=='lobby'?{scores:values,seed}:{});if(live){setRoom(v.state);setLength(v.state.length||8);setLevel(v.state.level==='easy'?'easy':'normal');setProgressError('');if(values.length===length)setSaved(true);}}catch(e:any){if(live)setProgressError(e.message);}},1200);return()=>{live=false;clearInterval(t);};},[screen,stage,seed,length]);
  useEffect(()=>{if(screen!=='lobby'||!room?.start)return;const t=setInterval(()=>{setElapsed(clock.current.now());if(clock.current.now()>=room.start){clearInterval(t);begin(room.seed,true);}},100);return()=>clearInterval(t);},[screen,room?.start]);
@@ -43,7 +44,7 @@ export default function Page(){
  async function sendProgress(values:number[]){const turn=epoch.current;setProgressError('');try{const v=await api('progress',{scores:values,seed});if(turn!==epoch.current||!auth.current)return;setRoom(v.state);setLength(v.state.length||8);setLevel(v.state.level==='easy'?'easy':'normal');if(values.length===deck.length)countShared({...auth.current});}catch{if(turn!==epoch.current||!auth.current)return;setProgressError('Pisteiden lähetys ei onnistunut. Yritä uudelleen.');}}
  async function saveResult(){const turn=epoch.current;try{await api('finish',{scores:scoreRef.current,seed});if(turn!==epoch.current||!auth.current)return;setSaved(true);countShared({...auth.current});setError('');}catch(e:any){setError(e.message+' Voit yrittää tuloksen tallennusta uudelleen.');}}
  function next(){if(!raceDone)return;if(idx<deck.length-1){setIdx(idx+1);setStage('intro');}else{setScreen('results');if(auth.current)saveResult();}}
- function askHome(){if(screen==='game'&&!window.confirm('Keskeytetäänkö peli ja palataan etusivulle?'))return;home();}
+ function askHome(){if(screen==='game')exitDialog.current?.showModal();else home();}
  function home(){if(screen==='kids')music.selectTheme('hups');leaveRoom();epoch.current++;clearInterval(timer.current);auth.current=null;setRoom(null);setScreen('home');setStage('intro');setError('');setProgressError('');}
  useEffect(()=>{if(screen==='game')window.scrollTo({top:0,behavior:'instant'});},[idx,stage,screen]);
  function challengeUrl(challengeCode: string) {
@@ -70,7 +71,7 @@ export default function Page(){
   }
  }
  const music=useThemeMusic(screen==='game'||screen==='results');
- return <main className={'phone scene-'+screen+' phase-'+stage}>{music.audio}<Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 52</span></header>
+ return <main className={'phone scene-'+screen+' phase-'+stage}>{music.audio}<Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 53</span></header>
  {screen==='home'&&<>
  <div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">
@@ -95,7 +96,7 @@ export default function Page(){
  {stage==='intro'&&<p className="intro-guide">{task.instruction}</p>}
  {stage==='intro'&&<div className="task-intro"><button className="primary" onClick={play}>Olen valmis →</button><p className="note">Aika alkaa vasta lähtölaskennan jälkeen.</p><LaunchScene avatar={avatar} index={idx}/></div>}
  {stage==='countdown'&&<div className="start-countdown" aria-live="polite"><Character id={avatar} happy/><strong key={count}>{count}</strong><p>Kohta mennään!</p></div>}
- {stage==='play'&&<div className="play-stage"><Minigame key={idx+':'+task.id} task={task} avatar={avatar} onFinish={finish}/>{taskResult&&(taskResult.score===0||task.id!=='circle')&&<div className={'task-finish '+(taskResult.score>0?'task-finish-star':'')} role="status" aria-label={taskResult.score>0?'Onnistuit!':undefined}>{taskResult.score>0?'✦':taskResult.text.includes('Aika loppui')?'Aika loppui':'Hupsista!'}</div>}</div>}
+ {stage==='play'&&<div className="play-stage"><Minigame key={idx+':'+task.id} task={task} avatar={avatar} onFinish={finish}/></div>}
  {stage==='feedback'&&<div className="feedback climb-feedback">{room?<><div className="earned"><span>SAIT <b>+{scores.at(-1)} P</b></span><small>{raceDone?'HIENOA! JATKETAANKO?':'VÄLITILANNE'}</small></div><ParkRace key={idx} players={room.players.map((p:any)=>p.id===room.me?{...p,scores}:p)} round={idx} length={deck.length} me={room.me} onComplete={()=>setRaceDone(true)}/><p className="round-detail">{detail}</p></>:<section className="solo-break">
  <div className="standings-title"><h2>Välitilanne!</h2><span>{idx+1} / {deck.length}</span></div>
  <div className="solo-mascot"><span aria-hidden="true">✦</span><Character id={avatar} happy={(scores.at(-1)??0)>0}/><span aria-hidden="true">✦</span></div>
@@ -110,5 +111,6 @@ export default function Page(){
  {progressError&&room&&<p className="error" role="status">{progressError} Pisteiden lähetystä yritetään uudelleen.</p>}
  {error&&<div className="error" role="status">{error}<button aria-label="Sulje ilmoitus" onClick={()=>setError('')}>×</button></div>}
  <footer>{screen==='home'&&<p className="home-bottom-description">{taskCatalog.length>100?'Yli sata erilaista peliä.':'Lähes sata erilaista peliä.'} Yksin tai yhdessä.</p>}HUPS! · PIENET PELIT, ISO ILO{screen!=='home'&&<small className="studio-credit">MAMV Studio <span>• Tehty iloksi</span></small>}</footer>
+ {screen==='game'&&<dialog className="exit-dialog" ref={exitDialog} aria-labelledby="exit-title"><h2 id="exit-title">Keskeytetäänkö peli?</h2><p>Etusivulle palaaminen päättää kierroksesi.</p><div className="exit-actions"><button className="primary" autoFocus onClick={()=>exitDialog.current?.close()}>Jatka peliä</button><button className="textbutton" onClick={()=>{exitDialog.current?.close();home();}}>Palaa etusivulle</button></div></dialog>}
  </main>;
 }

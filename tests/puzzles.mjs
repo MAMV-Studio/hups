@@ -44,15 +44,16 @@ const dragEvent=(b,delta=0)=>({clientX:b.axis==='h'?100+delta*100:100,clientY:b.
 let actual=L.slideLayout(p.seed);for(const [i,d]of solution){const b=buttons(render('Slide'))[i],ev=dragEvent(actual[i]);b.props.onPointerDown(ev);b.props.onPointerMove(dragEvent(actual[i],d));b.props.onPointerUp(dragEvent(actual[i],d));actual=L.moveBlock(actual,i,d);}assert.equal(calls.length,1);assert.ok(calls[0][0]>0);
 render('Slide',true);let dragButton=buttons(render('Slide'))[0];dragButton.props.onPointerDown(dragEvent(actual[0]));dragButton.props.onPointerMove(dragEvent(actual[0],-8));dragButton.props.onPointerCancel(dragEvent(actual[0],-8));assert.equal(calls.length,0);assert.equal(h.states[2],0,'Cancelled drag does not count moves');
 render('Lights',true);const lights=L.lightSeries(p.seed);for(const light of lights.slice(0,6)){p.ms=light.at;const b=buttons(render('Lights'))[light.key];b.props.onPointerDown({preventDefault(){}});}p.ms=lights[6].at;buttons(render('Lights'))[(lights[6].key+1)%4].props.onPointerDown({preventDefault(){}});assert.equal(calls[0][0],150,'Wrong light preserves 6 earned hits');
-// Rendered light is the sole accepted target, including late first taps and a backlog.
-p.ms=0;render('Lights',true);buttons(render('Lights'))[0].props.onPointerDown({preventDefault(){}});assert.equal(calls.length,0,'Before the first light, taps are ignored');
-p.ms=3000;for(let hit=0;hit<10;hit++){
- const pads=buttons(render('Lights')),lit=pads.findIndex(b=>b.props.className==='lit');assert.ok(lit>=0,'A queued target is visible');
- pads[lit].props.onPointerDown({preventDefault(){}});assert.equal(calls.length,0,'Visible light is accepted even when later events are due');
- const gap=buttons(render('Lights'));assert.ok(gap.every(b=>b.props.className!== 'lit'),'Accepted light switches off');gap[lit].props.onPointerDown({preventDefault(){}});assert.equal(calls.length,0,'Duplicate tap in dark gap is ignored');p.ms+=750;
-}
-let pads=buttons(render('Lights')),visible=pads.findIndex(b=>b.props.className==='lit');pads[(visible+1)%4].props.onPointerDown({preventDefault(){}});assert.equal(calls[0][0],250,'Only a wrong active light ends the game, with earned points retained');
-console.log('PASS: late first press, ten visible lights, brief dark gap, duplicate taps and actual wrong-light scoring.');
+// Flashes are timed independently of the answer queue.
+p.ms=0;render('Lights',true);
+const press=i=>buttons(render('Lights'))[i].props.onPointerDown({preventDefault(){}});
+const litKeys=()=>buttons(render('Lights')).flatMap((button,i)=>button.props.className==='lit'?[i]:[]);
+press(0);assert.equal(calls.length,0);
+p.ms=lights[0].at;assert.deepEqual(litKeys(),[lights[0].key]);
+p.ms+=300;assert.deepEqual(litKeys(),[],'An unanswered flash goes out on schedule');
+p.ms=lights[1].at;assert.deepEqual(litKeys(),[lights[1].key],'The next flash starts with an answer still pending');
+press(lights[0].key);press(lights[1].key);assert.equal(calls.length,0,'A dark target remains answerable in order');
+p.ms=lights[3].at;press(lights[2].key);press((lights[3].key+1)%4);assert.equal(calls[0][0],75);
 console.log('PASS: actual matching, parcel selection, pipe rotation, majority, cup choice, continuous one-stroke, finger drags and earned speed-light points.');
 // Actual wrapper timeouts: long puzzles must not inherit the legacy 10-second cap.
 const oldInterval=globalThis.setInterval,oldClear=globalThis.clearInterval,oldTimeout=globalThis.setTimeout,oldNow=performance.now;let now=0,tick;
