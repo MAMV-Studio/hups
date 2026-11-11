@@ -1,5 +1,4 @@
-Pura Hups-Vercel-38.zip.
+Pura Hups-Vercel-39.zip.
 Lataa sen sisältö GitHubin hups-repositorion juureen kuten ennen.
-Odota Vercel Ready ja päivitä kaikki laitteet VERSIO 38.
-Ei Supabase- tai ympäristömuuttujamuutoksia.
-Katso PAIVITYS-38.txt.
+Odota Vercel Ready ja päivitä sivu versioon 39.
+Käynnistä tunnari yläpalkin Musiikki-painikkeesta.

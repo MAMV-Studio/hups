@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState,useMemo} from 'react';
 import {createGameClock} from '../game-clock';
 import {Backdrop} from './backdrop';
+import {ThemeMusic} from './theme-music';
 import {WobblyText} from './wobbly-text';
 import {Character,characters,ParkRace,ParkTrim} from './characters';
 import {taskDeck,taskCatalog,makeTask} from '../tasks';
@@ -40,7 +41,7 @@ export default function Page(){
  function askHome(){if(screen==='game'&&!window.confirm('Keskeytetäänkö peli ja palataan etusivulle?'))return;home();}
  function home(){leaveRoom();epoch.current++;clearInterval(timer.current);auth.current=null;setRoom(null);setScreen('home');setStage('intro');setError('');setProgressError('');}
  useEffect(()=>{if(screen==='game')window.scrollTo({top:0,behavior:'instant'});},[idx,stage,screen]);
- return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 38</span></header>
+ return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><ThemeMusic duringPlay={screen==='game'||screen==='results'} /></header>
  {screen==='home'&&<>
  <div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">
