@@ -7,18 +7,20 @@ for(let seed=0;seed<150;seed++){
  for(const easy of [true,false]){const pipes=L.pipeLayout(seed,easy);assert.equal(L.pipeRoute(pipes.cells),null,'Starts unsolved');pipes.path.forEach(i=>pipes.cells[i].turn=0);assert.ok(L.pipeRoute(pipes.cells),'Planted pipe solution connects');const slide=L.slideLayout(seed,easy);assert.ok(L.slideMinimum(slide)>0&&L.slideMinimum(slide)<30,'Sliding puzzle is solvable in few moves');const g=L.lineGraph(seed,easy);const degrees=g.points.map((_,i)=>g.edges.filter(e=>e.includes(i)).length);assert.ok([0,2].includes(degrees.filter(d=>d%2).length),'Euler trail exists');const maze=L.windingMaze(seed,easy);assert.equal(maze.route[0],0);assert.equal(maze.route.at(-1),maze.size**2-1);assert.ok(maze.holes.every(h=>!maze.route.includes(h)));const m=L.majorityLayout(seed,easy);assert.equal(m.counts.filter(n=>n===Math.max(...m.counts)).length,1);assert.equal(m.items.length,m.counts.reduce((a,b)=>a+b,0));}
  for(const n of [2,3,4]){const x=L.parcelLayout(seed,n);assert.equal(x.answer,x.paths[x.target].at(-1));for(let row=0;row<6;row++)assert.equal(new Set(x.paths.map(p=>p[row])).size,n);const swaps=L.cupMoves(seed,n);assert.equal(swaps.length,10);for(let s=0;s<=10;s++)assert.equal(new Set(L.cupPositions(swaps,s,n)).size,n);}
  const poly=L.polygon(seed),a={x:0,y:150},b={x:300,y:150};assert.ok(Math.abs(L.area(L.clipPolygon(poly,a,b))+L.area(L.clipPolygon(poly,a,b,-1))-L.area(poly))<.001);
- const series=L.lightSeries(seed);assert.ok(series.length>40);assert.ok(series.every((v,i)=>v.at<30000&&v.key>=0&&v.key<4&&(!i||v.at>series[i-1].at)));
+ const series=L.lightSeries(seed);assert.ok(series.length>40);assert.ok(series.every((v,i)=>v.at<30000&&v.key>=0&&v.key<4&&(!i||(v.at>series[i-1].at&&v.key!==series[i-1].key))));
  const easy=tasks.taskDeck(seed,20,'easy');assert.equal(easy.length,20);assert.equal(new Set(easy.map(t=>t.id)).size,20);assert.ok(easy.every(t=>t.data.level==='easy'));assert.ok(!easy.some(t=>['add','subtract','double','half','digits','shortword','longword','colorword','alphabet','lettergap','even','speedlights','pipes'].includes(t.id)));assert.deepEqual(easy,tasks.taskDeck(seed,20,'easy'));
 }
 // New board diversity, sufficient difficulty, Euler connectivity and physical maze traversal.
 for(const easy of [true,false]){
- const slides=new Set(),graphs=new Set();let hardest=0;
+ const slides=new Set(),graphs=new Set(),shapes=new Set();let hardest=0;
  for(let seed=0;seed<60;seed++){
   const b=L.slideLayout(seed,easy);slides.add(JSON.stringify(b));hardest=Math.max(hardest,L.slideMinimum(b));assert.deepEqual(b,L.slideLayout(seed,easy));
+  shapes.add(JSON.stringify(L.polygon(seed,easy)));
   const graph=L.lineGraph(seed,easy);graphs.add(JSON.stringify(graph));const seen=new Set([graph.edges[0][0]]);for(let pass=0;pass<graph.points.length;pass++)for(const [a,b]of graph.edges)if(seen.has(a)||seen.has(b)){seen.add(a);seen.add(b);}assert.ok(graph.edges.every(([a,b])=>seen.has(a)&&seen.has(b)));
-  const m=L.windingMaze(seed,easy);assert.equal(m.holes.length,0);assert.ok(m.route.length>=m.size*2);let pos={x:.5,y:.5};for(const n of m.route.slice(1)){const target={x:n%m.size+.5,y:Math.floor(n/m.size)+.5};for(let tick=0;tick<60;tick++){const dx=target.x-pos.x,dy=target.y-pos.y;pos=L.moveMarble(m,pos,{x:Math.max(-.04,Math.min(.04,dx)),y:Math.max(-.04,Math.min(.04,dy))});}assert.ok(Math.hypot(pos.x-target.x,pos.y-target.y)<.01,'Full-size marble traverses every corridor and corner');}
+  const m=L.windingMaze(seed,easy);assert.equal(m.holes.length,0);assert.ok(m.route.length>=m.size*2);let pos={x:.5,y:.5};for(const n of m.route.slice(1)){const target={x:n%m.size+.5,y:Math.floor(n/m.size)+.5};for(let tick=0;tick<60;tick++){const dx=target.x-pos.x,dy=target.y-pos.y;pos=L.moveMarble(m,pos,{x:Math.max(-.04,Math.min(.04,dx)),y:Math.max(-.04,Math.min(.04,dy))},.23);}assert.ok(Math.hypot(pos.x-target.x,pos.y-target.y)<.01,'Full-size marble traverses every corridor and corner');}
   assert.deepEqual(m,L.windingMaze(seed,easy));
  }
+ assert.ok(shapes.size>=10,'Rotated variants of different split shapes');
  assert.ok(slides.size>45,'Many distinct sliding puzzles');assert.ok(graphs.size>=20,'Rotated graph variants');assert.ok(hardest>=(easy?4:8));
 }
 const sealed={size:2,walls:Array.from({length:4},()=>[true,true,true,true]),holes:[],route:[]};let marble={x:.5,y:.5};for(let i=0;i<100;i++)marble=L.moveMarble(sealed,marble,{x:.1,y:.1});assert.ok(marble.x<=.81&&marble.y<=.81,'Marble cannot cross closed walls diagonally');

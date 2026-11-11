@@ -15,3 +15,22 @@
 @keyframes goal-pulse{50%{opacity:.4;scale:1.13}}
 @keyframes marble-drop{35%{scale:1.13}to{scale:0;opacity:0}}
 @keyframes marble-pop{from{scale:0;opacity:1}to{scale:1.6;opacity:0}}
+
+/* Pipe terminals use the same column widths and gaps as the board. */
+.pipe-layout .pipe-board{border-radius:10px}
+.pipe-terminals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;padding-inline:4px}
+.pipe-terminals svg{display:block;width:min(100%,56px);justify-self:center}
+.pipe-inlet{grid-column:1;margin-bottom:-4px;z-index:1}
+.pipe-outlet{grid-column:4;margin-top:-4px;z-index:1}
+@media(max-height:740px){.pipe-layout{max-width:300px;margin-inline:auto}}
+
+.slide-board{border-color:transparent;background-clip:padding-box}
+.slide-board::before{content:"";position:absolute;inset:-5px;border:5px solid #b693cc;border-radius:inherit;clip-path:polygon(0 0,100% 0,100% 25%,calc(100% - 6px) 25%,calc(100% - 6px) 50%,100% 50%,100% 100%,0 100%);pointer-events:none}
+.slide-block.block-0{background:#ff7894}
+.slide-exit{width:30px;height:23px;right:-24px;top:37.5%;transform:translateY(-50%);pointer-events:none}
+
+.cup-shell{border-color:color-mix(in srgb,var(--cup-color),#fff 45%);background:linear-gradient(90deg,color-mix(in srgb,var(--cup-color),#292039 36%),var(--cup-color) 40%,color-mix(in srgb,var(--cup-color),#292039 46%))}
+.cup-ball{width:44px;height:44px;left:calc(50% - 22px);background:radial-gradient(circle at 28% 23%,#fffde1,#e7ff74 40%,#aacc29);box-shadow:0 0 14px #dcff78a0,0 5px #1c1725}
+.tilt-reset{width:100%;min-height:44px}
+.tilt-switch{margin-top:8px}
+.puzzle-tilt .puzzle-note:empty{display:none}

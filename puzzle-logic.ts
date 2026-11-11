@@ -7,7 +7,7 @@ export function majorityLayout(seed:number,easy=false){const r=random(seed),coun
 export function parcelLayout(seed:number,count:number){const r=random(seed),paths=Array.from({length:count},(_,i)=>[i]);for(let row=0;row<5;row++){const perm=shuffle(Array.from({length:count},(_,i)=>i),r);paths.forEach((p,i)=>p.push(perm[i]));}const target=Math.floor(r()*count);return {paths,target,answer:paths[target].at(-1)!};}
 export function cupMoves(seed:number,count:number){const r=random(seed);return Array.from({length:10},()=>{const a=Math.floor(r()*count),b=(a+1+Math.floor(r()*(count-1)))%count;return [a,b];});}
 export function cupPositions(moves:number[][],step:number,count:number){const p=Array.from({length:count},(_,i)=>i);for(const [a,b]of moves.slice(0,step))[p[a],p[b]]=[p[b],p[a]];return p;}
-export function lightSeries(seed:number){const r=random(seed);let t=750;return Array.from({length:120},()=>{const v={at:t,key:Math.floor(r()*4)};t+=Math.max(180,740-t*.021);return v;}).filter(v=>v.at<30000);}
+export function lightSeries(seed:number){const r=random(seed);let t=750,previous=-1;return Array.from({length:120},()=>{const key=previous<0?Math.floor(r()*4):(previous+1+Math.floor(r()*3))%4;const v={at:t,key};previous=key;t+=Math.max(180,740-t*.021);return v;}).filter(v=>v.at<30000);}
 // Connected pipe ports: top, right, bottom, left. The planted path is always solvable.
 export const turnPorts=(ports:number[],turn:number)=>ports.map(v=>(v+turn)%4);
 export function pipeLayout(seed:number,easy=false){const r=random(seed);const path=easy?[0,1,5,9,10,11,15]:seed%2?[0,4,8,9,5,6,10,14,15]:[0,1,2,6,5,9,10,11,15];const cells=Array.from({length:16},()=>({ports:shuffle([0,1,2,3],r).slice(0,2),turn:Math.floor(r()*4)}));
@@ -40,7 +40,21 @@ export function lineGraph(seed:number,easy=false){
  const g=templates[Math.abs(seed)%templates.length],turn=Math.floor(Math.abs(seed)/templates.length)%4;
  return {points:g.points.map(p=>{let x=p.x-150,y=p.y-140;for(let i=0;i<turn;i++)[x,y]=[-y,x];return {x:x+150,y:y+140};}),edges:g.edges};
 }
-export function polygon(seed:number,easy=false):P[]{const a=easy?[{x:45,y:55},{x:255,y:55},{x:235,y:240},{x:70,y:260}]:[{x:40,y:40},{x:160,y:40},{x:160,y:140},{x:260,y:140},{x:260,y:260},{x:40,y:260}];return seed%2?a.map(p=>({x:300-p.x,y:p.y})):a;}
+const splitShapes = [
+ [[45,55],[255,55],[235,240],[70,260]],
+ [[50,215],[85,62],[262,130]],
+ [[42,115],[159,41],[261,101],[240,229],[98,260]],
+ [[40,40],[160,40],[160,140],[260,140],[260,260],[40,260]],
+ [[42,69],[253,69],[253,130],[165,130],[165,253],[91,253],[91,130],[42,130]],
+ [[40,56],[258,56],[258,234],[195,234],[195,132],[112,132],[112,254],[40,254]],
+];
+export function polygon(seed:number,easy=false):P[]{
+ const r=random(seed),index=Math.floor(r()*3)+(easy?0:3),turn=Math.floor(r()*4);
+ return splitShapes[index].map(([x,y])=>{
+  for(let i=0;i<turn;i++)[x,y]=[300-y,x];
+  return {x,y};
+ });
+}
 export function area(poly:P[]){return Math.abs(poly.reduce((s,p,i)=>{const q=poly[(i+1)%poly.length];return s+p.x*q.y-q.x*p.y;},0)/2);}
 export function clipPolygon(poly:P[],a:P,b:P,side=1){const cross=(p:P)=>((b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x))*side,out:P[]=[];for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],u=cross(p),v=cross(q);if(u>=0)out.push(p);if((u>=0)!==(v>=0)){const t=u/(u-v);out.push({x:p.x+t*(q.x-p.x),y:p.y+t*(q.y-p.y)});}}return out;}
 export function splitRatio(poly:P[],a:P,b:P){if(Math.hypot(b.x-a.x,b.y-a.y)<20)return null;const ratio=area(clipPolygon(poly,a,b))/area(poly);return ratio<=.001||ratio>=.999?null:ratio;}
