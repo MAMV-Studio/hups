@@ -189,8 +189,10 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .game-toolbar{display:block}
 .game-toolbar .task-position{margin:0 auto}
 .task-finish{position:absolute;inset:0 0 auto;z-index:6;display:grid;place-items:center;min-height:42px;color:#fff3e5;text-shadow:0 2px 8px #17111f;pointer-events:none;font:22px 'Lilita One',sans-serif}
-.task-finish-star{color:#c8fa63;font-size:43px;animation:finish-star .36s .18s both}
-@keyframes finish-star{from{opacity:0;transform:scale(.45)}to{opacity:1;transform:scale(1)}}
+.task-finish-star{inset:50% auto auto 50%;width:min(3cm,32vw);aspect-ratio:1;min-height:0;font-size:0;transform:translate(-50%,-72%);filter:drop-shadow(0 4px 10px #17111f);animation:finish-star .56s .12s both}
+.task-finish-star::before{content:"";width:100%;height:100%;background:#c8fa63;clip-path:polygon(50% 0,65% 35%,100% 50%,65% 65%,50% 100%,35% 65%,0 50%,35% 35%)}
+.play-stage:has(.play-buddy)>.task-finish-star{top:calc(50% - 28px)}
+@keyframes finish-star{from{opacity:0;transform:translate(-50%,-50%) scale(.35)}to{opacity:1;transform:translate(-50%,-72%) scale(1)}}
 .puzzle-onestroke.puzzle-solved .one-stroke-board{animation:finish-glow .8s ease-out}
 @keyframes finish-glow{50%{box-shadow:0 0 20px #a8f8e9}}
 @media(prefers-reduced-motion:reduce){.task-finish-star,.puzzle-onestroke.puzzle-solved .one-stroke-board{animation:none}}
@@ -208,3 +210,12 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
  .scene-join .code-slots b{height:39px}
  .scene-join .key-balloons>button{max-height:57px}
 }
+
+.scene-game .climb-feedback:has(>.solo-break){padding-top:clamp(16px,calc(72svh - 410px),200px)}
+.scene-results .solo-ceremony .podium-cast.single{--solo-avatar:clamp(136px,28svh,234px);--solo-podium:clamp(178px,63vw,270px)}
+.scene-results .solo-ceremony .podium-cast.single .podium-player{width:var(--solo-podium);flex-basis:var(--solo-podium)}
+.scene-results .solo-ceremony .podium-cast.single .podium-avatar{height:var(--solo-avatar)}
+.scene-results .solo-ceremony .podium-cast.single .podium-avatar>.character{width:var(--solo-avatar);height:var(--solo-avatar)}
+.scene-results .solo-ceremony .podium-cast.single .podium-block{height:clamp(82px,13svh,112px);gap:5px}
+.scene-results .solo-ceremony .podium-cast.single .podium-block>b{font-size:30px}
+.scene-results .solo-ceremony .podium-cast.single .podium-block>small{font-size:14px}
