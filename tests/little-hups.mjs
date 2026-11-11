@@ -1,6 +1,6 @@
 import ts from 'typescript';import fs from 'node:fs';import assert from 'node:assert/strict';
 const uri=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
-const compile=p=>ts.transpileModule(fs.readFileSync(p,'utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022}}).outputText;
+const compile=(p,jsx)=>ts.transpileModule(fs.readFileSync(p,'utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022,jsx}}).outputText;
 const lib=uri(compile('libgame.ts'));
 const {kidCatalog,kidDeck,kidChallenge}=await import(uri(compile('little-tasks.ts').replace("'./libgame'",JSON.stringify(lib))));
 const {paintStroke,paintCoverage,holeAt}=await import(uri(compile('play-logic.ts')));
@@ -29,7 +29,8 @@ console.log('PASS: actual scratch and spray pointer completion exactly once; cor
 // Cover actual child flow: concealed scratch DOM, obvious size differences and fifth-game return.
 for(const id of ['big','small']){const t=kidChallenge(id,42);assert.equal(t.sample,'');const sizes=t.items.map(x=>parseInt(x.size)).sort((a,b)=>a-b);assert.deepEqual(sizes,[24,48,78,116]);}
 const scratchNodes=nodes(mount({kind:'scratch',onComplete(){}},true));assert.ok(!scratchNodes.some(n=>n.type==='foreignObject'));assert.ok(scratchNodes.some(n=>n.type==='mask'));assert.equal(h.states[6].length,0,'Scratch starts without any revealed strokes');
-const littleSrc=ts.transpileModule(fs.readFileSync('app/little-hups.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText.replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'./play-counter'",JSON.stringify(uri('export function beginCount(){return {complete(){}};}'))).replace("'./puzzle-games'",JSON.stringify(uri('export function PuzzleGame(){return null;}'))).replace("'./tactile-games'",JSON.stringify(uri('export function TactileGame(){return null;}'))).replace("'../little-tasks'",JSON.stringify(uri(compile('little-tasks.ts').replace("'./libgame'",JSON.stringify(lib)))));
+const wobble=uri(compile('app/wobbly-text.tsx',ts.JsxEmit.ReactJSX).replace('"react/jsx-runtime"',runtime));
+const littleSrc=ts.transpileModule(fs.readFileSync('app/little-hups.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText.replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'./wobbly-text'",JSON.stringify(wobble)).replace("'./play-counter'",JSON.stringify(uri('export function beginCount(){return {complete(){}};}'))).replace("'./puzzle-games'",JSON.stringify(uri('export function PuzzleGame(){return null;}'))).replace("'./tactile-games'",JSON.stringify(uri('export function TactileGame(){return null;}'))).replace("'../little-tasks'",JSON.stringify(uri(compile('little-tasks.ts').replace("'./libgame'",JSON.stringify(lib)))));
 const {LittleHups,littleFriends}=await import(uri(littleSrc));assert.equal(littleFriends[3].name,'Räyhä');
 function kidMount(){h.si=0;h.ri=0;return LittleHups({onExit(){}});}
 h.states=[];h.refs=[];let home=kidMount();const texts=nodes(home).filter(n=>n.type==='button');assert.ok(texts.findIndex(n=>n.props.children==='Leikitään! →')<texts.findIndex(n=>n.props.className==='pack-all'));

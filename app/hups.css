@@ -212,10 +212,13 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 }
 
 .scene-game .climb-feedback:has(>.solo-break){padding-top:clamp(16px,calc(72svh - 410px),200px)}
-.scene-results .solo-ceremony .podium-cast.single{--solo-avatar:clamp(136px,28svh,234px);--solo-podium:clamp(178px,63vw,270px)}
-.scene-results .solo-ceremony .podium-cast.single .podium-player{width:var(--solo-podium);flex-basis:var(--solo-podium)}
-.scene-results .solo-ceremony .podium-cast.single .podium-avatar{height:var(--solo-avatar)}
-.scene-results .solo-ceremony .podium-cast.single .podium-avatar>.character{width:var(--solo-avatar);height:var(--solo-avatar)}
+.scene-results .solo-ceremony .podium-cast.single{--solo-avatar:clamp(136px,28svh,216px);--solo-podium:min(100%,clamp(178px,63vw,270px));height:auto;min-height:0;padding-top:18px}
+.scene-results .solo-ceremony .podium-cast.single .podium-player{max-width:100%;width:var(--solo-podium);flex:0 0 var(--solo-podium)}
+.scene-results .solo-ceremony .podium-cast.single .podium-avatar{height:var(--solo-avatar);max-width:none;grid-template-columns:minmax(0,1fr)}
+.scene-results .solo-ceremony .podium-cast.single .podium-avatar>.character{width:min(100%,var(--solo-avatar));height:var(--solo-avatar);margin:0}
 .scene-results .solo-ceremony .podium-cast.single .podium-block{height:clamp(82px,13svh,112px);gap:5px}
 .scene-results .solo-ceremony .podium-cast.single .podium-block>b{font-size:30px}
 .scene-results .solo-ceremony .podium-cast.single .podium-block>small{font-size:14px}
+
+.scene-results .solo-ceremony .podium-crown{top:0}
+.little-start-view>.music-below-header{margin-top:14px}
