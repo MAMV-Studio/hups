@@ -95,10 +95,12 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 /* 30: studio signature below the favourite-game link, above the trim. */
 .phone .home-studio-bottom{display:block;text-align:center;margin:18px 0 14px;font-size:12px;line-height:1.4;color:#d2b2e4;letter-spacing:1.5px;font-weight:900}
 
-.theme-controls{position:absolute;right:0;top:50%;transform:translateY(-50%);display:grid;justify-items:end;gap:2px;z-index:2}
-.top .theme-controls .version{position:static;transform:none;font-size:7px}
-.theme-toggle{display:flex;align-items:center;gap:4px;min-height:30px;padding:0 8px;border:1px solid #9476aa;border-radius:18px;background:#392a45;color:#efdbf7;font:inherit;font-size:10px;font-weight:900}
-.theme-toggle span:first-child{font-size:16px;line-height:1}
+.name-with-music{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:10px;align-items:center}
+.name-with-music #name{min-width:0;width:100%}
+.theme-toggle{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid #9476aa;border-radius:50%;background:#392a45;color:#d2b9df;font-size:24px;line-height:1}
+.name-with-music .theme-toggle{width:48px;height:48px}
 .theme-toggle[aria-pressed=true]{border-color:#c8fa63;color:#c8fa63}
 .theme-toggle:focus-visible{outline:2px solid #c8fa63;outline-offset:3px}
-.theme-error{position:absolute;right:0;top:100%;width:185px;padding:7px;border-radius:10px;background:#392a45;color:#fff4df;font-size:12px}
+.theme-in-game{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2}
+.top:has(.theme-in-game) .version{right:50px}
+@media(max-width:360px){.top:has(.theme-in-game) .version{right:48px;font-size:6px;letter-spacing:0}}

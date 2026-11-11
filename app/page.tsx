@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState,useMemo} from 'react';
 import {createGameClock} from '../game-clock';
 import {Backdrop} from './backdrop';
-import {ThemeMusic} from './theme-music';
+import {useThemeMusic} from './theme-music';
 import {WobblyText} from './wobbly-text';
 import {Character,characters,ParkRace,ParkTrim} from './characters';
 import {taskDeck,taskCatalog,makeTask} from '../tasks';
@@ -41,13 +41,14 @@ export default function Page(){
  function askHome(){if(screen==='game'&&!window.confirm('Keskeytetäänkö peli ja palataan etusivulle?'))return;home();}
  function home(){leaveRoom();epoch.current++;clearInterval(timer.current);auth.current=null;setRoom(null);setScreen('home');setStage('intro');setError('');setProgressError('');}
  useEffect(()=>{if(screen==='game')window.scrollTo({top:0,behavior:'instant'});},[idx,stage,screen]);
- return <main className={'phone scene-'+screen+' phase-'+stage}><Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><ThemeMusic duringPlay={screen==='game'||screen==='results'} /></header>
+ const music=useThemeMusic(screen==='game'||screen==='results');
+ return <main className={'phone scene-'+screen+' phase-'+stage}>{music.audio}<Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 40</span>{screen!=='home'&&<div className="theme-in-game">{music.button}</div>}</header>
  {screen==='home'&&<>
  <div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">
  <div className="pick-label">Kuka lähtee matkaan? <b>{characters[avatar]?.name}</b></div>
  <div className="character-picker">{characters.map((a,i)=><button key={a.name} aria-label={`Valitse ${a.name}`} aria-pressed={avatar===i} style={{'--buddy-color':a.color} as React.CSSProperties} className={avatar===i?'picked':''} onClick={()=>setAvatar(i)}><Character id={i}/></button>)}</div>
- <label htmlFor="name">Sinun pelinimesi</label><input id="name" maxLength={18} value={name} placeholder="Keksi nimimerkki" onChange={e=>setName(e.target.value)}/>
+ <label htmlFor="name">Sinun pelinimesi</label><div className="name-with-music"><input id="name" maxLength={18} value={name} placeholder="Keksi nimimerkki" onChange={e=>setName(e.target.value)}/>{music.button}</div>
  <fieldset className="round-picker"><legend>Kuinka pitkä kisa?</legend><div className="round-presets">{[5,10,15,20].map((n,i)=><button key={n} aria-label={`${n} tehtävää`} aria-pressed={length===n} className={length===n?'selected':''} onClick={()=>setLength(n)}><b>{n}</b><small>{['Pikakisa','Sopiva kisa','Vielä lisää','Koko kattaus'][i]}</small></button>)}</div><p>Noin {Math.ceil(length*.4)} min · joka kerralla uusi sekoitus</p></fieldset>
  <button className="primary home-play" disabled={!name.trim()} onClick={()=>begin(Math.floor(Math.random()*1e8))}>Pelaa <span aria-hidden="true">→</span></button>
  <div className="split home-multiplayer"><button disabled={!name.trim()||busy} onClick={()=>{setCode('');setScreen('create');}}>Haasta kaverit <span aria-hidden="true">＋</span></button><button disabled={!name.trim()} onClick={()=>{leaveRoom();auth.current=null;setRoom(null);setProgressError('');setScreen('join');}}>Liity koodilla <span aria-hidden="true">→</span></button></div>

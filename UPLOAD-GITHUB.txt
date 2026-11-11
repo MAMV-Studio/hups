@@ -1,4 +1,3 @@
-Pura Hups-Vercel-39.zip.
-Lataa sen sisältö GitHubin hups-repositorion juureen kuten ennen.
-Odota Vercel Ready ja päivitä sivu versioon 39.
-Käynnistä tunnari yläpalkin Musiikki-painikkeesta.
+Pura Hups-Vercel-40.zip ja lataa sen sisältö GitHubiin kuten ennen.
+Odota Vercel Ready ja päivitä sivu versioon 40.
+Musiikin saa pois pelinimen viereisestä nuotista.
