@@ -2,6 +2,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+const THEME_TRACKS = {hups: '/hups-tunnari.mp3', pikkuhups: '/pikkuhups-tunnari.mp3'} as const;
 const MUSIC_PREFERENCE = 'hups-music-muted';
 
 export function useThemeMusic(duringPlay: boolean) {
@@ -94,8 +95,20 @@ export function useThemeMusic(duringPlay: boolean) {
     }
   }
 
+  function selectTheme(theme: keyof typeof THEME_TRACKS) {
+    const track = audio.current;
+    const src = THEME_TRACKS[theme];
+    if (!track || track.getAttribute('src') === src) return;
+
+    // Keep the same player and switch sources within the navigation gesture.
+    updatePlayback(false);
+    track.src = src;
+    play(true);
+  }
+
   return {
-    audio: <audio ref={audio} src="/hups-tunnari.mp3" preload="none" loop
+    selectTheme,
+    audio: <audio ref={audio} src={THEME_TRACKS.hups} preload="none" loop
       onPlaying={() => updatePlayback(true)} onPause={() => updatePlayback(false)}
       onError={() => updatePlayback(false)} />,
     button: <button type="button" className="theme-toggle" aria-label="Musiikki"
