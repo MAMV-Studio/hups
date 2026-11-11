@@ -48,7 +48,7 @@ export default function Minigame({task,onFinish,avatar=0}:{task:Task,avatar?:num
  function finishDrawing(e:React.PointerEvent<SVGSVGElement>){
   if(!drawActive.current)return;draw(e);drawActive.current=false;
   const stroke=pointsRef.current;if(stroke.length<2){retry();return;}
-  if(id==='circle')end(circleScore(stroke),'Ympyrän pyöreys ja viivan päiden yhdistyminen ratkaisevat.',350);
+  if(id==='circle'){const quality=circleScore(stroke);end(quality,`Ympyrän tarkkuus ${Math.round(quality/10)} %.`,350);}
   else{let len=0;for(let i=1;i<stroke.length;i++)len+=Math.hypot(stroke[i].x-stroke[i-1].x,stroke[i].y-stroke[i-1].y);end(accuracy(Math.abs(len-d.length),d.length*.7),`Viivasi oli ${Math.round(len/d.length*100)} % mallin pituudesta.`,350);}
  }
  function aim(e:React.PointerEvent<SVGSVGElement>){if(!canAnswer()||['spot','movingspot'].includes(id)&&expose)return;const r=e.currentTarget.getBoundingClientRect(),p={x:(e.clientX-r.left)/r.width*300,y:(e.clientY-r.top)/r.height*300};setTap(p);const target=id==='movingspot'?motionPoint(d,3000):id==='movingcenter'?motionPoint(d,performance.now()-start.current):d.point;const score=tapScore(p,target);end(score,`Tarkkuutesi oli ${(score/10).toLocaleString('fi-FI',{maximumFractionDigits:1})} %. Vihreä piste näytti oikean kohdan.`,650);}

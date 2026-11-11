@@ -35,7 +35,7 @@
 .tilt-switch{margin-top:8px}
 .puzzle-tilt .puzzle-note:empty{display:none}
 
-.puzzle-game:not(.puzzle-kids):has(>.task-reveal){padding-bottom:78px}
+
 .pipe-paint{stroke-dasharray:1;stroke-dashoffset:1;animation:paint-through .22s linear both}
 .paint-victim.splashed>.character{filter:none;animation:paint-splash .6s var(--paint-arrival) both}
 .paint-victim.splashed>b{animation:puzzle-reveal .4s var(--paint-arrival) both}

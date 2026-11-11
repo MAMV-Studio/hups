@@ -164,11 +164,7 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .phone a.home-studio-bottom{text-decoration:none}
 .game-toolbar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;margin:0 0 8px}
 .game-toolbar .task-position{grid-column:2;grid-row:1;margin:0;text-align:center}
-.game-toolbar .theme-toggle{grid-column:3;grid-row:1}
 .play-stage{position:relative}
-.task-reveal{position:absolute;inset:auto 0 0;z-index:6;display:grid;justify-items:center;gap:4px;padding:10px 14px;border:1px solid #a887bf;border-radius:18px;background:#362746;color:#fff3e5;text-align:center;pointer-events:none;box-shadow:0 4px 12px #120b20a0}
-.task-reveal strong{color:#c8fa63;font-family:'Lilita One',sans-serif;font-size:23px}
-.task-reveal span{font-size:13px;line-height:1.35}
 .solo-break{order:1;padding:16px;text-align:center;border:1px solid #82629c;border-radius:26px;background:radial-gradient(ellipse at 50% 38%,#61477b,#30233e 74%);margin-bottom:10px}
 .solo-mascot{display:flex;align-items:center;justify-content:center;gap:8px;color:#c8fa63;font-size:25px}
 .solo-mascot .character{display:block;width:clamp(100px,40vw,162px);height:clamp(100px,40vw,162px);margin:0}
@@ -187,3 +183,28 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .create-challenge .level-choice .character{display:block;width:72px;height:72px;margin:0}
 .create-challenge .level-choice b{font:clamp(13px,4vw,17px) 'Lilita One',sans-serif}
 
+
+.scene-home .round-picker{margin-bottom:12px}
+.scene-home .round-picker>p{margin-top:17px}
+.game-toolbar{display:block}
+.game-toolbar .task-position{margin:0 auto}
+.task-finish{position:absolute;inset:0 0 auto;z-index:6;display:grid;place-items:center;min-height:42px;color:#fff3e5;text-shadow:0 2px 8px #17111f;pointer-events:none;font:22px 'Lilita One',sans-serif}
+.task-finish-star{color:#c8fa63;font-size:43px;animation:finish-star .36s .18s both}
+@keyframes finish-star{from{opacity:0;transform:scale(.45)}to{opacity:1;transform:scale(1)}}
+.puzzle-onestroke.puzzle-solved .one-stroke-board{animation:finish-glow .8s ease-out}
+@keyframes finish-glow{50%{box-shadow:0 0 20px #a8f8e9}}
+@media(prefers-reduced-motion:reduce){.task-finish-star,.puzzle-onestroke.puzzle-solved .one-stroke-board{animation:none}}
+.scene-join .join-panel>.tag,.scene-join .balloon-keypad>label{font-size:10px}
+.scene-join .join-panel>h1{font-size:clamp(29px,8vw,36px)}
+.scene-join .balloon-keypad{max-width:260px}
+.scene-join .balloon-keypad>p{font-size:12px}
+.scene-join .code-slots b{width:44px;height:46px}
+.scene-join .key-balloons>button{max-height:66px;font-size:29px}
+.scene-join .key-balloons>.key-clear{font-size:10px}
+.scene-join .key-balloons>.key-backspace{font-size:22px;line-height:1}
+.scene-join .join-panel>.textbutton{font-size:14px}
+@media(max-height:700px){
+ .scene-join .balloon-keypad{max-width:220px;margin-block:8px 11px}
+ .scene-join .code-slots b{height:39px}
+ .scene-join .key-balloons>button{max-height:57px}
+}

@@ -8,14 +8,14 @@ function Face({id,kids=false}:{id:number,kids?:boolean}){return id<6?kids?<span 
 export function PuzzleGame({id,seed=1,level='normal',kids=false,onFinish}:{id:string,seed?:number,level?:string,kids?:boolean,onFinish:(score:number,text:string)=>void}){
  const easy=level==='easy'||kids,[ms,setMs]=useState(0),[ready,setReady]=useState(id!=='tilt'),[result,setResult]=useState<{score:number,text:string}|null>(null);const done=useRef(false),callback=useRef(onFinish),started=useRef(0),delay=useRef<any>(null);callback.current=onFinish;
  const wait=id==='cups'?6500:0,limit=kids?Infinity:id==='majority'||id==='cups'?5000:id==='bisect'?15000:30000;
- function finish(score:number,text:string){if(done.current)return;done.current=true;const value=Math.round(Math.max(0,Math.min(1000,score)));setResult({score:value,text});delay.current=setTimeout(()=>callback.current(value,text),kids?650:id==='pipes'&&value>0?3000:2200);}
+ function finish(score:number,text:string){if(done.current)return;done.current=true;const value=Math.round(Math.max(0,Math.min(1000,score)));setResult({score:value,text});const seconds=(Math.max(0,performance.now()-started.current-wait)/1000).toLocaleString('fi-FI',{minimumFractionDigits:1,maximumFractionDigits:1});delay.current=setTimeout(()=>callback.current(value,kids?text:`${text} Aika ${seconds} s.`),kids?650:id==='pipes'&&value>0?3000:1250);}
  useEffect(()=>{if(!ready)return;started.current=performance.now();const t=setInterval(()=>{if(done.current)return;const n=performance.now()-started.current;setMs(n);if(id!=='speedlights'&&n>=limit+wait)finish(0,'Hupsista! Aika loppui — 0 pistettä.');},25);return()=>clearInterval(t);},[ready]);
  useEffect(()=>()=>clearTimeout(delay.current),[]);
  const p:Props={seed,easy,kids,ms,blocked:()=>done.current||!ready,finish:(score,text)=>finish(id==='speedlights'||id==='slide'||id==='bisect'?score:score/(1+Math.max(0,ms-wait)/45000),text)};
- return <div className={'puzzle-game puzzle-'+id+(kids?' puzzle-kids':'')}>
+ return <div className={'puzzle-game puzzle-'+id+(kids?' puzzle-kids':'')+(result&&result.score>0?' puzzle-solved':'')}>
  {!kids&&ready&&<div className="puzzle-clock"><span>{ms<wait?'Seuraa tarkasti…':Math.max(0,Math.ceil((limit-Math.max(0,ms-wait))/1000))+' s'}</span><i style={{width:Math.max(0,100*(1-Math.max(0,ms-wait)/limit))+'%'}}/></div>}
  {id==='memorypairs'&&<Memory {...p}/>}{id==='parcel'&&<Parcel {...p}/>}{id==='speedlights'&&<Lights {...p}/>}{id==='pipes'&&<Pipes {...p}/>}{id==='majority'&&<Majority {...p}/>}{id==='slide'&&<Slide {...p}/>}{id==='onestroke'&&<OneStroke {...p}/>}{id==='cups'&&<Cups {...p}/>}{id==='bisect'&&<Bisect {...p}/>}{id==='tilt'&&<Tilt {...p} active={ready} onStart={()=>setReady(true)}/>}
- {result&&!kids&&<div className="task-reveal" role="status"><strong>{result.score>0?`+${result.score} p`:'Hupsista!'}</strong><span>{result.text}</span></div>}
+ {result&&!kids&&(result.score===0||!['pipes','onestroke','slide','tilt'].includes(id))&&<div className={'task-finish '+(result.score>0?'task-finish-star':'')} role="status" aria-label={result.score>0?'Onnistuit!':undefined}>{result.score>0?'✦':result.text.includes('Aika loppui')?'Aika loppui':'Hupsista!'}</div>}
  {result&&kids&&<div className={'puzzle-result '+(result.score>0?'win':'')+(id==='tilt'&&result.score>0?' marble-success':'')} role="status"><span>{result.score>0?'✦':'Hups!'}</span><p>{result.text}</p></div>}
  </div>;
 }
