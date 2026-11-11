@@ -8,14 +8,15 @@ function Face({id,kids=false}:{id:number,kids?:boolean}){return id<6?kids?<span 
 export function PuzzleGame({id,seed=1,level='normal',kids=false,onFinish}:{id:string,seed?:number,level?:string,kids?:boolean,onFinish:(score:number,text:string)=>void}){
  const easy=level==='easy'||kids,[ms,setMs]=useState(0),[ready,setReady]=useState(id!=='tilt'),[result,setResult]=useState<{score:number,text:string}|null>(null);const done=useRef(false),callback=useRef(onFinish),started=useRef(0),delay=useRef<any>(null);callback.current=onFinish;
  const wait=id==='cups'?6500:0,limit=kids?Infinity:id==='majority'||id==='cups'?5000:id==='bisect'?15000:30000;
- function finish(score:number,text:string){if(done.current)return;done.current=true;const value=Math.round(Math.max(0,Math.min(1000,score)));setResult({score:value,text});delay.current=setTimeout(()=>callback.current(value,text),kids?650:1200);}
+ function finish(score:number,text:string){if(done.current)return;done.current=true;const value=Math.round(Math.max(0,Math.min(1000,score)));setResult({score:value,text});delay.current=setTimeout(()=>callback.current(value,text),kids?650:id==='pipes'&&value>0?3000:2200);}
  useEffect(()=>{if(!ready)return;started.current=performance.now();const t=setInterval(()=>{if(done.current)return;const n=performance.now()-started.current;setMs(n);if(id!=='speedlights'&&n>=limit+wait)finish(0,'Hupsista! Aika loppui — 0 pistettä.');},25);return()=>clearInterval(t);},[ready]);
  useEffect(()=>()=>clearTimeout(delay.current),[]);
  const p:Props={seed,easy,kids,ms,blocked:()=>done.current||!ready,finish:(score,text)=>finish(id==='speedlights'||id==='slide'||id==='bisect'?score:score/(1+Math.max(0,ms-wait)/45000),text)};
  return <div className={'puzzle-game puzzle-'+id+(kids?' puzzle-kids':'')}>
  {!kids&&ready&&<div className="puzzle-clock"><span>{ms<wait?'Seuraa tarkasti…':Math.max(0,Math.ceil((limit-Math.max(0,ms-wait))/1000))+' s'}</span><i style={{width:Math.max(0,100*(1-Math.max(0,ms-wait)/limit))+'%'}}/></div>}
  {id==='memorypairs'&&<Memory {...p}/>}{id==='parcel'&&<Parcel {...p}/>}{id==='speedlights'&&<Lights {...p}/>}{id==='pipes'&&<Pipes {...p}/>}{id==='majority'&&<Majority {...p}/>}{id==='slide'&&<Slide {...p}/>}{id==='onestroke'&&<OneStroke {...p}/>}{id==='cups'&&<Cups {...p}/>}{id==='bisect'&&<Bisect {...p}/>}{id==='tilt'&&<Tilt {...p} active={ready} onStart={()=>setReady(true)}/>}
- {result&&<div className={'puzzle-result '+(result.score>0?'win':'')+(id==='tilt'&&result.score>0?' marble-success':'')} role="status"><span>{result.score>0?'✦':'Hups!'}</span><p>{result.text}</p></div>}
+ {result&&!kids&&<div className="task-reveal" role="status"><strong>{result.score>0?`+${result.score} p`:'Hupsista!'}</strong><span>{result.text}</span></div>}
+ {result&&kids&&<div className={'puzzle-result '+(result.score>0?'win':'')+(id==='tilt'&&result.score>0?' marble-success':'')} role="status"><span>{result.score>0?'✦':'Hups!'}</span><p>{result.text}</p></div>}
  </div>;
 }
 export function Memory(p:Props){const pairs=p.kids?4:p.easy?6:8,layout=useMemo(()=>memoryLayout(p.seed,pairs),[p.seed,pairs]);const [open,setOpen]=useState<number[]>([]),[matched,setMatched]=useState<number[]>([]),[tries,setTries]=useState(0);const current=useRef<number[]>([]),found=useRef(new Set<number>()),lock=useRef(false),attempts=useRef(0),timeout=useRef<any>(null);useEffect(()=>()=>clearTimeout(timeout.current),[]);
@@ -41,11 +42,26 @@ export function Pipes(p:Props){const initial=useMemo(()=>pipeLayout(p.seed,p.eas
   <path d="M13 14q-9-13 19-13t19 13" fill="none" stroke="#e9c7f4" strokeWidth="3"/>
   <path d="M10 14h44l-6 26H16Z" fill="#82dfea" stroke="#e9c7f4" strokeWidth="3"/>
   <path d="M13 21h38" stroke="#d6fbff" strokeWidth="4" strokeLinecap="round"/>
- </svg></div><div className="pipe-board">{cells.map((c,i)=><button key={i} aria-label={`Käännä putki ${i+1}`} onClick={()=>turn(i)} className={route?.includes(i)?'flow':''} style={{'--flow-delay':`${Math.max(0,route?.indexOf(i)??0)*.06}s`} as React.CSSProperties}><svg viewBox="0 0 70 70"><path d={turnPorts(c.ports,c.turn).map(v=>`M35 35 L${[35,70,35,0][v]} ${[0,35,70,35][v]}`).join(' ')} fill="none" stroke="#9e7cbb" strokeWidth="20" strokeLinecap="round"/><path d={turnPorts(c.ports,c.turn).map(v=>`M35 35 L${[35,70,35,0][v]} ${[0,35,70,35][v]}`).join(' ')} fill="none" stroke={route?.includes(i)?'#82dfea':'#392741'} strokeWidth="10"/></svg></button>)}</div><div className="pipe-terminals">
+ </svg></div><div className="pipe-board">{cells.map((c,i)=>{
+  const ports=turnPorts(c.ports,c.turn);
+  const index=route?.indexOf(i)??-1;
+  const edge=(port:number)=>`${[35,70,35,0][port]} ${[0,35,70,35][port]}`;
+  const prev=index>0?route![index-1]:-4;
+  const inlet=prev===i-4?0:prev===i+1?1:prev===i+4?2:3;
+  const outlet=ports.find(port=>port!==inlet)!;
+  const outline=`M${edge(ports[0])} L35 35 L${edge(ports[1])}`;
+  return <button key={i} aria-label={`Käännä putki ${i+1}`} onClick={()=>turn(i)}>
+   <svg viewBox="0 0 70 70">
+    <path d={outline} fill="none" stroke="#9e7cbb" strokeWidth="20" strokeLinejoin="round"/>
+    <path d={outline} fill="none" stroke="#392741" strokeWidth="10" strokeLinejoin="round"/>
+    {index>=0&&<path className="pipe-paint" pathLength="1" style={{animationDelay:`${index*.14}s`}} d={`M${edge(inlet)} L35 35 L${edge(outlet)}`} fill="none" stroke="#82dfea" strokeWidth="10" strokeLinejoin="round"/>}
+   </svg>
+  </button>;
+ })}</div><div className="pipe-terminals">
  <svg className="pipe-outlet" viewBox="0 0 64 32" role="img" aria-label="Putken ulostulo">
   <path d="M32 0v16" stroke="#9e7cbb" strokeWidth="15"/><path d="M32 0v16" stroke="#82dfea" strokeWidth="8"/>
   <path d="m24 18 8 8 8-8" fill="none" stroke="#82dfea" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
- </svg></div></div><div className={'paint-victim '+(route?'splashed':'')}><Face id={p.seed%6}/><b aria-hidden="true">✦</b></div></>;
+ </svg></div></div><div className={'paint-victim '+(route?'splashed':'')} style={{'--paint-arrival':`${(route?.length??0)*.14}s`} as React.CSSProperties}><Face id={p.seed%6}/><b aria-hidden="true">✦</b></div></>;
 }
 export function Majority(p:Props){const m=useMemo(()=>majorityLayout(p.seed,p.easy),[p.seed,p.easy]),[chosen,setChosen]=useState(-1);return <><p className="puzzle-instruction">Mitä väriä on eniten? Arvioi nopeasti!</p><div className={'majority-field '+(chosen>=0?'sorted':'')}>{m.items.map((v,i)=><span key={i} style={{color:inkColors[v],rotate:((i*37+p.seed)%50-25)+'deg'}}>{m.shape}</span>)}</div><div className="majority-options">{m.counts.map((n,i)=><button key={i} style={{background:inkColors[i]}} aria-label={['Sininen','Vaaleanpunainen','Vihreä'][i]} onClick={()=>{if(p.blocked())return;setChosen(i);p.finish(i===m.winner?1000:0,`Eniten oli ${['sinisiä','vaaleanpunaisia','vihreitä'][m.winner]}: ${m.counts[m.winner]}.`);}}>{m.shape}{chosen>=0&&<small>{n}</small>}</button>)}</div></>;
 }

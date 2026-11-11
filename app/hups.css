@@ -122,16 +122,14 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 }
 .theme-toggle[aria-pressed=true]{border-color:#c8fa63;color:#c8fa63}
 .theme-toggle:focus-visible{outline:2px solid #c8fa63;outline-offset:3px}
-.theme-in-game{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2}
-.top:has(.theme-in-game) .version{right:50px}
-@media(max-width:360px){.top:has(.theme-in-game) .version{right:48px;font-size:6px;letter-spacing:0}}
+.music-below-header{display:flex;justify-content:flex-end;margin-top:8px}
 
 .scene-lobby .code {
   display: grid;
-  grid-template-columns: auto auto;
-  justify-content: center;
+  grid-template-columns: 1fr;
+  justify-items: center;
   align-items: center;
-  gap: 0 14px;
+  gap: 6px;
   padding: 12px 8px 16px;
   margin: 18px 0 12px;
 }
@@ -149,8 +147,6 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
   line-height: 1.05;
 }
 .code .share-challenge {
-  grid-column: 2;
-  grid-row: 1 / span 2;
   display: block;
   margin: 0;
   min-height: 44px;
@@ -169,3 +165,25 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .game-toolbar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;margin:0 0 8px}
 .game-toolbar .task-position{grid-column:2;grid-row:1;margin:0;text-align:center}
 .game-toolbar .theme-toggle{grid-column:3;grid-row:1}
+.play-stage{position:relative}
+.task-reveal{position:absolute;inset:auto 0 0;z-index:6;display:grid;justify-items:center;gap:4px;padding:10px 14px;border:1px solid #a887bf;border-radius:18px;background:#362746;color:#fff3e5;text-align:center;pointer-events:none;box-shadow:0 4px 12px #120b20a0}
+.task-reveal strong{color:#c8fa63;font-family:'Lilita One',sans-serif;font-size:23px}
+.task-reveal span{font-size:13px;line-height:1.35}
+.solo-break{order:1;padding:16px;text-align:center;border:1px solid #82629c;border-radius:26px;background:radial-gradient(ellipse at 50% 38%,#61477b,#30233e 74%);margin-bottom:10px}
+.solo-mascot{display:flex;align-items:center;justify-content:center;gap:8px;color:#c8fa63;font-size:25px}
+.solo-mascot .character{display:block;width:clamp(100px,40vw,162px);height:clamp(100px,40vw,162px);margin:0}
+.solo-mascot span:last-child{color:#f6a5d3}
+.solo-earned{display:block;color:#c8fa63;font:35px 'Lilita One',sans-serif}
+.solo-break p{font-size:13px;margin:4px 0 10px;color:#e9d7ef}
+.solo-total{color:#dec5ef}.solo-total b{color:#fff3df}
+.solo-progress{display:flex;gap:4px;margin-top:12px}
+.solo-progress i{flex:1;height:6px;background:#69507c;border-radius:8px}
+.solo-progress .completed{background:#c8fa63}
+.create-challenge .level-choice{padding:8px 0;border:0;background:none}
+.create-challenge .level-choice .split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.create-challenge .level-choice button{display:grid;justify-items:center;align-content:center;gap:5px;padding:8px;color:#2b1c3b;border:2px solid #f7c7e6;border-radius:23px;background:linear-gradient(#fac3e3,#e895ce);box-shadow:0 4px #8c537d}
+.create-challenge .level-choice button:nth-child(2){background:linear-gradient(#a6eaf1,#72c7dc);border-color:#c9f5f8;box-shadow:0 4px #456c87}
+.create-challenge .level-choice button[aria-pressed=true]{outline:2px solid #d6ff91;outline-offset:3px}
+.create-challenge .level-choice .character{display:block;width:72px;height:72px;margin:0}
+.create-challenge .level-choice b{font:clamp(13px,4vw,17px) 'Lilita One',sans-serif}
+
