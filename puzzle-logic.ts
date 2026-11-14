@@ -83,9 +83,9 @@ export const codeDirections = [
 
 export function codeLayout(seed:number){
  const layouts=[
-  ['....TG','.###..','.....#','.#.##.','.#....','S..#..'],
-  ['G..#..','##.T..','...##.','.#....','...##.','#....S'],
-  ['..G...','.#.##.','.#.T..','....#.','#.###.','S.....'],
+  ['.....G','.###..','.....#','.#.##.','.#....','S..#..'],
+  ['G..#..','##....','...##.','.#....','...##.','#....S'],
+  ['..G...','.#.##.','.#....','....#.','#.###.','S.....'],
  ];
  const r=random(seed),rows=layouts[Math.floor(r()*layouts.length)];
  const tiles=(r()<.5?rows:rows.map(row=>Array.from(row).reverse().join(''))).join('');

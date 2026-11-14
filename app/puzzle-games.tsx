@@ -103,6 +103,7 @@ export function CodeRoute(p:Props & {avatar:number}){
  const layout=useMemo(()=>codeLayout(p.seed),[p.seed]);
  const [queue,setQueue]=useState<number[]>([]);
  const [cursor,setCursor]=useState(-1);
+ const [executed,setExecuted]=useState(0);
  const [cell,setCell]=useState(layout.start);
  const [failed,setFailed]=useState(-1);
  const [running,setRunning]=useState(false);
@@ -116,15 +117,14 @@ export function CodeRoute(p:Props & {avatar:number}){
   if(failed>=0){
    setQueue(queue.map((value,index)=>index===failed?command:value));
    setFailed(-1);
-  }else if(queue.length<20)setQueue([...queue,command]);
+  }else if(queue.length-executed<20)setQueue([...queue,command]);
   setHint('');
  }
  function run(){
-  if(running||p.blocked()||!queue.length)return;
+  if(running||p.blocked()||queue.length===executed)return;
   setRunning(true);
   setFailed(-1);
   setHint('');
-  setCell(layout.start);
   function advance(index:number,position:number){
    if(p.blocked())return;
    if(index===queue.length){
@@ -137,11 +137,13 @@ export function CodeRoute(p:Props & {avatar:number}){
    setCursor(index);
    if(next===null){
     setRunning(false);
+    setQueue(queue.slice(0,index+1));
     setFailed(index);
     setHint('Hups! Valitse nuoli tilalle.');
     return;
    }
    setCell(next);
+   setExecuted(index+1);
    if(next===layout.goal){
     setSolved(true);
     setRunning(false);
@@ -151,19 +153,20 @@ export function CodeRoute(p:Props & {avatar:number}){
    }
    timer.current=setTimeout(()=>advance(index+1,next),210);
   }
-  timer.current=setTimeout(()=>advance(0,layout.start),160);
+  timer.current=setTimeout(()=>advance(executed,cell),160);
  }
 
+ const firstVisible=Math.max(0,executed-(running?1:0));
  return <div className="code-route">
   <p className="puzzle-instruction">Anna komennot ja paina Aja!</p>
   <div className={'code-board'+(failed>=0&&hint?' code-bump':'')+(solved?' code-win':'')} aria-label="Koodausrata">
-   {Array.from(layout.tiles,(tile,index)=><span key={index} className={'code-tile code-'+(tile==='#'?'wall':tile==='G'?'goal':tile==='S'?'start':tile==='T'?'tunnel':'floor')} aria-hidden="true">{tile==='G'?'★':''}</span>)}
+   {Array.from(layout.tiles,(tile,index)=><span key={index} className={'code-tile code-'+(tile==='#'?'wall':tile==='G'?'goal':tile==='S'?'start':'floor')} aria-hidden="true">{tile==='G'?'★':''}</span>)}
    <div className="code-avatar" style={{left:cell%layout.size*100/layout.size+'%',top:Math.floor(cell/layout.size)*100/layout.size+'%'}} aria-hidden="true"><Character id={p.avatar} happy={solved}/></div>
    {solved&&<span className="code-splash" aria-hidden="true">✦ ★ ✦</span>}
   </div>
-  <div className="code-queue" aria-label="Komennot">{queue.length?queue.map((command,index)=><button type="button" key={index} disabled={running||p.blocked()} aria-label={`Komento ${index+1}: ${codeDirections[command].label}. Vaihda komento`} className={index===failed?'code-error':index===cursor?'code-current':''} onClick={()=>{setFailed(index);setHint('Valitse uusi suunta.');}}>{codeDirections[command].symbol}</button>):<span>Valitse ensimmäinen nuoli</span>}</div>
-  <div className="code-keys">{[3,0,2,1].map(command=><button type="button" key={command} disabled={running||p.blocked()||(queue.length>=20&&failed<0)} aria-label={codeDirections[command].label} onClick={()=>add(command)}>{codeDirections[command].symbol}</button>)}</div>
-  <div className="code-actions"><button type="button" aria-label="Poista viimeinen komento" disabled={!queue.length||running||p.blocked()} onClick={()=>{setQueue(queue.slice(0,-1));setFailed(-1);setCursor(-1);setHint('');}}>↶</button><button type="button" className="primary" disabled={!queue.length||running||p.blocked()} onClick={run}>Aja!</button></div>
+  <div className="code-queue" aria-label="Komennot">{queue.length>executed||running?queue.slice(firstVisible).map((command,offset)=>{const index=offset+firstVisible;return <button type="button" key={index} disabled={running||p.blocked()||index<executed} aria-label={`Komento ${index+1}: ${codeDirections[command].label}. Vaihda komento`} className={index===failed?'code-error':index===cursor?'code-current':''} onClick={()=>{setFailed(index);setHint('Valitse uusi suunta.');}}>{codeDirections[command].symbol}</button>}):<span>{executed?'Lisää seuraava nuoli':'Valitse ensimmäinen nuoli'}</span>}</div>
+  <div className="code-keys">{[3,0,2,1].map(command=><button type="button" key={command} disabled={running||p.blocked()||(queue.length-executed>=20&&failed<0)} aria-label={codeDirections[command].label} onClick={()=>add(command)}>{codeDirections[command].symbol}</button>)}</div>
+  <div className="code-actions"><button type="button" aria-label="Poista viimeinen komento" disabled={queue.length===executed||running||p.blocked()} onClick={()=>{setQueue(queue.slice(0,-1));setFailed(-1);setCursor(-1);setHint('');}}>⌫</button><button type="button" className="primary" disabled={queue.length===executed||running||p.blocked()} onClick={run}>Aja!</button></div>
   <p className="puzzle-note" role="status">{hint}</p>
  </div>;
 }

@@ -81,3 +81,32 @@ for(let seed=0;seed<150;seed++){
  assert.ok(queue.some(([cell,distance])=>cell===layout.goal&&distance<=20),'Star is reachable within command capacity');
 }
 console.log('PASS: coding tracks have reachable goals and prevent crossing the board edge.');
+
+const codeLayout=L.codeLayout(p.seed);
+const firstMove=L.codeDirections.findIndex((_,index)=>L.codeStep(codeLayout,codeLayout.start,index)!==null);
+const nextCell=L.codeStep(codeLayout,codeLayout.start,firstMove);
+const badMove=L.codeDirections.findIndex((_,index)=>L.codeStep(codeLayout,nextCell,index)===null);
+const routeButton=label=>buttons(render('CodeRoute')).find(button=>button.props['aria-label']===label||button.props.children===label);
+const avatarTop=()=>nodes(render('CodeRoute')).find(n=>n.props.className==='code-avatar').props.style.top;
+const avatarLeft=()=>nodes(render('CodeRoute')).find(n=>n.props.className==='code-avatar').props.style.left;
+const pending=[];
+const originalTimeout=globalThis.setTimeout;
+globalThis.setTimeout=fn=>{pending.push(fn);return 1;};
+try{
+ render('CodeRoute',true);
+ for(const index of [firstMove,badMove,firstMove])routeButton(L.codeDirections[index].label).props.onClick();
+ routeButton('Aja!').props.onClick();
+ while(pending.length)pending.shift()();
+ const chips=buttons(render('CodeRoute')).filter(n=>n.props['aria-label']?.startsWith('Komento'));
+ assert.equal(chips.length,1);
+ assert.equal(chips[0].props.className,'code-error');
+ assert.equal(avatarTop(),Math.floor(nextCell/6)*100/6+'%');
+ const back=(firstMove+2)%4;
+ routeButton(L.codeDirections[back].label).props.onClick();
+ routeButton('Aja!').props.onClick();
+ while(pending.length)pending.shift()();
+ assert.equal(avatarTop(),Math.floor(codeLayout.start/6)*100/6+'%');
+ assert.equal(avatarLeft(),codeLayout.start%6*100/6+'%');
+ assert.equal(buttons(render('CodeRoute')).filter(n=>n.props.className==='code-error').length,0);
+}finally{globalThis.setTimeout=originalTimeout;}
+console.log('PASS: a crash drops the trailing commands, preserves the failed arrow, and the repaired route resumes from the current tile.');

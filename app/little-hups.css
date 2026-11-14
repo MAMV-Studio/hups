@@ -48,15 +48,3 @@
 @media(max-height:740px){.little-welcome .little-hero{height:150px}.little-welcome .little-hero>.little-character{height:120px}.little-welcome .little-hero>.little-character:nth-child(2){height:150px}}
 
 .little-start-view{min-height:calc(100svh - 130px)}
-
-.tooth-game{text-align:center}
-.tooth-game>h1{margin:12px 0;color:#fff1d8}
-.tooth-game>.little-character{display:block;width:118px;height:125px;margin:0 auto}
-.tooth-game>p{margin:9px 0;color:#fff0df;font-weight:900}
-.tooth-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;max-width:310px;margin:auto;padding:13px 19px;background:#582844;border:5px solid #f69fb1;border-radius:35px;touch-action:none;user-select:none}
-.tooth-board button{min-height:49px;position:relative;isolation:isolate;overflow:hidden;background:#fffaf0;border:2px solid #f5ced9;border-radius:8px 8px 15px 15px;color:#9e6942;font-size:23px;font-weight:900;touch-action:none}
-.tooth-board button:nth-child(n+5){border-radius:15px 15px 8px 8px}
-.tooth-board button::before{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 35% 55%,#eeba5c,#ffe6a5 76%);opacity:var(--film);content:''}
-.tooth-board button.tooth-clean{color:#2a9c8a;background:#fff;border-color:#a2efdb}
-.tooth-game .tooth-timer{font:2rem 'Lilita One',sans-serif;color:#c9f89d}
-.tooth-start{margin-top:14px}

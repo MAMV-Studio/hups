@@ -222,7 +222,7 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .exit-dialog::backdrop{background:#130c1bbd}
 .exit-dialog h2{margin:0;font:clamp(25px,7vw,32px) 'Lilita One',sans-serif}
 .exit-actions{display:grid;gap:12px;margin-top:20px;grid-auto-rows:1fr}
-.exit-actions .primary{margin:0;min-height:52px}
+.phone .exit-actions .primary{display:grid;place-items:center;text-align:center;margin:0;min-height:52px}
 
 .mirror-arrow{display:block;width:34px;height:34px;margin:auto}
 .extra-model.mirror-frame{width:min(135px,48%);min-height:0;aspect-ratio:1;margin:18px auto 24px;border:3px solid #af9bdb;border-radius:30px;background:linear-gradient(145deg,#554368,#30263f);color:#f3deff;box-shadow:0 5px #22182e,inset 0 2px #ffffff30,0 0 20px #b89cff24}
