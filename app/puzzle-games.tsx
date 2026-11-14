@@ -1,19 +1,20 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {Character} from './characters';
-import {memoryLayout,majorityLayout,parcelLayout,cupMoves,cupPositions,lightSeries,pipeLayout,pipeRoute,turnPorts,slideLayout,moveBlock,slideMinimum,lineGraph,polygon,clipPolygon,splitRatio,windingMaze,moveMarble,inkColors,P,Block} from '../puzzle-logic';
+import {codeLayout,codeDirections,codeStep,memoryLayout,majorityLayout,parcelLayout,cupMoves,cupPositions,lightSeries,pipeLayout,pipeRoute,turnPorts,slideLayout,moveBlock,slideMinimum,lineGraph,polygon,clipPolygon,splitRatio,windingMaze,moveMarble,inkColors,P,Block} from '../puzzle-logic';
 type Props={seed:number,easy:boolean,kids:boolean,ms:number,blocked:()=>boolean,finish:(score:number,text:string)=>void};
 const names=['Vieterö','Pörhö','Moukku','Löllö','Nuppu','Töppö','Lankakerä','Ilmapallo'];
 function Face({id,kids=false}:{id:number,kids?:boolean}){return id<6?kids?<span className="puzzle-kid-face" role="img" aria-label={['Kuje','Kieppi','Hupsu','Räyhä','Tassu','Hauva'][id]} style={{backgroundImage:`url('/little-friend-${id}.png')`}}/>:<Character id={id}/>:<span className="puzzle-object" aria-label={names[id]}>{['🧶','🎈'][id-6]}</span>;}
-export function PuzzleGame({id,seed=1,level='normal',kids=false,onFinish}:{id:string,seed?:number,level?:string,kids?:boolean,onFinish:(score:number,text:string)=>void}){
+export function PuzzleGame({id,seed=1,level='normal',kids=false,avatar=0,onFinish}:{id:string,seed?:number,level?:string,kids?:boolean,avatar?:number,onFinish:(score:number,text:string)=>void}){
  const easy=level==='easy'||kids,[ms,setMs]=useState(0),[ready,setReady]=useState(id!=='tilt'),[result,setResult]=useState<{score:number,text:string}|null>(null);const done=useRef(false),callback=useRef(onFinish),started=useRef(0),delay=useRef<any>(null);callback.current=onFinish;
- const wait=id==='cups'?6500:0,limit=kids?Infinity:id==='majority'||id==='cups'?5000:id==='bisect'?15000:30000;
+ const wait=id==='cups'?6500:0,limit=kids?Infinity:id==='majority'||id==='cups'?5000:id==='bisect'?15000:id==='coderoute'?45000:30000;
  function finish(score:number,text:string){if(done.current)return;done.current=true;const value=Math.round(Math.max(0,Math.min(1000,score)));setResult({score:value,text});const seconds=(Math.max(0,performance.now()-started.current-wait)/1000).toLocaleString('fi-FI',{minimumFractionDigits:1,maximumFractionDigits:1});delay.current=setTimeout(()=>callback.current(value,kids?text:`${text} Aika ${seconds} s.`),kids?650:id==='pipes'&&value>0?3000:1250);}
  useEffect(()=>{if(!ready)return;started.current=performance.now();const t=setInterval(()=>{if(done.current)return;const n=performance.now()-started.current;setMs(n);if(id!=='speedlights'&&n>=limit+wait)finish(0,'Hupsista! Aika loppui — 0 pistettä.');},25);return()=>clearInterval(t);},[ready]);
  useEffect(()=>()=>clearTimeout(delay.current),[]);
  const p:Props={seed,easy,kids,ms,blocked:()=>done.current||!ready,finish:(score,text)=>finish(id==='speedlights'||id==='slide'||id==='bisect'?score:score/(1+Math.max(0,ms-wait)/45000),text)};
  return <div className={'puzzle-game puzzle-'+id+(kids?' puzzle-kids':'')+(result&&result.score>0?' puzzle-solved':'')}>
  {!kids&&ready&&<div className="puzzle-clock"><span>{ms<wait?'Seuraa tarkasti…':Math.max(0,Math.ceil((limit-Math.max(0,ms-wait))/1000))+' s'}</span><i style={{width:Math.max(0,100*(1-Math.max(0,ms-wait)/limit))+'%'}}/></div>}
+ {id==='coderoute'&&<CodeRoute {...p} avatar={avatar}/>}
  {id==='memorypairs'&&<Memory {...p}/>}{id==='parcel'&&<Parcel {...p}/>}{id==='speedlights'&&<Lights {...p}/>}{id==='pipes'&&<Pipes {...p}/>}{id==='majority'&&<Majority {...p}/>}{id==='slide'&&<Slide {...p}/>}{id==='onestroke'&&<OneStroke {...p}/>}{id==='cups'&&<Cups {...p}/>}{id==='bisect'&&<Bisect {...p}/>}{id==='tilt'&&<Tilt {...p} active={ready} onStart={()=>setReady(true)}/>}
  </div>;
 }
@@ -28,7 +29,7 @@ export function Parcel(p:Props){const n=p.kids?2:p.easy?3:4,layout=useMemo(()=>p
  return <><p className="puzzle-instruction">Seuraa paketin narua. Kenelle yllätys kuuluu?</p><div className="parcel-stage"><svg viewBox="0 0 300 260" aria-label="Risteilevät pakettinarut">{layout.paths.map((a,i)=><path key={i} d={d(a)} fill="none" stroke="#bba3d9" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round"/>)}{show&&<path d={d(layout.paths[layout.target])} fill="none" stroke="#d3ff80" strokeWidth="8" className="parcel-trace"/>}<text x={x(layout.target)} y="30" textAnchor="middle" fontSize="32">🎁</text>{layout.paths.map((_,i)=><circle key={i} cx={x(i)} cy="242" r="5" fill="#f4c8e9"/>)}</svg><div className="parcel-friends" style={{gridTemplateColumns:`repeat(${n},1fr)`}}>{Array.from({length:n},(_,i)=><button key={i} aria-label={`Paketti hahmolle ${names[i]}`} onClick={()=>{if(p.blocked())return;if(i===answer){setShow(true);p.finish(1000,'Paketti löysi oikean kaverin!');}else setHint('Hupsista, seuraa narua uudelleen!');}}><Face id={i} kids={p.kids}/>{show&&i===answer&&<span className="gift-reward">{['🎈','🧶','🍪','⭐'][i]}</span>}</button>)}</div></div><p role="status" className="puzzle-note">{hint||'Katse seuraa, sormi valitsee.'}</p></>;
 }
 export function Lights(p:Props){const series=useMemo(()=>lightSeries(p.seed),[p.seed]),[hits,setHits]=useState(0),consumed=useRef(0),hitsRef=useRef(0);
- const flashMs=300;
+ const flashMs=450;
  const expected=series[consumed.current];
  const lit=new Set(series.filter((light,index)=>index>=consumed.current&&light.at<=p.ms&&p.ms-light.at<flashMs).map(light=>light.key));
  useEffect(()=>{if(p.ms>=30000&&!p.blocked())p.finish(Math.min(1000,hitsRef.current*25),`${hitsRef.current} oikeaa valoa!`);},[p.ms]);
@@ -78,7 +79,7 @@ export function OneStroke(p:Props){const g=useMemo(()=>lineGraph(p.seed,p.easy),
  function touch(e:React.PointerEvent<SVGSVGElement>,start=false){if(p.blocked())return;const i=point(e);if(start){if(i<0)return;e.currentTarget.setPointerCapture(e.pointerId);active.current=true;route.current=[i];used.current=new Set();setPath([i]);setHint('');return;}if(!active.current||i<0||route.current.at(-1)===i)return;const last=route.current.at(-1)!,edge=g.edges.findIndex(([a,b])=>a===last&&b===i||a===i&&b===last);if(edge<0||used.current.has(edge)){setHint('Sama viiva vain kerran. Aloita uudelleen!');active.current=false;return;}used.current.add(edge);route.current=[...route.current,i];setPath(route.current);if(used.current.size===g.edges.length){active.current=false;p.finish(1000,'Koko kuvio yhdellä vedolla!');}}
  return <><p className="puzzle-instruction">Piirrä kaikki viivat nostamatta sormea. Sama viiva vain kerran.</p><svg className="one-stroke-board" viewBox="0 0 300 285" preserveAspectRatio="none" onPointerDown={e=>touch(e,true)} onPointerMove={e=>touch(e)} onPointerUp={()=>{active.current=false;if(used.current.size<g.edges.length)setHint('Uusi yritys: aloita mistä tahansa pisteestä.');}} onPointerCancel={()=>active.current=false} aria-label="Yhden viivan piirtoalue">{g.edges.map(([a,b],i)=><line key={i} x1={g.points[a].x} y1={g.points[a].y} x2={g.points[b].x} y2={g.points[b].y} stroke="#76588e" strokeWidth="8"/>)}<path d={path.map((n,i)=>`${i?'L':'M'}${g.points[n].x} ${g.points[n].y}`).join(' ')} fill="none" stroke="#8cdeeb" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round"/>{g.points.map((v,i)=><circle key={i} cx={v.x} cy={v.y} r="15" fill={path.at(-1)===i?'#f3a7cd':'#d1f87d'}/>)}</svg><p className="puzzle-note" role="status">{hint||'Viiva napsahtaa pisteisiin.'}</p></>;
 }
-export function Cups(p:Props){const n=p.easy?3:4,moves=useMemo(()=>cupMoves(p.seed,n),[p.seed,n]),step=Math.max(0,Math.min(10,Math.floor((p.ms-1500)/500)+1)),positions=cupPositions(moves,step,n),ball=p.seed%n,[chosen,setChosen]=useState(-1),shown=p.ms<1500||chosen>=0;return <><p className="puzzle-instruction">{p.ms<1500?'Muista, minkä kupin alla pallo on!':p.ms<6500?'Seuraa kuppia…':'Minkä kupin alla pallo on?'}</p><div className="cups-stage">{Array.from({length:n},(_,identity)=>{const slot=positions.indexOf(identity),lift=shown&&(identity===ball||identity===chosen);return <button key={identity} aria-label={`Kuppi ${slot+1}`} disabled={p.ms<6500||p.blocked()} style={{left:(slot+.5)*100/n+'%',width:90/n+'%','--cup-color':['#b893ec','#52c6dd','#ff8bb7','#efad62'][identity]} as React.CSSProperties} className={lift?'lifted':''} onClick={()=>{if(p.blocked()||p.ms<6500)return;setChosen(identity);p.finish(identity===ball?1000:0,identity===ball?'Pallo löytyi — poks!':'Hupsista! Pallo piilotteli toisen kupin alla.');}}>{identity===ball&&shown&&<span className="cup-ball"/>}<span className="cup-shell">★</span></button>;})}</div><p className="puzzle-note">{p.ms<6500?'Kupit pysähtyvät ennen vastaamista.':'Napauta yhtä kuppia.'}</p></>;
+export function Cups(p:Props){const n=p.easy?3:4,moves=useMemo(()=>cupMoves(p.seed,n),[p.seed,n]),step=Math.max(0,Math.min(10,Math.floor((p.ms-1500)/500)+1)),positions=cupPositions(moves,step,n),ball=p.seed%n,[chosen,setChosen]=useState(-1),shown=p.ms<1500||chosen>=0;return <><p className="puzzle-instruction">{p.ms<1500?'Muista, minkä kupin alla pallo on!':p.ms<6500?'Seuraa kuppia…':'Minkä kupin alla pallo on?'}</p><div className="cups-stage">{Array.from({length:n},(_,identity)=>{const slot=positions.indexOf(identity),lift=shown&&(identity===ball||identity===chosen);return <button key={identity} aria-label={`Kuppi ${slot+1}`} disabled={p.ms<6500||p.blocked()} style={{left:(slot+.5)*100/n+'%',width:90/n+'%','--cup-color':'#5de5ed'} as React.CSSProperties} className={lift?'lifted':''} onClick={()=>{if(p.blocked()||p.ms<6500)return;setChosen(identity);p.finish(identity===ball?1000:0,identity===ball?'Pallo löytyi — poks!':'Hupsista! Pallo piilotteli toisen kupin alla.');}}>{identity===ball&&shown&&<span className="cup-ball"/>}<span className="cup-shell">★</span></button>;})}</div><p className="puzzle-note">{p.ms<6500?'Kupit pysähtyvät ennen vastaamista.':'Napauta yhtä kuppia.'}</p></>;
 }
 export function Bisect(p:Props){const poly=useMemo(()=>polygon(p.seed,p.easy),[p.seed,p.easy]),[line,setLine]=useState<P[]>([]),[ratio,setRatio]=useState<number|null>(null),[hint,setHint]=useState('');const start=useRef<P|null>(null);const pos=(e:React.PointerEvent<SVGSVGElement>)=>{const b=e.currentTarget.getBoundingClientRect();return {x:(e.clientX-b.left)*300/b.width,y:(e.clientY-b.top)*300/b.height};};const pts=(a:P[])=>a.map(v=>`${v.x},${v.y}`).join(' ');
  return <><p className="puzzle-instruction">Leikkaa kuvio suoralla viivalla kahteen yhtä suureen osaan.</p><svg className="bisect-board" viewBox="0 0 300 300" aria-label="Kuvion puolitusalue" onPointerDown={e=>{if(p.blocked())return;e.currentTarget.setPointerCapture(e.pointerId);start.current=pos(e);setLine([start.current,start.current]);}} onPointerMove={e=>{if(start.current&&!p.blocked())setLine([start.current,pos(e)]);}} onPointerCancel={()=>start.current=null} onPointerUp={e=>{if(!start.current||p.blocked())return;const a=start.current,b=pos(e);start.current=null;const r=splitRatio(poly,a,b);if(r===null){setHint('Vedä viiva kuvion läpi. Voit aloittaa ulkopuolelta.');return;}setLine([a,b]);setRatio(r);p.finish(1000*(1-2*Math.abs(.5-r)),`${Math.round(r*100)} % / ${100-Math.round(r*100)} % — ${Math.abs(.5-r)<.06?'melkein tasan!':'hyvä yritys!'}`);}}><defs><linearGradient id="split-fill" x2="100%" y2="100%"><stop stopColor={['#b99bea','#86dcec','#f7a6cd'][Math.abs(p.seed)%3]}/><stop offset="1" stopColor={['#eea5d5','#b6ee89','#ffcf7f'][Math.abs(p.seed)%3]}/></linearGradient></defs><polygon points={pts(poly)} fill="url(#split-fill)" stroke="#fff1db" strokeWidth="3" strokeLinejoin="round"/>{ratio!==null&&line.length===2&&[1,-1].map((side,i)=><polygon key={side} points={pts(clipPolygon(poly,line[0],line[1],side))} fill={i?'#f2a4ce':'#8edfe9'} transform={`translate(${side*4},${side*4})`}/>)}{line.length===2&&<line x1={line[0].x} y1={line[0].y} x2={line[1].x} y2={line[1].y} stroke="#e0ff89" strokeWidth="5" strokeLinecap="round"/>}</svg><p className="puzzle-note" role="status">{hint||'Nosta sormi, kun leikkaus on valmis.'}</p></>;
@@ -96,4 +97,73 @@ export function Tilt(p:Props&{active:boolean,onStart:()=>void}){
  return <><p className="puzzle-instruction">{p.active?(sensor?'Kallista ja kuljeta kuula maalireikään!':'Ohjaa kuula nuolilla maalireikään!'):'Pidä puhelin mukavassa asennossa. Aloita, kun olet valmis.'}</p><svg className="tilt-board" viewBox="0 0 300 300" aria-label="Kuulalabyrintti"><defs><linearGradient id="maze-floor" x2="100%" y2="100%"><stop stopColor="#334a61"/><stop offset="1" stopColor="#503356"/></linearGradient><radialGradient id="marble-shine" cx="30%" cy="25%"><stop stopColor="#fff7db"/><stop offset=".4" stopColor="#f5b3d5"/><stop offset="1" stopColor="#a56fce"/></radialGradient></defs><rect width="300" height="300" fill="url(#maze-floor)"/>{maze.walls.map((w,i)=>{const x=i%n*cell,y=Math.floor(i/n)*cell;return <g key={i}>{w[0]&&<line x1={x} y1={y} x2={x+cell} y2={y} stroke="#b7a3e8" strokeWidth="5" strokeLinecap="round"/>}{w[3]&&<line x1={x} y1={y} x2={x} y2={y+cell} stroke="#b7a3e8" strokeWidth="5" strokeLinecap="round"/>}</g>;})}<rect x="2" y="2" width="296" height="296" rx="14" fill="none" stroke="#b7a3e8" strokeWidth="5" strokeLinecap="round"/><circle className="marble-goal-ring" cx={(n-.5)*cell} cy={(n-.5)*cell} r={cell*.43} fill="none" stroke="#cafa70" strokeWidth="2"/><circle cx={(n-.5)*cell} cy={(n-.5)*cell} r={cell*.38} fill="#100d1b" stroke="#8a6b99" strokeWidth="2"/>{trail.map((v,i)=><circle key={i} cx={v.x*cell} cy={v.y*cell} r={cell*.14*i/8} fill="#efaed9" opacity={i*.035}/>)}<g className={arrived?'marble-arrived':''} style={{transformOrigin:`${pos.x*cell}px ${pos.y*cell}px`}}><circle cx={pos.x*cell} cy={pos.y*cell+1} r={cell*.24} fill="#1a1028" opacity=".5"/><circle cx={pos.x*cell} cy={pos.y*cell} r={cell*.23} fill="url(#marble-shine)" stroke="#ffe7f6" strokeWidth="1"/><circle cx={pos.x*cell-cell*.05} cy={pos.y*cell-cell*.07} r={cell*.035} fill="#fff"/></g>{arrived&&<g className="marble-splash" style={{transformOrigin:`${(n-.5)*cell}px ${(n-.5)*cell}px`}}>{Array.from({length:8},(_,i)=><circle key={i} cx={(n-.5)*cell+Math.cos(i*Math.PI/4)*cell*.45} cy={(n-.5)*cell+Math.sin(i*Math.PI/4)*cell*.45} r="3" fill={inkColors[i%3]}/>)}</g>}</svg>
  {!p.active?<div className="tilt-start"><button className="primary" disabled={waiting} onClick={()=>void begin(true)}>Aloita kallistuksella →</button><button disabled={waiting} onClick={()=>void begin(false)}>Pelaa nuolipainikkeilla</button></div>:<>{!sensor&&<div className="tilt-controls">{['↑','→','↓','←'].map((s,i)=><button key={s} aria-label={['Ohjaa ylös','Ohjaa oikealle','Ohjaa alas','Ohjaa vasemmalle'][i]} onPointerDown={e=>{e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);held.current.add(i);}} onPointerUp={()=>held.current.delete(i)} onPointerCancel={()=>held.current.delete(i)} onLostPointerCapture={()=>held.current.delete(i)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();held.current.add(i);}}} onKeyUp={()=>held.current.delete(i)}>{s}</button>)}</div>}{sensor&&<button className="tilt-reset" onClick={calibrate}>Aseta keskiasento uudelleen</button>}{canTilt&&<button className="tilt-reset tilt-switch" onClick={changeControls}>{sensor?'Vaihda nuoliohjaukseen':'Vaihda kallistukseen'}</button>}</>}
  <p className="puzzle-note" role="status">{hint||(p.active&&!sensor?'Nuolia voi pitää pohjassa. Myös näppäimistön nuolet toimivat.':'')}</p></>;
+}
+
+export function CodeRoute(p:Props & {avatar:number}){
+ const layout=useMemo(()=>codeLayout(p.seed),[p.seed]);
+ const [queue,setQueue]=useState<number[]>([]);
+ const [cursor,setCursor]=useState(-1);
+ const [cell,setCell]=useState(layout.start);
+ const [failed,setFailed]=useState(-1);
+ const [running,setRunning]=useState(false);
+ const [solved,setSolved]=useState(false);
+ const [hint,setHint]=useState('');
+ const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
+
+ function add(command:number){
+  if(running||p.blocked())return;
+  if(failed>=0){
+   setQueue(queue.map((value,index)=>index===failed?command:value));
+   setFailed(-1);
+  }else if(queue.length<20)setQueue([...queue,command]);
+  setHint('');
+ }
+ function run(){
+  if(running||p.blocked()||!queue.length)return;
+  setRunning(true);
+  setFailed(-1);
+  setHint('');
+  setCell(layout.start);
+  function advance(index:number,position:number){
+   if(p.blocked())return;
+   if(index===queue.length){
+    setRunning(false);
+    setCursor(-1);
+    setHint('Tähti jäi vielä radalle. Lisää tai vaihda komentoja.');
+    return;
+   }
+   const next=codeStep(layout,position,queue[index]);
+   setCursor(index);
+   if(next===null){
+    setRunning(false);
+    setFailed(index);
+    setHint('Hups! Valitse nuoli tilalle.');
+    return;
+   }
+   setCell(next);
+   if(next===layout.goal){
+    setSolved(true);
+    setRunning(false);
+    setHint('Tähti löytyi!');
+    p.finish(1000,'Hahmo löysi reitin tähdelle!');
+    return;
+   }
+   timer.current=setTimeout(()=>advance(index+1,next),210);
+  }
+  timer.current=setTimeout(()=>advance(0,layout.start),160);
+ }
+
+ return <div className="code-route">
+  <p className="puzzle-instruction">Anna komennot ja paina Aja!</p>
+  <div className={'code-board'+(failed>=0&&hint?' code-bump':'')+(solved?' code-win':'')} aria-label="Koodausrata">
+   {Array.from(layout.tiles,(tile,index)=><span key={index} className={'code-tile code-'+(tile==='#'?'wall':tile==='G'?'goal':tile==='S'?'start':tile==='T'?'tunnel':'floor')} aria-hidden="true">{tile==='G'?'★':''}</span>)}
+   <div className="code-avatar" style={{left:cell%layout.size*100/layout.size+'%',top:Math.floor(cell/layout.size)*100/layout.size+'%'}} aria-hidden="true"><Character id={p.avatar} happy={solved}/></div>
+   {solved&&<span className="code-splash" aria-hidden="true">✦ ★ ✦</span>}
+  </div>
+  <div className="code-queue" aria-label="Komennot">{queue.length?queue.map((command,index)=><button type="button" key={index} disabled={running||p.blocked()} aria-label={`Komento ${index+1}: ${codeDirections[command].label}. Vaihda komento`} className={index===failed?'code-error':index===cursor?'code-current':''} onClick={()=>{setFailed(index);setHint('Valitse uusi suunta.');}}>{codeDirections[command].symbol}</button>):<span>Valitse ensimmäinen nuoli</span>}</div>
+  <div className="code-keys">{[3,0,2,1].map(command=><button type="button" key={command} disabled={running||p.blocked()||(queue.length>=20&&failed<0)} aria-label={codeDirections[command].label} onClick={()=>add(command)}>{codeDirections[command].symbol}</button>)}</div>
+  <div className="code-actions"><button type="button" aria-label="Poista viimeinen komento" disabled={!queue.length||running||p.blocked()} onClick={()=>{setQueue(queue.slice(0,-1));setFailed(-1);setCursor(-1);setHint('');}}>↶</button><button type="button" className="primary" disabled={!queue.length||running||p.blocked()} onClick={run}>Aja!</button></div>
+  <p className="puzzle-note" role="status">{hint}</p>
+ </div>;
 }

@@ -50,7 +50,7 @@ const press=i=>buttons(render('Lights'))[i].props.onPointerDown({preventDefault(
 const litKeys=()=>buttons(render('Lights')).flatMap((button,i)=>button.props.className==='lit'?[i]:[]);
 press(0);assert.equal(calls.length,0);
 p.ms=lights[0].at;assert.deepEqual(litKeys(),[lights[0].key]);
-p.ms+=300;assert.deepEqual(litKeys(),[],'An unanswered flash goes out on schedule');
+p.ms+=450;assert.deepEqual(litKeys(),[],'An unanswered flash goes out on schedule');
 p.ms=lights[1].at;assert.deepEqual(litKeys(),[lights[1].key],'The next flash starts with an answer still pending');
 press(lights[0].key);press(lights[1].key);assert.equal(calls.length,0,'A dark target remains answerable in order');
 p.ms=lights[3].at;press(lights[2].key);press((lights[3].key+1)%4);assert.equal(calls[0][0],75);
@@ -65,3 +65,19 @@ try{
  h.states=[];h.refs=[];h.effects=[];h.si=0;h.ri=0;calls=[];components.PuzzleGame({id:'tilt',onFinish:(...a)=>calls.push(a)});assert.equal(h.states[1],false,'Tilt timer awaits explicit start');h.effects[0]();assert.equal(calls.length,0);
  console.log('PASS: actual 30s/15s/5s deadlines, cup reveal exclusion, single completion and tilt waits for explicit start.');
 }finally{globalThis.setInterval=oldInterval;globalThis.clearInterval=oldClear;globalThis.setTimeout=oldTimeout;Object.defineProperty(performance,'now',{value:oldNow,configurable:true});}
+
+for(let seed=0;seed<150;seed++){
+ const layout=L.codeLayout(seed),visited=new Set([layout.start]),queue=[[layout.start,0]];
+ assert.equal(layout.tiles.length,36);
+ assert.ok(L.codeStep(layout,layout.start,2)===null,'Bottom edge stops a downward command');
+ for(const [cell,distance] of queue){
+  for(let command=0;command<4;command++){
+   const next=L.codeStep(layout,cell,command);
+   if(next===null||visited.has(next))continue;
+   visited.add(next);
+   queue.push([next,distance+1]);
+  }
+ }
+ assert.ok(queue.some(([cell,distance])=>cell===layout.goal&&distance<=20),'Star is reachable within command capacity');
+}
+console.log('PASS: coding tracks have reachable goals and prevent crossing the board edge.');

@@ -1,3 +1,3 @@
-Pura Hups-Vercel-52.zip ja lataa sen sisältö GitHubiin kuten ennen.
-Odota Vercel Ready ja päivitä sivu versioon 52.
+Pura Hups-Vercel-54.zip ja lataa sen sisältö GitHubiin kuten ennen.
+Odota Vercel Ready ja päivitä sivu versioon 54.
 Musiikin saa pois pelinimen viereisestä nuotista.

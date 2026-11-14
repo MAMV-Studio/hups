@@ -218,14 +218,24 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .scene-results .solo-ceremony .podium-crown{top:0}
 .little-start-view>.music-below-header{margin-top:14px}
 
-.exit-dialog{width:min(400px,calc(100% - 36px));max-height:calc(100% - 36px);padding:24px;border:2px solid #a889be;border-radius:26px;background:#362644;color:#fff3e5;text-align:center;box-shadow:0 8px #1c1226}
+.exit-dialog{position:fixed;inset:0;margin:auto;width:min(400px,calc(100% - 36px));max-height:calc(100% - 36px);padding:24px;border:2px solid #a889be;border-radius:26px;background:#362644;color:#fff3e5;text-align:center;box-shadow:0 8px #1c1226}
 .exit-dialog::backdrop{background:#130c1bbd}
 .exit-dialog h2{margin:0;font:clamp(25px,7vw,32px) 'Lilita One',sans-serif}
-.exit-dialog p{margin:12px 0 20px;color:#e1caec}
-.exit-actions{display:grid;gap:12px}
+.exit-actions{display:grid;gap:12px;margin-top:20px;grid-auto-rows:1fr}
 .exit-actions .primary{margin:0;min-height:52px}
-.exit-actions .textbutton{min-height:44px}
+
 .mirror-arrow{display:block;width:34px;height:34px;margin:auto}
 .extra-model.mirror-frame{width:min(135px,48%);min-height:0;aspect-ratio:1;margin:18px auto 24px;border:3px solid #af9bdb;border-radius:30px;background:linear-gradient(145deg,#554368,#30263f);color:#f3deff;box-shadow:0 5px #22182e,inset 0 2px #ffffff30,0 0 20px #b89cff24}
 .mirror-frame .mirror-arrow{width:60%;height:auto}
 .extra-model.mirror-frame.mirror-solved{border-color:#c8fa63;box-shadow:0 0 25px #c8fa6380}
+
+.bubble-hunt .toy-ball,.balloon-surprise .toy-ball{width:19%}
+.extra-task-orientation .extra-model .mirror-arrow{width:76px;height:76px}
+.extra-task-orientation .choice-grid .mirror-arrow{width:52px;height:52px}
+.extra-task-oddarrow .extra-nine button{background:#7044a2;color:#fff5fc;border:2px solid #c2a0eb}
+.extra-task-oddarrow .extra-nine button:nth-child(3n+2){background:#236f86;border-color:#95edf5}
+.extra-task-oddarrow .extra-nine button:nth-child(3n){background:#a53c73;border-color:#ffbcdf}
+.extra-task-oddarrow .extra-nine .mirror-arrow{width:clamp(30px,10vw,46px);height:auto;vertical-align:middle}
+.extra-task-oddarrow .extra-nine .odd-hit{background:#d0fc82;color:#282037;animation:odd-arrow-hop .35s ease-out}
+@keyframes odd-arrow-hop{50%{transform:translateY(-8px) scale(1.1)}}
+@media(prefers-reduced-motion:reduce){.extra-task-oddarrow .extra-nine .odd-hit{animation:none}}

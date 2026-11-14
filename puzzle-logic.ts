@@ -1,6 +1,6 @@
 import {random,shuffle} from './libgame';
 export type P={x:number,y:number};
-export const puzzleIds=['memorypairs','parcel','speedlights','pipes','majority','slide','onestroke','cups','bisect','tilt'];
+export const puzzleIds=['coderoute','memorypairs','parcel','speedlights','pipes','majority','slide','onestroke','cups','bisect','tilt'];
 export const inkColors=['#91dcea','#f3a3cf','#cafa70'];
 export function memoryLayout(seed:number,pairs:number){const r=random(seed),ids=pairs===8?Array.from({length:8},(_,i)=>i):[...shuffle([0,1,2,3,4,5],r).slice(0,pairs===4?3:4),...shuffle([6,7],r).slice(0,pairs===4?1:2)];return shuffle([...ids,...ids],r);}
 export function majorityLayout(seed:number,easy=false){const r=random(seed),count=easy?[17,10]:[18,21,15],order=shuffle(count,r),winner=order.indexOf(Math.max(...order)),items=shuffle(order.flatMap((n,c)=>Array(n).fill(c)),r);return {items,winner,counts:order,shape:seed%2?'●':'■'};}
@@ -72,4 +72,30 @@ export function moveMarble(maze:ReturnType<typeof mazeLayout>,v:P,delta:P,r=.19)
  x=Math.max(r,Math.min(n-r,x));y=v.y+delta.y;
  for(let i=0;i<n*n;i++){const wx=i%n,wy=Math.floor(i/n);if(maze.walls[i][0]&&x>wx-r&&x<wx+1+r){if(v.y<=wy-r&&y>wy-r)y=wy-r;if(v.y>=wy+r&&y<wy+r)y=wy+r;}}
  return {x,y:Math.max(r,Math.min(n-r,y))};
+}
+
+export const codeDirections = [
+ {x:0,y:-1,symbol:'↑',label:'Ylös'},
+ {x:1,y:0,symbol:'→',label:'Oikealle'},
+ {x:0,y:1,symbol:'↓',label:'Alas'},
+ {x:-1,y:0,symbol:'←',label:'Vasemmalle'},
+];
+
+export function codeLayout(seed:number){
+ const layouts=[
+  ['....TG','.###..','.....#','.#.##.','.#....','S..#..'],
+  ['G..#..','##.T..','...##.','.#....','...##.','#....S'],
+  ['..G...','.#.##.','.#.T..','....#.','#.###.','S.....'],
+ ];
+ const r=random(seed),rows=layouts[Math.floor(r()*layouts.length)];
+ const tiles=(r()<.5?rows:rows.map(row=>Array.from(row).reverse().join(''))).join('');
+ return {tiles,start:tiles.indexOf('S'),goal:tiles.indexOf('G'),size:6};
+}
+
+export function codeStep(layout:ReturnType<typeof codeLayout>,cell:number,command:number){
+ const {x,y}=codeDirections[command];
+ const col=cell%layout.size+x,row=Math.floor(cell/layout.size)+y;
+ if(col<0||row<0||col>=layout.size||row>=layout.size)return null;
+ const next=row*layout.size+col;
+ return layout.tiles[next]==='#'?null:next;
 }
