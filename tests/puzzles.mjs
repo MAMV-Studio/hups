@@ -27,7 +27,7 @@ const sealed={size:2,walls:Array.from({length:4},()=>[true,true,true,true]),hole
 console.log('PASS: 150 seeds, exact matching pairs at 3 sizes, soluble pipes/slides/Euler trails/mazes, unique majority, consistent parcels/cups, split areas, timed light series, same easy decks without maths/reading.');
 // Exercise real component input handlers with deterministic state, not duplicate game rules.
 const h=globalThis.__puzzleHooks={states:[],refs:[],si:0,ri:0,effects:[]};const hooks=uri(`const h=globalThis.__puzzleHooks;export function useState(v){const i=h.si++;if(!(i in h.states))h.states[i]=v;return [h.states[i],n=>h.states[i]=typeof n==='function'?n(h.states[i]):n];}export function useRef(v){const i=h.ri++;return h.refs[i]??(h.refs[i]={current:v});}export function useMemo(fn){return fn();}export function useEffect(fn){h.effects.push(fn);}`);
-const runtime=JSON.stringify('file://'+require.resolve('react/jsx-runtime')),components=await import(uri(compile('app/puzzle-games.tsx').replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'./characters'",JSON.stringify(uri('export function Character(){return null;}'))).replace("'../puzzle-logic'",JSON.stringify(logicSrc))));
+const runtime=JSON.stringify('file://'+require.resolve('react/jsx-runtime')),components=await import(uri(compile('app/puzzle-games.tsx').replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'./characters'",JSON.stringify(uri('export function Character(){return null;}'))).replace("'../puzzle-logic'",JSON.stringify(logicSrc)).replace("'../libgame'",JSON.stringify(lib))));
 let calls=[],p={seed:20,easy:false,kids:false,ms:1000,blocked:()=>false,finish:(...a)=>calls.push(a)};
 const render=(name,reset=false)=>{if(reset){h.states=[];h.refs=[];calls=[];}h.si=0;h.ri=0;return components[name](p);};
 function nodes(tree){const result=[];function walk(v){if(!v||typeof v!=='object')return;if(Array.isArray(v)){v.forEach(walk);return;}if(v.props){result.push(v);walk(v.props.children);}}walk(tree);return result;}
@@ -110,3 +110,20 @@ try{
  assert.equal(buttons(render('CodeRoute')).filter(n=>n.props.className==='code-error').length,0);
 }finally{globalThis.setTimeout=originalTimeout;}
 console.log('PASS: a crash drops the trailing commands, preserves the failed arrow, and the repaired route resumes from the current tile.');
+
+render('ColorSort',true);
+const ballColor=button=>button.props.style['--sort-color'];
+let sortButtons=buttons(render('ColorSort'));
+const wrongBasket=sortButtons.slice(9).findIndex(basket=>ballColor(basket)!==ballColor(sortButtons[0]));
+sortButtons[0].props.onClick({detail:0});
+buttons(render('ColorSort'))[9+wrongBasket].props.onClick();
+assert.equal(buttons(render('ColorSort'))[0].props.disabled,false);
+for(let i=0;i<9;i++){
+ sortButtons=buttons(render('ColorSort'));
+ const basket=sortButtons.slice(9).findIndex(b=>ballColor(b)===ballColor(sortButtons[i]));
+ sortButtons[i].props.onClick({detail:0});
+ buttons(render('ColorSort'))[9+basket].props.onClick();
+}
+assert.equal(calls.length,1);
+assert.equal(calls[0][0],1000);
+console.log('PASS: color sorting rejects a wrong basket and finishes after all nine balls are sorted.');

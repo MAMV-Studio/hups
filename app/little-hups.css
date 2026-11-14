@@ -48,3 +48,7 @@
 @media(max-height:740px){.little-welcome .little-hero{height:150px}.little-welcome .little-hero>.little-character{height:120px}.little-welcome .little-hero>.little-character:nth-child(2){height:150px}}
 
 .little-start-view{min-height:calc(100svh - 130px)}
+
+.little-task-pair .little-example{font-size:clamp(76px,24vw,108px)}
+.little-task-pair .little-choices{grid-template-columns:repeat(3,minmax(0,1fr))}
+.little-task-pair .little-choices button>span{font-size:clamp(33px,12vw,54px)}

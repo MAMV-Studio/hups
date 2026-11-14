@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
+import {random,shuffle} from '../libgame';
 import {Character} from './characters';
 import {codeLayout,codeDirections,codeStep,memoryLayout,majorityLayout,parcelLayout,cupMoves,cupPositions,lightSeries,pipeLayout,pipeRoute,turnPorts,slideLayout,moveBlock,slideMinimum,lineGraph,polygon,clipPolygon,splitRatio,windingMaze,moveMarble,inkColors,P,Block} from '../puzzle-logic';
 type Props={seed:number,easy:boolean,kids:boolean,ms:number,blocked:()=>boolean,finish:(score:number,text:string)=>void};
@@ -14,6 +15,7 @@ export function PuzzleGame({id,seed=1,level='normal',kids=false,avatar=0,onFinis
  const p:Props={seed,easy,kids,ms,blocked:()=>done.current||!ready,finish:(score,text)=>finish(id==='speedlights'||id==='slide'||id==='bisect'?score:score/(1+Math.max(0,ms-wait)/45000),text)};
  return <div className={'puzzle-game puzzle-'+id+(kids?' puzzle-kids':'')+(result&&result.score>0?' puzzle-solved':'')}>
  {!kids&&ready&&<div className="puzzle-clock"><span>{ms<wait?'Seuraa tarkasti…':Math.max(0,Math.ceil((limit-Math.max(0,ms-wait))/1000))+' s'}</span><i style={{width:Math.max(0,100*(1-Math.max(0,ms-wait)/limit))+'%'}}/></div>}
+ {id==='colorsort'&&<ColorSort {...p}/>}
  {id==='coderoute'&&<CodeRoute {...p} avatar={avatar}/>}
  {id==='memorypairs'&&<Memory {...p}/>}{id==='parcel'&&<Parcel {...p}/>}{id==='speedlights'&&<Lights {...p}/>}{id==='pipes'&&<Pipes {...p}/>}{id==='majority'&&<Majority {...p}/>}{id==='slide'&&<Slide {...p}/>}{id==='onestroke'&&<OneStroke {...p}/>}{id==='cups'&&<Cups {...p}/>}{id==='bisect'&&<Bisect {...p}/>}{id==='tilt'&&<Tilt {...p} active={ready} onStart={()=>setReady(true)}/>}
  </div>;
@@ -34,7 +36,7 @@ export function Lights(p:Props){const series=useMemo(()=>lightSeries(p.seed),[p.
  const lit=new Set(series.filter((light,index)=>index>=consumed.current&&light.at<=p.ms&&p.ms-light.at<flashMs).map(light=>light.key));
  useEffect(()=>{if(p.ms>=30000&&!p.blocked())p.finish(Math.min(1000,hitsRef.current*25),`${hitsRef.current} oikeaa valoa!`);},[p.ms]);
  function hit(i:number){if(p.blocked()||!expected||expected.at>p.ms)return;if(expected.key!==i){p.finish(Math.min(1000,hitsRef.current*25),`Vauhti vei mukanaan! ${hitsRef.current} oikeaa valoa.`);return;}consumed.current++;hitsRef.current++;setHits(hitsRef.current);}
- return <><p className="puzzle-instruction">Paina valot syttymisjärjestyksessä. Tahti kiihtyy!</p><strong className="light-count">{hits}</strong><div className="speed-pads">{['#bc9ae7','#83deea','#f5a4c8','#d2f574'].map((c,i)=><button key={i} aria-label={['Violetti valo','Sininen valo','Vaaleanpunainen valo','Vihreä valo'][i]} className={lit.has(i)?'lit':''} style={{'--ink':c} as React.CSSProperties} onPointerDown={e=>{e.preventDefault();hit(i);}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();hit(i);}}}><Face id={i}/><b>{['★','≈','ϟ','❧'][i]}</b></button>)}</div><p className="puzzle-note">Väärä painallus päättää pelin. Kerätyt pisteet säilyvät.</p></>;
+ return <><p className="puzzle-instruction">Paina valot syttymisjärjestyksessä. Tahti kiihtyy!</p><strong className="light-count">{hits}</strong><div className="speed-pads">{['#bc9ae7','#83deea','#f5a4c8','#d2f574'].map((c,i)=><button key={i} aria-label={['Violetti valo','Sininen valo','Vaaleanpunainen valo','Vihreä valo'][i]} className={lit.has(i)?'lit':''} style={{'--ink':c} as React.CSSProperties} onPointerDown={e=>{e.preventDefault();hit(i);}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();hit(i);}}}></button>)}</div><p className="puzzle-note">Väärä painallus päättää pelin. Kerätyt pisteet säilyvät.</p></>;
 }
 export function Pipes(p:Props){const initial=useMemo(()=>pipeLayout(p.seed,p.easy),[p.seed,p.easy]),[cells,setCells]=useState(initial.cells),[route,setRoute]=useState<number[]|null>(null);const current=useRef(initial.cells);
  function turn(i:number){if(p.blocked()||route)return;const next=current.current.map((v,j)=>j===i?{...v,turn:(v.turn+1)%4}:v);current.current=next;setCells(next);const path=pipeRoute(next);if(path){setRoute(path);p.finish(1000,'Maali löysi reitin — spläts!');}}
@@ -166,7 +168,74 @@ export function CodeRoute(p:Props & {avatar:number}){
   </div>
   <div className="code-queue" aria-label="Komennot">{queue.length>executed||running?queue.slice(firstVisible).map((command,offset)=>{const index=offset+firstVisible;return <button type="button" key={index} disabled={running||p.blocked()||index<executed} aria-label={`Komento ${index+1}: ${codeDirections[command].label}. Vaihda komento`} className={index===failed?'code-error':index===cursor?'code-current':''} onClick={()=>{setFailed(index);setHint('Valitse uusi suunta.');}}>{codeDirections[command].symbol}</button>}):<span>{executed?'Lisää seuraava nuoli':'Valitse ensimmäinen nuoli'}</span>}</div>
   <div className="code-keys">{[3,0,2,1].map(command=><button type="button" key={command} disabled={running||p.blocked()||(queue.length-executed>=20&&failed<0)} aria-label={codeDirections[command].label} onClick={()=>add(command)}>{codeDirections[command].symbol}</button>)}</div>
-  <div className="code-actions"><button type="button" aria-label="Poista viimeinen komento" disabled={queue.length===executed||running||p.blocked()} onClick={()=>{setQueue(queue.slice(0,-1));setFailed(-1);setCursor(-1);setHint('');}}>⌫</button><button type="button" className="primary" disabled={queue.length===executed||running||p.blocked()} onClick={run}>Aja!</button></div>
+  <div className="code-actions"><button type="button" aria-label="Poista viimeinen komento" disabled={queue.length===executed||running||p.blocked()} onClick={()=>{setQueue(queue.slice(0,-1));setFailed(-1);setCursor(-1);setHint('');}}><svg width="30" height="24" viewBox="0 0 32 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M12 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H12L3 12Z"/><path d="m16 8 8 8m0-8-8 8"/></svg></button><button type="button" className="primary" disabled={queue.length===executed||running||p.blocked()} onClick={run}>Aja!</button></div>
   <p className="puzzle-note" role="status">{hint}</p>
+ </div>;
+}
+
+const sortColors=[
+ {name:'Violetti',color:'#c2a0ff',symbol:'◆'},
+ {name:'Sininen',color:'#78dfef',symbol:'●'},
+ {name:'Oranssi',color:'#ffab69',symbol:'★'},
+];
+
+export function ColorSort(p:Props){
+ const balls=useMemo(()=>shuffle([0,1,2,0,1,2,0,1,2],random(p.seed)),[p.seed]);
+ const [sorted,setSorted]=useState<number[]>([]);
+ const [selected,setSelected]=useState<number|null>(null);
+ const [drag,setDrag]=useState<{x:number,y:number}|null>(null);
+ const [hint,setHint]=useState('');
+ const placed=useRef<number[]>([]);
+ const pointer=useRef<{id:number,index:number,x:number,y:number,moved:boolean}|null>(null);
+ const baskets=useRef<HTMLDivElement>(null);
+
+ function drop(index:number,basket:number){
+  if(p.blocked()||placed.current.includes(index))return;
+  setSelected(null);
+  if(balls[index]!==basket){setHint('Hups! Kokeile samanväristä koria.');return;}
+  placed.current=[...placed.current,index];
+  setSorted(placed.current);
+  setHint('Poks!');
+  if(placed.current.length===balls.length)p.finish(1000,'Kaikki pallot omissa koreissaan!');
+ }
+
+ return <div className="color-sort">
+  <p className="puzzle-instruction">Vedä pallot samanvärisiin koreihin.</p>
+  <div className="color-sort-balls">
+   {balls.map((color,index)=><button type="button" key={index} disabled={sorted.includes(index)||p.blocked()} aria-label={`${sortColors[color].name} pallo ${index+1}`} aria-pressed={selected===index} className={sorted.includes(index)?'sort-placed':undefined} style={{'--sort-color':sortColors[color].color} as React.CSSProperties}
+    onClick={event=>{if(event.detail===0)setSelected(index);}}
+    onPointerDown={event=>{
+     if(event.button!==0||pointer.current||p.blocked())return;
+     event.currentTarget.setPointerCapture(event.pointerId);
+     pointer.current={id:event.pointerId,index,x:event.clientX,y:event.clientY,moved:false};
+     setSelected(index);
+    }}
+    onPointerMove={event=>{
+     const active=pointer.current;
+     if(!active||event.pointerId!==active.id)return;
+     if(Math.hypot(event.clientX-active.x,event.clientY-active.y)>6)active.moved=true;
+     if(active.moved)setDrag({x:event.clientX,y:event.clientY});
+    }}
+    onPointerUp={event=>{
+     const active=pointer.current;
+     if(!active||event.pointerId!==active.id)return;
+     pointer.current=null;
+     setDrag(null);
+     if(!active.moved)return;
+     const target=document.elementFromPoint(event.clientX,event.clientY)?.closest<HTMLElement>('[data-sort-basket]');
+     if(target&&baskets.current?.contains(target))drop(index,Number(target.dataset.sortBasket));
+     else setSelected(null);
+    }}
+    onLostPointerCapture={()=>{if(pointer.current?.index===index){pointer.current=null;setDrag(null);setSelected(null);}}}
+   >{sortColors[color].symbol}</button>)}
+  </div>
+  <div className="color-sort-baskets" ref={baskets}>
+   {sortColors.map((color,index)=><button type="button" key={color.name} data-sort-basket={index} aria-label={`${color.name} kori`} style={{'--sort-color':color.color} as React.CSSProperties} onClick={()=>{if(selected!==null)drop(selected,index);}}>
+    <span aria-hidden="true">{color.symbol}</span>
+    <span className="sort-splash" aria-hidden="true" key={sorted.filter(i=>balls[i]===index).length}>{sorted.some(i=>balls[i]===index)?'✦':''}</span>
+   </button>)}
+  </div>
+  {drag&&selected!==null&&<span className="sort-drag" aria-hidden="true" style={{left:drag.x,top:drag.y,background:sortColors[balls[selected]].color}}>{sortColors[balls[selected]].symbol}</span>}
+  <p className="puzzle-note" role="status">{sorted.length} / {balls.length} {hint}</p>
  </div>;
 }

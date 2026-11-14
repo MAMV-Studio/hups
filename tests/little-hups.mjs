@@ -11,7 +11,7 @@ for(let seed=0;seed<200;seed++){
 }
 const empty=new Set();assert.equal(paintCoverage(empty),0);paintStroke(empty,{x:0,y:100},{x:320,y:100});assert.ok(empty.size>40,'A fast stroke must fill its entire path');const again=new Set(empty);paintStroke(again,{x:0,y:100},{x:320,y:100});assert.equal(again.size,empty.size,'Repeated painting does not inflate coverage');
 const complete=new Set();for(let y=0;y<=240;y+=25)paintStroke(complete,{x:0,y},{x:320,y});assert.ok(paintCoverage(complete)>=.9);assert.ok([...complete].every(n=>n>=0&&n<320));
-console.log('PASS: 16 child-friendly task types across 200 seeds, category filters, unique correct choices, repeatable data, bounded holes, continuous brush coverage and duplicate-stroke protection.');
+console.log('PASS: 17 child-friendly task types across 200 seeds, category filters, unique correct choices, repeatable data, bounded holes, continuous brush coverage and duplicate-stroke protection.');
 // Exercise the actual pointer handlers and caught-hole guard, not a duplicate implementation.
 const {createRequire}=await import('node:module');const require=createRequire(import.meta.url);
 const runtime=JSON.stringify('file://'+require.resolve('react/jsx-runtime'));

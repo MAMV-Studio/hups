@@ -1,5 +1,6 @@
 import {random,shuffle} from './libgame';
 export const kidCatalog=[
+ {id:'pair',title:'Etsi oikea pari!',group:'find'},
  {id:'memorypairs',title:'Etsi kuvaparit!',group:'find'},
  {id:'parcel',title:'Kenelle yllätys?',group:'find'},
  {id:'popall',title:'Kaikki pallot poks!',group:'pop'},
@@ -22,6 +23,11 @@ const palette=[{color:'#79c6ff',label:'Sininen'},{color:'#f7a1b5',label:'Vaalean
 export function kidChallenge(id:string,seed:number):{sample:string,sampleColor?:string,items:{icon?:string,label:string,color?:string,size?:string,correct:boolean}[]}{
  const r=random(seed),mix=(a:any[])=>shuffle(a,r);let sample='',sampleColor:string|undefined,items:any[]=[];
  if(id==='popall'||id==='popblue'){sample=id==='popblue'?'🔵':'🎈';items=mix(Array.from({length:6},(_,i)=>({...palette[i%4],correct:id==='popall'||i%4===0})));}
+ else if(id==='pair'){
+  const pictures=mix([['🍎','Omena'],['🚗','Auto'],['🍓','Mansikka'],['🐱','Kissa'],['🦋','Perhonen'],['⚽','Pallo']]).slice(0,3);
+  sample=pictures[0][0];
+  items=mix(pictures.map(([icon,label]:string[],i:number)=>({icon,label,correct:i===0})));
+ }
  else if(id==='color'){const target=Math.floor(r()*4);sample='●';sampleColor=palette[target].color;items=mix(palette.map((p,i)=>({...p,correct:i===target})));}
  else if(id==='shape'){const a=['●','▲','■','★'],n=Math.floor(r()*4);sample=a[n];items=mix(a.map((icon,i)=>({icon,label:['Ympyrä','Kolmio','Neliö','Tähti'][i],color:'#b79ae6',correct:i===n})));}
  else if(id==='big'||id==='small'){sample='';items=mix([24,48,78,116].map((n,i)=>({icon:'●',label:`${['Pienin','Pieni','Iso','Isoin'][i]} pallo`,size:n+'px',correct:i===(id==='big'?3:0),color:'#a6dae5'})));}

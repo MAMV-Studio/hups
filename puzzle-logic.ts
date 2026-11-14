@@ -1,6 +1,6 @@
 import {random,shuffle} from './libgame';
 export type P={x:number,y:number};
-export const puzzleIds=['coderoute','memorypairs','parcel','speedlights','pipes','majority','slide','onestroke','cups','bisect','tilt'];
+export const puzzleIds=['colorsort','coderoute','memorypairs','parcel','speedlights','pipes','majority','slide','onestroke','cups','bisect','tilt'];
 export const inkColors=['#91dcea','#f3a3cf','#cafa70'];
 export function memoryLayout(seed:number,pairs:number){const r=random(seed),ids=pairs===8?Array.from({length:8},(_,i)=>i):[...shuffle([0,1,2,3,4,5],r).slice(0,pairs===4?3:4),...shuffle([6,7],r).slice(0,pairs===4?1:2)];return shuffle([...ids,...ids],r);}
 export function majorityLayout(seed:number,easy=false){const r=random(seed),count=easy?[17,10]:[18,21,15],order=shuffle(count,r),winner=order.indexOf(Math.max(...order)),items=shuffle(order.flatMap((n,c)=>Array(n).fill(c)),r);return {items,winner,counts:order,shape:seed%2?'●':'■'};}

@@ -62,8 +62,8 @@
 .code-actions{grid-template-columns:1fr 3fr;margin-top:6px}
 .code-keys button,.code-actions>button:first-child{min-height:44px;padding:0;border:0;border-radius:12px;background:#ff8e9e;color:#331937;font-size:26px;font-weight:900;box-shadow:inset 0 -3px #40242f30}
 .code-keys button:nth-child(even){background:#ffd362}
-.code-actions>button:first-child{background:#c8a3ef}
-.phone .code-actions .primary{min-height:44px;margin:0;padding:6px;text-align:center}
+.code-actions>button:first-child{display:grid;place-items:center;background:#c8a3ef}
+.phone .code-actions .primary{justify-content:center;min-height:44px;margin:0;padding:6px;text-align:center}
 .code-bump .code-avatar .character{animation:odd-arrow-hop .3s ease-out}
 .code-splash{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(36px,12vw,62px);color:#ffee7f;text-shadow:2px 3px #8f4c24;pointer-events:none;animation:odd-arrow-hop .55s ease-out}
 .code-round .game-toolbar,.code-round .task-heading{margin-bottom:6px}
@@ -72,3 +72,14 @@
 .code-route .puzzle-note:empty{display:none}
 .code-board{width:min(100%,42dvh);margin-inline:auto;box-sizing:border-box}
 @media(prefers-reduced-motion:reduce){.code-avatar{transition:none}.code-splash,.code-bump .code-avatar .character{animation:none}}
+
+.color-sort-balls,.color-sort-baskets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;place-items:center}
+.color-sort-balls{margin:10px auto 22px;max-width:250px}
+.color-sort-balls button,.sort-drag{display:grid;place-items:center;border-radius:50%;background:var(--sort-color);color:#2c1f39;border:2px solid #fff8;width:clamp(48px,16vw,62px);aspect-ratio:1;font-size:20px;box-shadow:inset 0 -5px #0002,0 4px #1c162b;touch-action:none}
+.color-sort-balls button[aria-pressed=true]{outline:3px solid #ffefd3;outline-offset:2px}
+.color-sort-balls .sort-placed{visibility:hidden}
+.color-sort-baskets button{position:relative;width:100%;min-height:75px;border:3px solid var(--sort-color);border-radius:9px 9px 25px 25px;background:color-mix(in srgb,var(--sort-color),#302342 24%);color:#2c1f39;font-size:29px}
+.sort-splash{position:absolute;inset:0;display:grid;place-items:center;color:#fff8eb;pointer-events:none;animation:sort-splash .38s ease-out both}
+@keyframes sort-splash{from{transform:scale(.5);opacity:1}to{transform:scale(2);opacity:0}}
+.sort-drag{position:fixed;z-index:20;transform:translate(-50%,-50%);pointer-events:none}
+@media(prefers-reduced-motion:reduce){.sort-splash{display:none}}
