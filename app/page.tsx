@@ -20,6 +20,7 @@ const total=(a:number[])=>a.reduce((x,y)=>x+y,0);
 export default function Page(){
  const [screen,setScreen]=useState('home'),[name,setName]=useState(''),[code,setCode]=useState(''),[seed,setSeed]=useState(1),[idx,setIdx]=useState(0),[stage,setStage]=useState('intro'),[scores,setScores]=useState<number[]>([]),[detail,setDetail]=useState(''),[elapsed,setElapsed]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[room,setRoom]=useState<any>(null),[saved,setSaved]=useState(false),[avatar,setAvatar]=useState(0),[count,setCount]=useState(3),[progressError,setProgressError]=useState(''),[raceDone,setRaceDone]=useState(false),[practiceId,setPracticeId]=useState<string|null>(null);
  const [account,setAccount]=useState<Session|null>(null);
+ const [accountReturn,setAccountReturn]=useState(false);
  const completeAccountRound=useRef<null|(()=>Promise<void>)>(null);
  const accountId=account?.user.id;
  useEffect(()=>{
@@ -47,7 +48,7 @@ export default function Page(){
  const [level,setLevel]=useState('normal');
  const clock=useRef(createGameClock());
  const auth=useRef<any>(null),finished=useRef(false),timer=useRef<any>(null),scoreRef=useRef<number[]>([]),epoch=useRef(0);const deck=useMemo(()=>practiceId?[makeTask(practiceId,seed)]:taskDeck(seed,length,level),[seed,practiceId,length,level]),task=deck[idx];
- useEffect(()=>{const invite=new URLSearchParams(window.location.search).get('haaste');if(invite&&/^\d{4}$/.test(invite)){setCode(invite);setScreen('join');}try{setName(localStorage.getItem('pt-name')||'');setAvatar(Number(localStorage.getItem('pt-avatar'))||0);}catch{}},[]);
+ useEffect(()=>{const url=new URL(window.location.href);const invite=url.searchParams.get('haaste');if(url.searchParams.has('profiili')){setScreen('account');setAccountReturn(true);url.searchParams.delete('profiili');window.history.replaceState(window.history.state,'',url);}else if(invite&&/^\d{4}$/.test(invite)){setCode(invite);setScreen('join');}try{setName(localStorage.getItem('pt-name')||'');setAvatar(Number(localStorage.getItem('pt-avatar'))||0);}catch{}},[]);
  const api=async(action:string,extra:any={})=>{const identity=action==='create'||action==='join'?await accountHeaders():{};const sent=performance.now();const r=await fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json',...identity},cache:'no-store',body:JSON.stringify({...auth.current,action,version:28,...extra})});const v:any=await r.json();clock.current.sync(v.serverNow,sent,performance.now());if(!r.ok){if(v.updateRequired)setError(v.error);if(v.left){auth.current=null;setRoom(null);setScreen('home');setError(v.error);}throw Error(v.error);}return v;};
  useEffect(()=>{if(['results','game'].includes(screen)&&room&&room.seed!==seed){setSeed(room.seed);setScores([]);scoreRef.current=[];setSaved(false);setScreen('lobby');}},[room,screen,seed]);
  function leaveRoom(){if(!auth.current)return;const payload=JSON.stringify({...auth.current,action:'leave',version:28});void fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true}).catch(()=>{});}
@@ -94,7 +95,7 @@ export default function Page(){
   }
  }
  const music=useThemeMusic(screen==='game'||screen==='results');
- return <main className={'phone scene-'+screen+' phase-'+stage}>{music.audio}<Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 58</span></header>
+ return <main className={'phone scene-'+screen+' phase-'+stage}>{music.audio}<Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 59</span></header>
  {screen==='home'&&<>
  <div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">
@@ -104,14 +105,14 @@ export default function Page(){
  <fieldset className="round-picker"><legend>Kuinka pitkä kisa?</legend><div className="round-presets">{[5,10,15,20].map((n,i)=><button key={n} aria-label={`${n} tehtävää`} aria-pressed={length===n} className={length===n?'selected':''} onClick={()=>setLength(n)}><b>{n}</b><small>{['Pikakisa','Sopiva kisa','Vielä lisää','Koko kattaus'][i]}</small></button>)}</div><p>Noin {Math.ceil(length*.4)} min · joka kerralla uusi sekoitus</p></fieldset>
  <button className="primary home-play" disabled={!name.trim()} onClick={()=>begin(Math.floor(Math.random()*1e8))}>Pelaa <span aria-hidden="true">→</span></button>
  <div className="split home-multiplayer"><button disabled={!name.trim()||busy} onClick={()=>{setCode('');setScreen('create');}}>Haasta kaverit <span aria-hidden="true">＋</span></button><button disabled={!name.trim()} onClick={()=>{leaveRoom();auth.current=null;setRoom(null);setProgressError('');setScreen('join');}}>Liity koodilla <span aria-hidden="true">→</span></button></div>
- <button className="textbutton account-entry" onClick={()=>setScreen('account')}>{account?'Oma profiili':'Kirjaudu tai luo tili'} →</button>
+ <button className="textbutton account-entry" onClick={()=>{setAccountReturn(false);setScreen('account');}}>{account?'Oma profiili':'Kirjaudu Googlella'} →</button>
  <button className="little-entry" onClick={()=>{leaveRoom();auth.current=null;setRoom(null);music.selectTheme('pikkuhups');setScreen('kids');window.scrollTo({top:0,behavior:'instant'});}}>🎈 Siirry Pikkuhupsiin →</button>
  <button className="textbutton browse-games" onClick={()=>setScreen('library')}>Löydä oma suosikkipelisi →</button>
  <a className="home-studio home-studio-bottom" href="/tilastot">MAMV Studio</a>
  <ParkTrim/>
  </section>
  </>}
- {screen==='account'&&<AccountPanel session={account} name={name} avatar={avatar} onSave={applyProfile} onBack={home}/>}
+ {screen==='account'&&<AccountPanel session={account} name={name} avatar={avatar} onSave={applyProfile} onBack={home} returned={accountReturn}/>}
  {screen==='kids'&&<LittleHups onExit={home} musicButton={music.button}/>}
  {screen==='create'&&<section className="create-challenge"><span className="tag">KAVERIEN KANSSA</span><h1>Millainen<br/><em>kisa tänään?</em></h1><fieldset className="level-choice"><legend>Valitse tehtävätaso koko porukalle</legend><div className="split"><button aria-pressed={level==='easy'} onClick={()=>setLevel('easy')}><Character id={4}/><b>Helpommat tehtävät</b></button><button aria-pressed={level==='normal'} onClick={()=>setLevel('normal')}><Character id={2}/><b>Haastavammat tehtävät</b></button></div><p className="note">{level==='easy'?'Noin 6–9-vuotiaille. Taitoa, muistia ja kujeilua — ilman lasku- tai lukutehtäviä.':'Kaikki Hupsin haasteet, myös vaativammat pulmat ja laskut.'}</p></fieldset><p className="note">{length} tehtävää · kaikille samat pelit ja sama taso.</p><button className="primary" disabled={busy} onClick={()=>roomAction('create')}>Luo haastekoodi →</button><button className="textbutton" onClick={home}>← Takaisin</button></section>}
  {screen==='library'&&<section className="game-library"><span className="tag">{taskCatalog.length} PIENTÄ HAASTETTA</span><h1>Mitä tänään<br/><em>kokeiltaisiin?</em></h1><p>Kokeile yksittäistä peliä tai löydä uusi suosikki.</p><div className="library-grid">{taskCatalog.map(t=><button key={t.id} onClick={()=>begin(Math.floor(Math.random()*1e8),false,t.id)}><span>{t.icon}</span><b>{t.title}</b><small>{t.category}</small></button>)}</div><button className="textbutton" onClick={home}>← Alkuun</button></section>}

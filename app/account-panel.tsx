@@ -11,12 +11,10 @@ type Props={
  avatar:number;
  onSave:(name:string,avatar:number)=>void;
  onBack:()=>void;
+ returned:boolean;
 };
 
-export function AccountPanel({session,name,avatar,onSave,onBack}:Props){
- const [email,setEmail]=useState('');
- const [sentTo,setSentTo]=useState('');
- const [code,setCode]=useState('');
+export function AccountPanel({session,name,avatar,onSave,onBack,returned}:Props){
  const [nickname,setNickname]=useState(name);
  const [character,setCharacter]=useState(avatar);
  const [counts,setCounts]=useState<{games:number,wins:number}|null>(null);
@@ -39,45 +37,48 @@ export function AccountPanel({session,name,avatar,onSave,onBack}:Props){
 
  useEffect(()=>{setNickname(name);setCharacter(avatar);},[name,avatar]);
 
- async function submit(event:FormEvent){
-  event.preventDefault();
+ async function signIn(){
   if(!accountClient||busy)return;
   setBusy(true);
   setMessage('');
   try{
-   if(userId){
-    const trimmed=nickname.trim();
-    if(!trimmed){setMessage('Kirjoita nimimerkki.');return;}
-    const {error}=await accountClient.from('hups_profiles').upsert({user_id:userId,nickname:trimmed,avatar:character});
-    if(error)throw error;
-    onSave(trimmed,character);
-    setMessage('Profiili tallennettu.');
-   }else if(sentTo){
-    const {error}=await accountClient.auth.verifyOtp({email:sentTo,token:code,type:'email'});
-    if(error)throw error;
-    setCode('');
-    setSentTo('');
-   }else{
-    const address=email.trim();
-    const {error}=await accountClient.auth.signInWithOtp({email:address,options:{shouldCreateUser:true}});
-    if(error)throw error;
-    setSentTo(address);
-   }
+   const redirectTo=new URL('/?profiili=1',window.location.origin).href;
+   const {error}=await accountClient.auth.signInWithOAuth({provider:'google',options:{redirectTo}});
+   if(error)throw error;
   }catch{
-   setMessage(userId?'Profiilin tallennus epäonnistui.':sentTo?'Koodi on virheellinen tai vanhentunut. Tarkista koodi tai pyydä uusi.':'Koodia ei voitu lähettää. Tarkista osoite ja yritä hetken päästä uudelleen.');
-  }finally{setBusy(false);}
+   setMessage('Google-kirjautumista ei voitu avata. Yritä uudelleen.');
+   setBusy(false);
+  }
+ }
+
+ async function submit(event:FormEvent){
+  event.preventDefault();
+  if(!accountClient||!userId||busy)return;
+  const trimmed=nickname.trim();
+  if(!trimmed){setMessage('Kirjoita nimimerkki.');return;}
+  setBusy(true);
+  setMessage('');
+  try{
+   const {error}=await accountClient.from('hups_profiles').upsert({user_id:userId,nickname:trimmed,avatar:character});
+   if(error)throw error;
+   onSave(trimmed,character);
+   setMessage('Profiili tallennettu.');
+  }catch{setMessage('Profiilin tallennus epäonnistui.');}
+  finally{setBusy(false);}
  }
 
  return <section className="hups-account">
   <h1>{session?'Oma profiili':'Kirjaudu tai luo tili'}</h1>
-  {!accountClient?<p>Tilitoimintoa ei ole vielä otettu käyttöön.</p>:<form onSubmit={submit}>
-   {session?<><div className="account-totals"><span><strong>{counts?.games??'–'}</strong> Pelatut pelit</span><span><strong>{counts?.wins??'–'}</strong> Voitot</span></div>
+  {!accountClient?<p>Tilitoimintoa ei ole vielä otettu käyttöön.</p>:session?<form onSubmit={submit}>
+   <div className="account-totals"><span><strong>{counts?.games??'–'}</strong> Pelatut pelit</span><span><strong>{counts?.wins??'–'}</strong> Voitot</span></div>
     <label htmlFor="account-nickname">Nimimerkki</label><input id="account-nickname" value={nickname} onChange={event=>setNickname(event.target.value)} maxLength={18} required/>
     <div className="character-picker" aria-label="Valitse hahmo">{characters.map((item,index)=><button type="button" key={item.name} aria-label={item.name} aria-pressed={character===index} className={character===index?'picked':''} onClick={()=>setCharacter(index)}><Character id={index}/></button>)}</div>
-   </>:sentTo?<><p>Koodi lähetettiin osoitteeseen <strong>{sentTo}</strong>.</p><label htmlFor="account-code">Kertakoodi</label><input id="account-code" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={event=>setCode(event.target.value.replace(/\D/g,'').slice(0,10))} required/></>:<><p>Pelatut kierrokset ja moninpelivoitot tallentuvat tilillesi.</p><label htmlFor="account-email">Sähköposti</label><input id="account-email" type="email" autoComplete="email" maxLength={254} value={email} onChange={event=>setEmail(event.target.value)} required/></>}
-   <button className="primary" disabled={busy}>{session?'Tallenna profiili':sentTo?'Kirjaudu':'Lähetä kertakoodi'}</button>
-   {sentTo&&!session&&<button type="button" className="textbutton" disabled={busy} onClick={()=>{setSentTo('');setCode('');setMessage('');}}>Vaihda osoite tai pyydä uusi koodi</button>}
-  </form>}
+   <button className="primary" disabled={busy}>Tallenna profiili</button>
+  </form>:<>
+   {returned&&<p role="status">Jos kirjautuminen keskeytyi, voit yrittää uudelleen.</p>}
+   <p>Pelatut kierrokset ja moninpelivoitot tallentuvat tilillesi.</p>
+   <button type="button" className="primary" onClick={signIn} disabled={busy}>Kirjaudu Googlella</button>
+  </>}
   {message&&<p role="status">{message}</p>}
   {session&&<button className="textbutton" onClick={async()=>{const result=await accountClient?.auth.signOut({scope:'local'});if(result?.error)setMessage('Uloskirjautuminen epäonnistui.');}}>Kirjaudu ulos</button>}
   <button className="textbutton" onClick={onBack}>← Etusivulle</button>
