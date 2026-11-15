@@ -1,4 +1,4 @@
-Hups 59 ja Google-kirjautuminen
+Hups 60 ja Google-kirjautuminen
 
 1. Käytä Hupsin nykyistä Supabase-projektia. Jos version 58 tilit.sql
    on jo ajettu, sama tietokantamuutos on valmiina.
@@ -16,7 +16,7 @@ Hups 59 ja Google-kirjautuminen
 5. Supabase → Authentication → URL Configuration: aseta Site URL:ksi
    Hupsin julkinen osoite ja lisää Redirect URLs -listaan sama osoite
    muodossa https://oma-hups-osoite/?profiili=1.
-6. Pura Hups-Vercel-59.zip ja päivitä GitHub. Kun Vercel näyttää Ready,
+6. Pura Hups-Vercel-60.zip ja päivitä GitHub. Kun Vercel näyttää Ready,
    testaa Kirjaudu Googlella, profiilin tallennus ja vieraspeli.
 
 Supabasen ohje: https://supabase.com/docs/guides/auth/social-sign-in/auth-google

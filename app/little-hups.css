@@ -52,3 +52,14 @@
 .little-task-pair .little-example{font-size:clamp(76px,24vw,108px)}
 .little-task-pair .little-choices{grid-template-columns:repeat(3,minmax(0,1fr))}
 .little-task-pair .little-choices button>span{font-size:clamp(33px,12vw,54px)}
+
+.tactile-surface.spray{background:#fff4db}
+.paint-pots button{display:grid;place-items:end center;min-height:74px;background:none!important;border:0;box-shadow:none;padding:8px}
+.paint-pots button .spray-can{position:relative;display:block;width:34px;height:48px;border-radius:8px 8px 5px 5px;background:var(--spray-color);box-shadow:inset -5px 0 #0002,0 3px #191122}
+.spray-can::before{content:'';position:absolute;width:54%;height:8px;bottom:100%;left:23%;background:#e1d8e9;border-radius:4px 4px 0 0}
+.paint-pots button[aria-pressed=true] .spray-can{outline:2px solid #fff6de;outline-offset:3px}
+.peek-yard::before{content:none}
+.peek-yard{background:linear-gradient(#422e54,#2b223b);padding:10px 10px 15px;gap:4px 8px}
+.peek-yard .peek-hole{height:92px}
+.peek-yard .peek-mascot>.character{width:73px;height:78px}
+.peek-yard .peek-mascot{clip-path:inset(0 0 8px round 16px);bottom:0}

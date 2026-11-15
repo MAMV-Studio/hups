@@ -8,7 +8,7 @@ const names=['Vieterö','Pörhö','Moukku','Löllö','Nuppu','Töppö','Lankaker
 function Face({id,kids=false}:{id:number,kids?:boolean}){return id<6?kids?<span className="puzzle-kid-face" role="img" aria-label={['Kuje','Kieppi','Hupsu','Räyhä','Tassu','Hauva'][id]} style={{backgroundImage:`url('/little-friend-${id}.png')`}}/>:<Character id={id}/>:<span className="puzzle-object" aria-label={names[id]}>{['🧶','🎈'][id-6]}</span>;}
 export function PuzzleGame({id,seed=1,level='normal',kids=false,avatar=0,onFinish}:{id:string,seed?:number,level?:string,kids?:boolean,avatar?:number,onFinish:(score:number,text:string)=>void}){
  const easy=level==='easy'||kids,[ms,setMs]=useState(0),[ready,setReady]=useState(id!=='tilt'),[result,setResult]=useState<{score:number,text:string}|null>(null);const done=useRef(false),callback=useRef(onFinish),started=useRef(0),delay=useRef<any>(null);callback.current=onFinish;
- const wait=id==='cups'?6500:0,limit=kids?Infinity:id==='majority'||id==='cups'?5000:id==='bisect'?15000:id==='coderoute'?45000:30000;
+ const wait=id==='cups'?6500:0,limit=kids?Infinity:id==='majority'||id==='cups'?5000:id==='bisect'?15000:id==='coderoute'||(id==='slide'&&!easy&&seed%3===1)?45000:30000;
  function finish(score:number,text:string){if(done.current)return;done.current=true;const value=Math.round(Math.max(0,Math.min(1000,score)));setResult({score:value,text});const seconds=(Math.max(0,performance.now()-started.current-wait)/1000).toLocaleString('fi-FI',{minimumFractionDigits:1,maximumFractionDigits:1});delay.current=setTimeout(()=>callback.current(value,kids?text:`${text} Aika ${seconds} s.`),kids?650:id==='pipes'&&value>0?3000:1250);}
  useEffect(()=>{if(!ready)return;started.current=performance.now();const t=setInterval(()=>{if(done.current)return;const n=performance.now()-started.current;setMs(n);if(id!=='speedlights'&&n>=limit+wait)finish(0,'Hupsista! Aika loppui — 0 pistettä.');},25);return()=>clearInterval(t);},[ready]);
  useEffect(()=>()=>clearTimeout(delay.current),[]);
@@ -70,11 +70,12 @@ export function Pipes(p:Props){const initial=useMemo(()=>pipeLayout(p.seed,p.eas
 export function Majority(p:Props){const m=useMemo(()=>majorityLayout(p.seed,p.easy),[p.seed,p.easy]),[chosen,setChosen]=useState(-1);return <><p className="puzzle-instruction">Mitä väriä on eniten? Arvioi nopeasti!</p><div className={'majority-field '+(chosen>=0?'sorted':'')}>{m.items.map((v,i)=><span key={i} style={{color:inkColors[v],rotate:((i*37+p.seed)%50-25)+'deg'}}>{m.shape}</span>)}</div><div className="majority-options">{m.counts.map((n,i)=><button key={i} style={{background:inkColors[i]}} aria-label={['Sininen','Vaaleanpunainen','Vihreä'][i]} onClick={()=>{if(p.blocked())return;setChosen(i);p.finish(i===m.winner?1000:0,`Eniten oli ${['sinisiä','vaaleanpunaisia','vihreitä'][m.winner]}: ${m.counts[m.winner]}.`);}}>{m.shape}{chosen>=0&&<small>{n}</small>}</button>)}</div></>;
 }
 export function Slide(p:Props){const initial=useMemo(()=>slideLayout(p.seed,p.easy),[p.seed,p.easy]),minimum=useMemo(()=>slideMinimum(initial),[initial]),[blocks,setBlocks]=useState(initial),[selected,setSelected]=useState(0),[moves,setMoves]=useState(0),[offset,setOffset]=useState(0),[escaped,setEscaped]=useState(false);const current=useRef(initial),moved=useRef(0),drag=useRef<{id:number,pointer:number,start:number,cell:number,delta:number}|null>(null);
- function commit(i:number,d:number){if(p.blocked()||!d)return;let next=current.current,steps=0;for(let k=0;k<Math.abs(d);k++){const b=moveBlock(next,i,Math.sign(d));if(!b)break;next=b;steps++;}if(!steps)return;current.current=next;setBlocks(next);moved.current+=steps;setMoves(moved.current);if(next[0].x===2){setEscaped(true);p.finish(Math.max(100,1000-Math.max(0,moved.current-minimum)*70-Math.floor(p.ms/1000)*3),`Ulos päästiin ${moved.current} ruutuaskeleella! Paras reitti: ${minimum}.`);}}
- function begin(e:React.PointerEvent<HTMLButtonElement>,i:number){if(p.blocked()||drag.current)return;e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);const b=current.current[i],rect=e.currentTarget.parentElement!.getBoundingClientRect();drag.current={id:i,pointer:e.pointerId,start:b.axis==='h'?e.clientX:e.clientY,cell:(rect.width-10)/4,delta:0};setSelected(i);setOffset(0);}
+ const size=initial[0].grid??4,unit=100/size;
+ function commit(i:number,d:number){if(p.blocked()||!d)return;let next=current.current,steps=0;for(let k=0;k<Math.abs(d);k++){const b=moveBlock(next,i,Math.sign(d));if(!b)break;next=b;steps++;}if(!steps)return;current.current=next;setBlocks(next);moved.current+=steps;setMoves(moved.current);if(next[0].x===size-next[0].len){setEscaped(true);p.finish(Math.max(100,1000-Math.max(0,moved.current-minimum)*70-Math.floor(p.ms/1000)*3),`Ulos päästiin ${moved.current} ruutuaskeleella! Paras reitti: ${minimum}.`);}}
+ function begin(e:React.PointerEvent<HTMLButtonElement>,i:number){if(p.blocked()||drag.current)return;e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);const b=current.current[i],rect=e.currentTarget.parentElement!.getBoundingClientRect();drag.current={id:i,pointer:e.pointerId,start:b.axis==='h'?e.clientX:e.clientY,cell:(rect.width-10)/size,delta:0};setSelected(i);setOffset(0);}
  function track(e:React.PointerEvent<HTMLButtonElement>){const d=drag.current;if(!d||d.pointer!==e.pointerId||p.blocked())return;const axis=current.current[d.id].axis,raw=((axis==='h'?e.clientX:e.clientY)-d.start)/d.cell;let allowed=0,next=current.current;for(let k=0;k<Math.ceil(Math.abs(raw));k++){const b=moveBlock(next,d.id,Math.sign(raw));if(!b)break;allowed++;next=b;}d.delta=Math.sign(raw)*Math.min(Math.abs(raw),allowed);setOffset(d.delta);}
  function end(e:React.PointerEvent<HTMLButtonElement>,cancel=false){const d=drag.current;if(!d||d.pointer!==e.pointerId)return;if(!cancel)track(e);drag.current=null;setOffset(0);if(!cancel)commit(d.id,Math.round(d.delta));}
- return <><p className="puzzle-instruction">Vedä palikoita sormella. Vapauta punaiselle reitti ulos oikealta!</p><div className={'slide-board '+(escaped?'escaped':'')}><svg className="slide-exit" viewBox="0 0 32 24" aria-hidden="true"><path d="M3 12h24m-8-8 8 8-8 8" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/></svg>{blocks.map((b,i)=><button key={i} aria-label={i===0?'Punainen palikka':`Este ${i}`} aria-pressed={selected===i} className={'slide-block block-'+i+(drag.current?.id===i?' dragging':'')} style={{left:(b.x+(selected===i&&b.axis==='h'?offset:0))*25+'%',top:(b.y+(selected===i&&b.axis==='v'?offset:0))*25+'%',width:(b.axis==='h'?b.len:1)*25+'%',height:(b.axis==='v'?b.len:1)*25+'%'}} onPointerDown={e=>begin(e,i)} onPointerMove={track} onPointerUp={e=>end(e)} onPointerCancel={e=>end(e,true)} onLostPointerCapture={e=>end(e,true)} onKeyDown={e=>{const axis=b.axis,keys=axis==='h'?['ArrowLeft','ArrowRight']:['ArrowUp','ArrowDown'],d=keys.indexOf(e.key);if(d>=0){e.preventDefault();setSelected(i);commit(i,d===0?-1:1);}}}>{i===0?<span className="slide-face"><Face id={p.seed%6}/></span>:<span className={'block-grip '+b.axis} aria-hidden="true"><i/><i/><i/></span>}</button>)}</div><p className="puzzle-note">{moves} ruutuaskelta · Palikat liikkuvat pitkän sivunsa suuntaan.</p></>;
+ return <><p className="puzzle-instruction">Vedä palikoita sormella. Vapauta punaiselle reitti ulos oikealta!</p><div className={'slide-board '+(escaped?'escaped ':'')+(size===5?'slide-five':'')}><svg className="slide-exit" viewBox="0 0 32 24" aria-hidden="true"><path d="M3 12h24m-8-8 8 8-8 8" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/></svg>{blocks.map((b,i)=><button key={i} aria-label={i===0?'Punainen palikka':`Este ${i}`} aria-pressed={selected===i} className={'slide-block block-'+i+(drag.current?.id===i?' dragging':'')} style={{left:(b.x+(selected===i&&b.axis==='h'?offset:0))*unit+'%',top:(b.y+(selected===i&&b.axis==='v'?offset:0))*unit+'%',width:(b.axis==='h'?b.len:1)*unit+'%',height:(b.axis==='v'?b.len:1)*unit+'%'}} onPointerDown={e=>begin(e,i)} onPointerMove={track} onPointerUp={e=>end(e)} onPointerCancel={e=>end(e,true)} onLostPointerCapture={e=>end(e,true)} onKeyDown={e=>{const axis=b.axis,keys=axis==='h'?['ArrowLeft','ArrowRight']:['ArrowUp','ArrowDown'],d=keys.indexOf(e.key);if(d>=0){e.preventDefault();setSelected(i);commit(i,d===0?-1:1);}}}>{i===0?<span className="slide-face"><Face id={p.seed%6}/></span>:<span className={'block-grip '+b.axis} aria-hidden="true"><i/><i/><i/></span>}</button>)}</div><p className="puzzle-note">{moves} ruutuaskelta · Palikat liikkuvat pitkän sivunsa suuntaan.</p></>;
 }
 export function OneStroke(p:Props){const g=useMemo(()=>lineGraph(p.seed,p.easy),[p.seed,p.easy]),[path,setPath]=useState<number[]>([]),[hint,setHint]=useState('');const route=useRef<number[]>([]),used=useRef(new Set<number>()),active=useRef(false);
  function point(e:React.PointerEvent<SVGSVGElement>){const b=e.currentTarget.getBoundingClientRect(),x=(e.clientX-b.left)*300/b.width,y=(e.clientY-b.top)*300/b.height;let best=-1,dist=27;g.points.forEach((v,i)=>{const d=Math.hypot(v.x-x,v.y-y);if(d<dist){dist=d;best=i;}});return best;}
@@ -174,9 +175,9 @@ export function CodeRoute(p:Props & {avatar:number}){
 }
 
 const sortColors=[
- {name:'Violetti',color:'#c2a0ff',symbol:'◆'},
- {name:'Sininen',color:'#78dfef',symbol:'●'},
- {name:'Oranssi',color:'#ffab69',symbol:'★'},
+ {name:'Violetti',color:'#c2a0ff'},
+ {name:'Sininen',color:'#78dfef'},
+ {name:'Oranssi',color:'#ffab69'},
 ];
 
 export function ColorSort(p:Props){
@@ -184,9 +185,10 @@ export function ColorSort(p:Props){
  const [sorted,setSorted]=useState<number[]>([]);
  const [selected,setSelected]=useState<number|null>(null);
  const [drag,setDrag]=useState<{x:number,y:number}|null>(null);
+ const [returning,setReturning]=useState<{index:number,x:number,y:number}|null>(null);
  const [hint,setHint]=useState('');
  const placed=useRef<number[]>([]);
- const pointer=useRef<{id:number,index:number,x:number,y:number,moved:boolean}|null>(null);
+ const pointer=useRef<{id:number,index:number,x:number,y:number}|null>(null);
  const baskets=useRef<HTMLDivElement>(null);
 
  function drop(index:number,basket:number){
@@ -202,40 +204,43 @@ export function ColorSort(p:Props){
  return <div className="color-sort">
   <p className="puzzle-instruction">Vedä pallot samanvärisiin koreihin.</p>
   <div className="color-sort-balls">
-   {balls.map((color,index)=><button type="button" key={index} disabled={sorted.includes(index)||p.blocked()} aria-label={`${sortColors[color].name} pallo ${index+1}`} aria-pressed={selected===index} className={sorted.includes(index)?'sort-placed':undefined} style={{'--sort-color':sortColors[color].color} as React.CSSProperties}
+   {balls.map((color,index)=><button type="button" key={index} disabled={sorted.includes(index)||p.blocked()} aria-label={`${sortColors[color].name} pallo ${index+1}`} aria-pressed={selected===index} className={sorted.includes(index)?'sort-placed':drag&&selected===index?'sort-held':returning?.index===index?'sort-returning':undefined} style={{'--sort-color':sortColors[color].color,'--return-x':returning?.index===index?returning.x+'px':undefined,'--return-y':returning?.index===index?returning.y+'px':undefined} as React.CSSProperties}
     onClick={event=>{if(event.detail===0)setSelected(index);}}
     onPointerDown={event=>{
      if(event.button!==0||pointer.current||p.blocked())return;
+     event.preventDefault();
      event.currentTarget.setPointerCapture(event.pointerId);
-     pointer.current={id:event.pointerId,index,x:event.clientX,y:event.clientY,moved:false};
+     const rect=event.currentTarget.getBoundingClientRect();
+     pointer.current={id:event.pointerId,index,x:rect.left+rect.width/2,y:rect.top+rect.height/2};
+     setReturning(null);
      setSelected(index);
+     setDrag({x:event.clientX,y:event.clientY});
     }}
     onPointerMove={event=>{
      const active=pointer.current;
      if(!active||event.pointerId!==active.id)return;
-     if(Math.hypot(event.clientX-active.x,event.clientY-active.y)>6)active.moved=true;
-     if(active.moved)setDrag({x:event.clientX,y:event.clientY});
+     setDrag({x:event.clientX,y:event.clientY});
     }}
     onPointerUp={event=>{
      const active=pointer.current;
      if(!active||event.pointerId!==active.id)return;
      pointer.current=null;
      setDrag(null);
-     if(!active.moved)return;
      const target=document.elementFromPoint(event.clientX,event.clientY)?.closest<HTMLElement>('[data-sort-basket]');
-     if(target&&baskets.current?.contains(target))drop(index,Number(target.dataset.sortBasket));
+     const basket=target&&baskets.current?.contains(target)?Number(target.dataset.sortBasket):null;
+     if(basket!==balls[index])setReturning({index,x:event.clientX-active.x,y:event.clientY-active.y});
+     if(basket!==null)drop(index,basket);
      else setSelected(null);
     }}
     onLostPointerCapture={()=>{if(pointer.current?.index===index){pointer.current=null;setDrag(null);setSelected(null);}}}
-   >{sortColors[color].symbol}</button>)}
+   />)}
   </div>
   <div className="color-sort-baskets" ref={baskets}>
    {sortColors.map((color,index)=><button type="button" key={color.name} data-sort-basket={index} aria-label={`${color.name} kori`} style={{'--sort-color':color.color} as React.CSSProperties} onClick={()=>{if(selected!==null)drop(selected,index);}}>
-    <span aria-hidden="true">{color.symbol}</span>
     <span className="sort-splash" aria-hidden="true" key={sorted.filter(i=>balls[i]===index).length}>{sorted.some(i=>balls[i]===index)?'✦':''}</span>
    </button>)}
   </div>
-  {drag&&selected!==null&&<span className="sort-drag" aria-hidden="true" style={{left:drag.x,top:drag.y,background:sortColors[balls[selected]].color}}>{sortColors[balls[selected]].symbol}</span>}
+  {drag&&selected!==null&&<span className="sort-drag" aria-hidden="true" style={{left:drag.x,top:drag.y,background:sortColors[balls[selected]].color}}/>}
   <p className="puzzle-note" role="status">{sorted.length} / {balls.length} {hint}</p>
  </div>;
 }

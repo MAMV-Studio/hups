@@ -13,21 +13,21 @@ export const turnPorts=(ports:number[],turn:number)=>ports.map(v=>(v+turn)%4);
 export function pipeLayout(seed:number,easy=false){const r=random(seed);const path=easy?[0,1,5,9,10,11,15]:seed%2?[0,4,8,9,5,6,10,14,15]:[0,1,2,6,5,9,10,11,15];const cells=Array.from({length:16},()=>({ports:shuffle([0,1,2,3],r).slice(0,2),turn:Math.floor(r()*4)}));
  path.forEach((n,i)=>{const prev=i?path[i-1]:-4,next=i===path.length-1?19:path[i+1];const port=(v:number)=>v===n-4?0:v===n+1?1:v===n+4?2:3;cells[n]={ports:[port(prev),port(next)],turn:Math.floor(r()*4)};});if(pipeRoute(cells))cells[0].turn=(cells[0].turn+1)%4;return {cells,path};}
 export function pipeRoute(cells:{ports:number[],turn:number}[]){const seen=new Set<number>(),queue=[[0]];if(!turnPorts(cells[0].ports,cells[0].turn).includes(0))return null;for(const path of queue){const n=path.at(-1)!;if(seen.has(n))continue;seen.add(n);const ps=turnPorts(cells[n].ports,cells[n].turn);if(n===15&&ps.includes(2))return path;for(const p of ps){const x=n%4,y=Math.floor(n/4),nx=x+[0,1,0,-1][p],ny=y+[-1,0,1,0][p];if(nx<0||nx>3||ny<0||ny>3)continue;const m=ny*4+nx;if(turnPorts(cells[m].ports,cells[m].turn).includes((p+2)%4))queue.push([...path,m]);}}return null;}
-export type Block={x:number,y:number,axis:'h'|'v',len:number};
+export type Block={x:number,y:number,axis:'h'|'v',len:number,grid?:number};
 // Generate several legal boards and retain a genuinely obstructed, solvable puzzle.
 const slideCache=new Map<string,Block[]>();
 export function slideLayout(seed:number,easy=false):Block[]{
  const key=seed+':'+easy,cached=slideCache.get(key);if(cached)return cached.map(b=>({...b}));
- const r=random(seed),target=easy?4:8;let best:Block[]=[{x:0,y:1,axis:'h',len:2},{x:2,y:0,axis:'v',len:2}],bestDistance=0;
- for(let attempt=0;attempt<180;attempt++){
-  const blocks:Block[]=[{x:0,y:1,axis:'h',len:2}],occupied=new Set([4,5]),count=easy?4:5+Math.floor(r()*2);
-  for(let k=0;k<60&&blocks.length<count;k++){const axis=r()<.5?'h':'v',len=!easy&&r()<.12?3:2,x=Math.floor(r()*4),y=Math.floor(r()*4);if(x+(axis==='h'?len:1)>4||y+(axis==='v'?len:1)>4)continue;const cells=Array.from({length:len},(_,i)=>(y+(axis==='v'?i:0))*4+x+(axis==='h'?i:0));if(cells.some(n=>occupied.has(n)))continue;cells.forEach(n=>occupied.add(n));blocks.push({x,y,axis,len});}
-  const d=slideMinimum(blocks);if(d>bestDistance){best=blocks;bestDistance=d;}if(d>=target&&d<=(easy?8:17)){best=blocks;break;}
+ const r=random(seed),hard=!easy&&seed%3===1,size=hard?5:4,row=hard?2:1,target=easy?4:hard?14:8;let best:Block[]=[{x:0,y:row,axis:'h',len:2,...(hard?{grid:size}:{})},{x:2,y:row-1,axis:'v',len:2}],bestDistance=0;
+ for(let attempt=0;attempt<(hard?360:180);attempt++){
+  const blocks:Block[]=[{x:0,y:row,axis:'h',len:2,...(hard?{grid:size}:{})}],occupied=new Set([row*size,row*size+1]),count=easy?4:hard?9:5+Math.floor(r()*2);
+  for(let k=0;k<60&&blocks.length<count;k++){const axis=r()<.5?'h':'v',len=!easy&&r()<.12?3:2,x=Math.floor(r()*size),y=Math.floor(r()*size);if(x+(axis==='h'?len:1)>size||y+(axis==='v'?len:1)>size)continue;const cells=Array.from({length:len},(_,i)=>(y+(axis==='v'?i:0))*size+x+(axis==='h'?i:0));if(cells.some(n=>occupied.has(n)))continue;cells.forEach(n=>occupied.add(n));blocks.push({x,y,axis,len});}
+  const d=slideMinimum(blocks);if(d>bestDistance&&d<(hard?29:30)){best=blocks;bestDistance=d;}if(d>=target&&d<=(easy?8:hard?25:17)){best=blocks;break;}
  }
  if(slideCache.size>100)slideCache.clear();slideCache.set(key,best);return best.map(b=>({...b}));
 }
-export function moveBlock(blocks:Block[],i:number,delta:number){const b=blocks[i],x=b.x+(b.axis==='h'?delta:0),y=b.y+(b.axis==='v'?delta:0);if(x<0||y<0||x+(b.axis==='h'?b.len:1)>4||y+(b.axis==='v'?b.len:1)>4)return null;const occupied=new Set<number>();blocks.forEach((v,j)=>{if(j!==i)for(let k=0;k<v.len;k++)occupied.add((v.y+(v.axis==='v'?k:0))*4+v.x+(v.axis==='h'?k:0));});for(let k=0;k<b.len;k++)if(occupied.has((y+(b.axis==='v'?k:0))*4+x+(b.axis==='h'?k:0)))return null;return blocks.map((v,j)=>j===i?{...v,x,y}:v);}
-export function slideMinimum(start:Block[]){const q=[{b:start,n:0}],seen=new Set<string>();for(const {b,n}of q){const key=b.map(v=>v.x+','+v.y).join(';');if(seen.has(key))continue;seen.add(key);if(b[0].x===2)return n;for(let i=0;i<b.length;i++)for(const d of [-1,1]){const next=moveBlock(b,i,d);if(next)q.push({b:next,n:n+1});}}return -1;}
+export function moveBlock(blocks:Block[],i:number,delta:number){const size=blocks[0].grid??4,b=blocks[i],x=b.x+(b.axis==='h'?delta:0),y=b.y+(b.axis==='v'?delta:0);if(x<0||y<0||x+(b.axis==='h'?b.len:1)>size||y+(b.axis==='v'?b.len:1)>size)return null;const occupied=new Set<number>();blocks.forEach((v,j)=>{if(j!==i)for(let k=0;k<v.len;k++)occupied.add((v.y+(v.axis==='v'?k:0))*size+v.x+(v.axis==='h'?k:0));});for(let k=0;k<b.len;k++)if(occupied.has((y+(b.axis==='v'?k:0))*size+x+(b.axis==='h'?k:0)))return null;return blocks.map((v,j)=>j===i?{...v,x,y}:v);}
+export function slideMinimum(start:Block[]){const q=[{b:start,n:0}],seen=new Set<string>();for(const {b,n}of q){const key=b.map(v=>v.x+','+v.y).join(';');if(seen.has(key))continue;seen.add(key);if(b[0].x===(b[0].grid??4)-b[0].len)return n;for(let i=0;i<b.length;i++)for(const d of [-1,1]){const next=moveBlock(b,i,d);if(next)q.push({b:next,n:n+1});}}return -1;}
 export function lineGraph(seed:number,easy=false){
  const templates:{points:P[],edges:number[][]}[]=[
   {points:[{x:65,y:110},{x:235,y:110},{x:235,y:245},{x:65,y:245},{x:150,y:35}],edges:easy?[[0,1],[1,2],[2,3],[3,0],[0,4],[4,1]]:[[0,1],[1,2],[2,3],[3,0],[0,4],[4,1],[0,2],[1,3]]},

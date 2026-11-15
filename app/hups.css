@@ -260,3 +260,19 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .account-totals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .account-totals>span{display:grid;gap:6px;padding:12px;background:#362644;border:1px solid #86679e;border-radius:15px;text-align:center;color:#f4e2fb}
 .account-totals strong{font-size:26px;color:#cbfa76}
+
+html,body{overscroll-behavior:none;overflow-x:clip;touch-action:pan-y}
+input,textarea,select{font-size:max(16px,1em)}
+.memory-prompt{text-align:center}
+.memory-feedback:empty{display:none}
+.memory-target{height:56px;display:grid;place-items:center;font-size:46px;line-height:1}
+.task-hidepics .hidden-pictures button{display:grid;place-items:center}
+.task-hidepics .hidden-pictures.revealing span{font-size:clamp(36px,12vw,58px)}
+.task-hidepics .hidden-pictures.answering span{font-size:30px}
+.task-picorder .sequence-answer .next-picture{border-color:#d3ff86;box-shadow:0 0 0 1px #d3ff86}
+.task-picorder .color-options button{font-size:clamp(31px,10vw,46px)}
+.extra-task-pictureposition .extra-model{font-size:clamp(31px,10vw,47px)}
+.scene-game .extra-task-pictureposition .choice-grid button{font-size:clamp(33px,11vw,50px)}
+.memory-arrow{display:inline-grid;place-items:center}
+.memory-arrow .mirror-arrow{width:46px;height:46px}
+.extra-model .memory-arrow .mirror-arrow{width:78px;height:78px}

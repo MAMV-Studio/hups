@@ -21,7 +21,7 @@ for(const easy of [true,false]){
   assert.deepEqual(m,L.windingMaze(seed,easy));
  }
  assert.ok(shapes.size>=10,'Rotated variants of different split shapes');
- assert.ok(slides.size>45,'Many distinct sliding puzzles');assert.ok(graphs.size>=20,'Rotated graph variants');assert.ok(hardest>=(easy?4:8));
+ assert.ok(slides.size>45,'Many distinct sliding puzzles');assert.ok(graphs.size>=20,'Rotated graph variants');assert.ok(hardest>=(easy?4:12));
 }
 const sealed={size:2,walls:Array.from({length:4},()=>[true,true,true,true]),holes:[],route:[]};let marble={x:.5,y:.5};for(let i=0;i<100;i++)marble=L.moveMarble(sealed,marble,{x:.1,y:.1});assert.ok(marble.x<=.81&&marble.y<=.81,'Marble cannot cross closed walls diagonally');
 console.log('PASS: 150 seeds, exact matching pairs at 3 sizes, soluble pipes/slides/Euler trails/mazes, unique majority, consistent parcels/cups, split areas, timed light series, same easy decks without maths/reading.');
@@ -127,3 +127,34 @@ for(let i=0;i<9;i++){
 assert.equal(calls.length,1);
 assert.equal(calls[0][0],1000);
 console.log('PASS: color sorting rejects a wrong basket and finishes after all nine balls are sorted.');
+
+render('ColorSort',true);
+const basketNodes=[0,1,2].map(index=>({dataset:{sortBasket:String(index)}}));
+let basketUnderPointer=0;
+const previousDocument=Object.getOwnPropertyDescriptor(globalThis,'document');
+Object.defineProperty(globalThis,'document',{configurable:true,value:{
+ elementFromPoint:()=>({closest:()=>basketNodes[basketUnderPointer]}),
+}});
+try{
+ const basketRef=nodes(render('ColorSort')).find(node=>node.props.className==='color-sort-baskets').props.ref;
+ basketRef.current={contains:node=>basketNodes.includes(node)};
+ for(let index=0;index<9;index++){
+  const options=buttons(render('ColorSort'));
+  basketUnderPointer=options.slice(9).findIndex(basket=>ballColor(basket)===ballColor(options[index]));
+  const event={pointerId:index+1,button:0,clientX:20,clientY:20,preventDefault(){},currentTarget:{
+   setPointerCapture(){},
+   getBoundingClientRect(){return {left:0,top:0,width:40,height:40};},
+  }};
+  options[index].props.onPointerDown(event);
+  assert.equal(buttons(render('ColorSort'))[index].props.className,'sort-held');
+  const ball=buttons(render('ColorSort'))[index];
+  ball.props.onPointerMove({...event,clientX:120,clientY:200});
+  ball.props.onPointerUp({...event,clientX:120,clientY:200});
+  assert.equal(buttons(render('ColorSort'))[index].props.className,'sort-placed');
+ }
+ assert.equal(calls.length,1);
+}finally{
+ if(previousDocument)Object.defineProperty(globalThis,'document',previousDocument);
+ else delete globalThis.document;
+}
+console.log('PASS: pointer drag sorts all nine balls across all three rows.');

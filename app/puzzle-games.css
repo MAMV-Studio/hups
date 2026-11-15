@@ -83,3 +83,11 @@
 @keyframes sort-splash{from{transform:scale(.5);opacity:1}to{transform:scale(2);opacity:0}}
 .sort-drag{position:fixed;z-index:20;transform:translate(-50%,-50%);pointer-events:none}
 @media(prefers-reduced-motion:reduce){.sort-splash{display:none}}
+
+.color-sort-balls .sort-held{opacity:0;touch-action:none}
+.color-sort-balls .sort-returning{animation:sort-return .22s ease-out}
+@keyframes sort-return{from{transform:translate(var(--return-x),var(--return-y))}to{transform:translate(0,0)}}
+@media(prefers-reduced-motion:reduce){.color-sort-balls .sort-returning{animation:none}}
+.slide-board.slide-five{background:repeating-linear-gradient(0deg,transparent 0 19%,#675277 20%),repeating-linear-gradient(90deg,#30233c 0 19%,#675277 20%)}
+.slide-five::before{clip-path:polygon(0 0,100% 0,100% 40%,calc(100% - 6px) 40%,calc(100% - 6px) 60%,100% 60%,100% 100%,0 100%)}
+.slide-five .slide-exit{top:50%}
