@@ -232,6 +232,12 @@ export function ColorSort(p:Props){
      if(basket!==null)drop(index,basket);
      else setSelected(null);
     }}
+    onPointerCancel={event=>{
+     if(pointer.current?.id!==event.pointerId)return;
+     pointer.current=null;
+     setDrag(null);
+     setSelected(null);
+    }}
     onLostPointerCapture={()=>{if(pointer.current?.index===index){pointer.current=null;setDrag(null);setSelected(null);}}}
    />)}
   </div>

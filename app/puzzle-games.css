@@ -91,3 +91,5 @@
 .slide-board.slide-five{background:repeating-linear-gradient(0deg,transparent 0 19%,#675277 20%),repeating-linear-gradient(90deg,#30233c 0 19%,#675277 20%)}
 .slide-five::before{clip-path:polygon(0 0,100% 0,100% 40%,calc(100% - 6px) 40%,calc(100% - 6px) 60%,100% 60%,100% 100%,0 100%)}
 .slide-five .slide-exit{top:50%}
+
+.scene-game .play-stage .color-sort-balls button{touch-action:none}
