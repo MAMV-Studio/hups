@@ -251,3 +251,12 @@ body,.phone,.phone.scene-game,.phone.scene-home,.phone.scene-results{font-family
 .board-reference{position:absolute;transform:translate(-50%,-50%);color:#ff9b58;pointer-events:none}
 .syllable-picture{text-align:center;font-size:clamp(64px,25vw,110px);line-height:1.1;margin:12px auto}
 .scene-game .syllable-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.hups-account{display:grid;gap:14px;max-width:420px;margin:24px auto}
+.hups-account form{display:grid;gap:12px}
+.hups-account form>input{width:100%;padding:13px;border:1px solid #987bab;border-radius:13px;background:#2e223b;color:#fff4e7}
+.hups-account .primary,.account-entry{justify-content:center}
+.account-entry{width:100%;margin:10px 0}
+.account-totals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.account-totals>span{display:grid;gap:6px;padding:12px;background:#362644;border:1px solid #86679e;border-radius:15px;text-align:center;color:#f4e2fb}
+.account-totals strong{font-size:26px;color:#cbfa76}

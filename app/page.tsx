@@ -7,6 +7,9 @@ import {WobblyText} from './wobbly-text';
 import {Character,characters,ParkRace,ParkTrim} from './characters';
 import {taskDeck,taskCatalog,makeTask} from '../tasks';
 import Minigame from './minigame';
+import type {Session} from '@supabase/supabase-js';
+import {AccountPanel} from './account-panel';
+import {accountClient,accountHeaders,beginAccountRound} from './account-client';
 import {beginCount,countShared} from './play-counter';
 import {LittleHups} from './little-hups';
 import {taskActions} from './task-look';
@@ -16,6 +19,26 @@ import {LaunchScene,ResultParty,WinnerReveal} from './arcade';
 const total=(a:number[])=>a.reduce((x,y)=>x+y,0);
 export default function Page(){
  const [screen,setScreen]=useState('home'),[name,setName]=useState(''),[code,setCode]=useState(''),[seed,setSeed]=useState(1),[idx,setIdx]=useState(0),[stage,setStage]=useState('intro'),[scores,setScores]=useState<number[]>([]),[detail,setDetail]=useState(''),[elapsed,setElapsed]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[room,setRoom]=useState<any>(null),[saved,setSaved]=useState(false),[avatar,setAvatar]=useState(0),[count,setCount]=useState(3),[progressError,setProgressError]=useState(''),[raceDone,setRaceDone]=useState(false),[practiceId,setPracticeId]=useState<string|null>(null);
+ const [account,setAccount]=useState<Session|null>(null);
+ const completeAccountRound=useRef<null|(()=>Promise<void>)>(null);
+ const accountId=account?.user.id;
+ useEffect(()=>{
+  if(!accountClient)return;
+  const {data:{subscription}}=accountClient.auth.onAuthStateChange((_event,session)=>setAccount(session));
+  return ()=>subscription.unsubscribe();
+ },[]);
+ useEffect(()=>{
+  if(!accountId||!accountClient)return;
+  let active=true;
+  void accountClient.from('hups_profiles').select('nickname,avatar').eq('user_id',accountId).maybeSingle().then(({data})=>{
+   if(active&&data){setName(data.nickname);setAvatar(data.avatar);}
+  });
+  return ()=>{active=false;};
+ },[accountId]);
+ function applyProfile(nickname:string,character:number){
+  setName(nickname);setAvatar(character);
+  try{localStorage.setItem('pt-name',nickname);localStorage.setItem('pt-avatar',String(character));}catch{}
+ }
  const exitDialog=useRef<HTMLDialogElement>(null);
  const counter=useRef<ReturnType<typeof beginCount>|null>(null);
  const [showPodium,setShowPodium]=useState(false);
@@ -25,14 +48,14 @@ export default function Page(){
  const clock=useRef(createGameClock());
  const auth=useRef<any>(null),finished=useRef(false),timer=useRef<any>(null),scoreRef=useRef<number[]>([]),epoch=useRef(0);const deck=useMemo(()=>practiceId?[makeTask(practiceId,seed)]:taskDeck(seed,length,level),[seed,practiceId,length,level]),task=deck[idx];
  useEffect(()=>{const invite=new URLSearchParams(window.location.search).get('haaste');if(invite&&/^\d{4}$/.test(invite)){setCode(invite);setScreen('join');}try{setName(localStorage.getItem('pt-name')||'');setAvatar(Number(localStorage.getItem('pt-avatar'))||0);}catch{}},[]);
- const api=async(action:string,extra:any={})=>{const sent=performance.now();const r=await fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({...auth.current,action,version:28,...extra})});const v:any=await r.json();clock.current.sync(v.serverNow,sent,performance.now());if(!r.ok){if(v.updateRequired)setError(v.error);if(v.left){auth.current=null;setRoom(null);setScreen('home');setError(v.error);}throw Error(v.error);}return v;};
+ const api=async(action:string,extra:any={})=>{const identity=action==='create'||action==='join'?await accountHeaders():{};const sent=performance.now();const r=await fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json',...identity},cache:'no-store',body:JSON.stringify({...auth.current,action,version:28,...extra})});const v:any=await r.json();clock.current.sync(v.serverNow,sent,performance.now());if(!r.ok){if(v.updateRequired)setError(v.error);if(v.left){auth.current=null;setRoom(null);setScreen('home');setError(v.error);}throw Error(v.error);}return v;};
  useEffect(()=>{if(['results','game'].includes(screen)&&room&&room.seed!==seed){setSeed(room.seed);setScores([]);scoreRef.current=[];setSaved(false);setScreen('lobby');}},[room,screen,seed]);
  function leaveRoom(){if(!auth.current)return;const payload=JSON.stringify({...auth.current,action:'leave',version:28});void fetch('/api/challenge',{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true}).catch(()=>{});}
  async function roomAction(action:string){if(busy)return;setBusy(true);setError('');try{const v=await api(action,{name,avatar,length,level,code:action==='create'?undefined:action==='join'?code.trim():auth.current?.code,token:action==='join'||action==='create'?undefined:auth.current?.token});if(v.token)auth.current={token:v.token,code:v.code};setRoom(v.state);setLength(v.state.length||8);setLevel(v.state.level==='easy'?'easy':'normal');if(!['rematch','accept','decline'].includes(action)){setSeed(v.state.seed);setScreen('lobby');}}catch(e:any){setError(e.message);}finally{setBusy(false);}}
  useEffect(()=>{if(!['lobby','results','game'].includes(screen))return;if(!auth.current)return;let live=true;const t=setInterval(async()=>{try{const values=scoreRef.current;const v=await api(values.length&&screen!=='lobby'?'progress':'poll',values.length&&screen!=='lobby'?{scores:values,seed}:{});if(live){setRoom(v.state);setLength(v.state.length||8);setLevel(v.state.level==='easy'?'easy':'normal');setProgressError('');if(values.length===length)setSaved(true);}}catch(e:any){if(live)setProgressError(e.message);}},1200);return()=>{live=false;clearInterval(t);};},[screen,stage,seed,length]);
  useEffect(()=>{if(screen!=='lobby'||!room?.start)return;const t=setInterval(()=>{setElapsed(clock.current.now());if(clock.current.now()>=room.start){clearInterval(t);begin(room.seed,true);}},100);return()=>clearInterval(t);},[screen,room?.start]);
- function begin(v:number,shared=false,single:string|null=null){if(shared&&auth.current){counter.current=null;countShared({...auth.current});}else counter.current=beginCount('hups',!!single);setShowPodium(false);setPracticeId(single);if(!shared){setLevel('normal');leaveRoom();auth.current=null;setRoom(null);}try{localStorage.setItem('pt-name',name);localStorage.setItem('pt-avatar',String(avatar));}catch{}epoch.current++;setSeed(v);setIdx(0);setScores([]);scoreRef.current=[];setSaved(false);setScreen('game');setStage('intro');setError('');}
- function finish(score:number,text:string){if(finished.current)return;finished.current=true;clearInterval(timer.current);const value=Math.max(0,Math.min(1000,Math.round(score)));scoreRef.current=[...scoreRef.current,value];setScores(scoreRef.current);setDetail(text);setRaceDone(!room);if(task.data.puzzle)setStage('feedback');else setTaskResult({score:value,text});if(auth.current){sendProgress(scoreRef.current);}else if(scoreRef.current.length===deck.length)counter.current?.complete();}
+ function begin(v:number,shared=false,single:string|null=null){completeAccountRound.current=!shared&&!single&&accountClient?beginAccountRound():null;if(shared&&auth.current){counter.current=null;countShared({...auth.current});}else counter.current=beginCount('hups',!!single);setShowPodium(false);setPracticeId(single);if(!shared){setLevel('normal');leaveRoom();auth.current=null;setRoom(null);}try{localStorage.setItem('pt-name',name);localStorage.setItem('pt-avatar',String(avatar));}catch{}epoch.current++;setSeed(v);setIdx(0);setScores([]);scoreRef.current=[];setSaved(false);setScreen('game');setStage('intro');setError('');}
+ function finish(score:number,text:string){if(finished.current)return;finished.current=true;clearInterval(timer.current);const value=Math.max(0,Math.min(1000,Math.round(score)));scoreRef.current=[...scoreRef.current,value];setScores(scoreRef.current);setDetail(text);setRaceDone(!room);if(task.data.puzzle)setStage('feedback');else setTaskResult({score:value,text});if(auth.current){sendProgress(scoreRef.current);}else if(scoreRef.current.length===deck.length){counter.current?.complete();void completeAccountRound.current?.();}}
  function play(){if(stage!=='intro')return;setCount(3);setStage('countdown');}
  useEffect(()=>{if(screen!=='game'||stage!=='countdown')return;let n=3;const t=setInterval(()=>{n--;setCount(n);if(n===0){clearInterval(t);startTask();}},1000);return()=>clearInterval(t);},[stage,screen]);
  useEffect(()=>{
@@ -71,7 +94,7 @@ export default function Page(){
   }
  }
  const music=useThemeMusic(screen==='game'||screen==='results');
- return <main className={'phone scene-'+screen+' phase-'+stage}>{music.audio}<Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 57</span></header>
+ return <main className={'phone scene-'+screen+' phase-'+stage}>{music.audio}<Backdrop/><header className="top">{screen!=='home'&&<button className="go-home" aria-label="Keskeytä ja palaa etusivulle" title="Etusivulle" onClick={askHome}>⌂</button>}<button className="brand" onClick={askHome}><WobblyText text="hups"/><i>!</i></button><span className="version">VERSIO 58</span></header>
  {screen==='home'&&<>
  <div className="home-welcome"><div><span className="home-kicker">PIENI HETKI. ISO HAASTE.</span><h1><WobblyText text="Pienet pelit. Iso ilo."/></h1></div><div className="home-pilot" aria-hidden="true"><span className="pilot-spark">✦</span><div className="pilot-friend friend-left"><Character id={(avatar+1)%6} happy/></div><Character id={avatar} happy/><div className="pilot-friend friend-right"><Character id={(avatar+2)%6} happy/></div><div className="pilot-ground"/></div></div>
  <section className="entry home-launch">
@@ -81,12 +104,14 @@ export default function Page(){
  <fieldset className="round-picker"><legend>Kuinka pitkä kisa?</legend><div className="round-presets">{[5,10,15,20].map((n,i)=><button key={n} aria-label={`${n} tehtävää`} aria-pressed={length===n} className={length===n?'selected':''} onClick={()=>setLength(n)}><b>{n}</b><small>{['Pikakisa','Sopiva kisa','Vielä lisää','Koko kattaus'][i]}</small></button>)}</div><p>Noin {Math.ceil(length*.4)} min · joka kerralla uusi sekoitus</p></fieldset>
  <button className="primary home-play" disabled={!name.trim()} onClick={()=>begin(Math.floor(Math.random()*1e8))}>Pelaa <span aria-hidden="true">→</span></button>
  <div className="split home-multiplayer"><button disabled={!name.trim()||busy} onClick={()=>{setCode('');setScreen('create');}}>Haasta kaverit <span aria-hidden="true">＋</span></button><button disabled={!name.trim()} onClick={()=>{leaveRoom();auth.current=null;setRoom(null);setProgressError('');setScreen('join');}}>Liity koodilla <span aria-hidden="true">→</span></button></div>
+ <button className="textbutton account-entry" onClick={()=>setScreen('account')}>{account?'Oma profiili':'Kirjaudu tai luo tili'} →</button>
  <button className="little-entry" onClick={()=>{leaveRoom();auth.current=null;setRoom(null);music.selectTheme('pikkuhups');setScreen('kids');window.scrollTo({top:0,behavior:'instant'});}}>🎈 Siirry Pikkuhupsiin →</button>
  <button className="textbutton browse-games" onClick={()=>setScreen('library')}>Löydä oma suosikkipelisi →</button>
  <a className="home-studio home-studio-bottom" href="/tilastot">MAMV Studio</a>
  <ParkTrim/>
  </section>
  </>}
+ {screen==='account'&&<AccountPanel session={account} name={name} avatar={avatar} onSave={applyProfile} onBack={home}/>}
  {screen==='kids'&&<LittleHups onExit={home} musicButton={music.button}/>}
  {screen==='create'&&<section className="create-challenge"><span className="tag">KAVERIEN KANSSA</span><h1>Millainen<br/><em>kisa tänään?</em></h1><fieldset className="level-choice"><legend>Valitse tehtävätaso koko porukalle</legend><div className="split"><button aria-pressed={level==='easy'} onClick={()=>setLevel('easy')}><Character id={4}/><b>Helpommat tehtävät</b></button><button aria-pressed={level==='normal'} onClick={()=>setLevel('normal')}><Character id={2}/><b>Haastavammat tehtävät</b></button></div><p className="note">{level==='easy'?'Noin 6–9-vuotiaille. Taitoa, muistia ja kujeilua — ilman lasku- tai lukutehtäviä.':'Kaikki Hupsin haasteet, myös vaativammat pulmat ja laskut.'}</p></fieldset><p className="note">{length} tehtävää · kaikille samat pelit ja sama taso.</p><button className="primary" disabled={busy} onClick={()=>roomAction('create')}>Luo haastekoodi →</button><button className="textbutton" onClick={home}>← Takaisin</button></section>}
  {screen==='library'&&<section className="game-library"><span className="tag">{taskCatalog.length} PIENTÄ HAASTETTA</span><h1>Mitä tänään<br/><em>kokeiltaisiin?</em></h1><p>Kokeile yksittäistä peliä tai löydä uusi suosikki.</p><div className="library-grid">{taskCatalog.map(t=><button key={t.id} onClick={()=>begin(Math.floor(Math.random()*1e8),false,t.id)}><span>{t.icon}</span><b>{t.title}</b><small>{t.category}</small></button>)}</div><button className="textbutton" onClick={home}>← Alkuun</button></section>}

@@ -7,7 +7,7 @@ globalThis.__store = {
  async read(code) {return {data:structuredClone(state),revision:rev};},
  async save(code,data,revision) {if(revision!==rev)return false;state=structuredClone(data);rev++;return true;}
 };
-const source=compile('app/api/challenge/route.ts').replace("'../../../libgame'",JSON.stringify(uri(compile('libgame.ts')))).replace("import { challengeStore } from '../../../server/challenge-store';","const challengeStore=()=>globalThis.__store;");
+const source=compile('app/api/challenge/route.ts').replace("import { recordRoomAccounts, roomAccountId } from '../../../server/room-accounts';","const recordRoomAccounts=async()=>{}, roomAccountId=async()=>{};").replace("'../../../libgame'",JSON.stringify(uri(compile('libgame.ts')))).replace("import { challengeStore } from '../../../server/challenge-store';","const challengeStore=()=>globalThis.__store;");
 const {POST}=await import(uri(source));
 const call=async(token,action,extra={})=>{const r=await POST(new Request('http://test/api',{method:'POST',body:JSON.stringify({token,action,code:'1234',version:28,...extra})}));return [r.status,await r.json()]};
 
@@ -80,3 +80,27 @@ console.log('PASS: newly created code is read back before showing; spaced code j
 {
 const [easyStatus,easyRoom]=await call('','create',{name:'Kid',length:10,level:'easy'});assert.equal(easyStatus,200);assert.equal(easyRoom.state.level,'easy');const token=easyRoom.token;const [,joined]=await call('','join',{code:easyRoom.code,name:'Guest',level:'normal'});assert.equal(joined.state.level,'easy');assert.equal((await call(token,'poll',{code:easyRoom.code,level:'normal'}))[1].state.level,'easy');console.log('PASS: challenge creator locks easy level; joining and polling cannot change it.');
 }
+
+const recorded=[];
+const accountModule=compile('server/room-accounts.ts').replace(
+ "import { roundUuid, statsRpc } from './play-stats';",
+ "const roundUuid=v=>v, statsRpc=(_fn,body)=>globalThis.__accountRows(body.p_entries);",
+);
+globalThis.__accountRows=rows=>recorded.push(rows);
+const {recordRoomAccounts}=await import(uri(accountModule));
+const accountPlayer={accountId:'private-account-id',scores:[900]};
+const otherPlayer={scores:[]};
+const accountRoom={code:'1234',seed:12,created:2,start:3,length:1,players:[accountPlayer,otherPlayer]};
+await recordRoomAccounts(accountRoom);
+assert.equal(recorded.at(-1)[0].won,false);
+otherPlayer.scores=[800];
+await recordRoomAccounts(accountRoom);
+assert.equal(recorded.at(-1)[0].won,true);
+otherPlayer.scores=[900];
+await recordRoomAccounts(accountRoom);
+assert.equal(recorded.at(-1)[0].won,false);
+const privateRoom=await call(undefined,'create');
+rooms.get(privateRoom[1].code).data.players[0].accountId=accountPlayer.accountId;
+const [,viewWithAccount]=await call(privateRoom[1].token,'poll',{code:privateRoom[1].code});
+assert.ok(!('accountId' in viewWithAccount.state.players[0]));
+console.log('PASS: private account ID stays out of room responses; wins require a settled round and a unique top score.');
