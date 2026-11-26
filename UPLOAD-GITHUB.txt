@@ -1,22 +1,22 @@
-Hups 62 ja Google-kirjautuminen
+Hups 63 – käyttöönotto
 
-1. Käytä Hupsin nykyistä Supabase-projektia. Jos version 58 tilit.sql
-   on jo ajettu, sama tietokantamuutos on valmiina.
-   Pidä nykyiset Vercelin SUPABASE-muuttujat käytössä.
-2. Avaa Supabasessa Authentication → Sign In / Providers → Google.
-   Kopioi sieltä Callback URL.
-3. Avaa Google Auth Platform (https://console.cloud.google.com/auth/).
-   Määritä Branding ja Audience, ja luo Clients-kohdassa Web application -asiakas.
-   Lisää Hupsin julkinen origin (https://oma-hups-osoite, ilman polkua)
-   kohtaan Authorized JavaScript origins.
-   Lisää Supabasesta kopioitu Callback URL kohtaan Authorized redirect URIs.
-   Jos sovellus on tilassa Testing, lisää omat testiosoitteet Test users -listaan.
-4. Syötä Googlen Client ID ja Client Secret Supabasen Google-asetuksiin,
-   ota Google käyttöön ja tallenna. Client Secret kuuluu vain Supabaseen.
-5. Supabase → Authentication → URL Configuration: aseta Site URL:ksi
-   Hupsin julkinen osoite ja lisää Redirect URLs -listaan sama osoite
-   muodossa https://oma-hups-osoite/?profiili=1.
-6. Pura Hups-Vercel-62.zip ja päivitä GitHub. Kun Vercel näyttää Ready,
-   testaa Kirjaudu Googlella, profiilin tallennus ja vieraspeli.
+1. Avaa Hupsin nykyinen Supabase-projekti ja SQL Editor.
+2. Avaa paketista supabase/joulu-63.sql, kopioi koko sisältö editoriin ja paina Run.
+   Tämä jatkaa aiemmin käyttöönotettua tilit.sql-tietokantaa.
+   Päivitys lisää asusteet, jouluhahmojen avautumisen, Päivän Hupsin tulokset
+   sekä kirjautuneiden keskinäiset kaveritilastot. Nykyiset tiedot säilyvät.
+3. Pura koko ZIP. Lisää puretut tiedostot ja kansiot nykyiseen GitHub-repositorioon.
+   Lisää myös uusi app/update-63.css, app/progression.ts, app/friend-stats.tsx,
+   app/christmas-games.tsx sekä public/christmas-characters.png.
+4. Odota, että Vercel näyttää Ready. Pelin otsikossa pitää lukea VERSIO 63.
+   Vercelin nykyiset Supabase- ja Google-asetukset sopivat tähän versioon.
+5. Avaa uusi kaverihaaste. Molempien tulee päivittää peli versioon 63.
+   Pelilinkistä voi nyt valita nimen ja hahmon ennen liittymistä.
+6. Tarkista Oma Hups kirjautuneena ja vieraana. Päivän Hupsin paras tulos
+   säilyy vieraalla samassa selaimessa ja kirjautuneella omalla tilillä.
+   Keskinäiset tilastot alkavat kertyä uusista kisoista, joissa molemmat ovat kirjautuneet.
 
-Supabasen ohje: https://supabase.com/docs/guides/auth/social-sign-in/auth-google
+Jouluhahmot: Lumiukko 10, Tonttu 25 ja Joulupukki 50 loppuun pelattua kisaa.
+Myös aiemmin tilille tallennetut kisat lasketaan mukaan.
+Asusteet: kruunu 5, rusetti 15 ja tähtilasit 30 kisaa.
+Kaikki pelit ovat pelattavissa myös vieraana.

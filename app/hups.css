@@ -284,3 +284,7 @@ input,textarea,select{font-size:max(16px,1em)}
   margin: 0 auto 18px;
   font-size: 1.15rem;
 }
+.scene-game .reaction.splash-reaction{width:min(68vw,240px);height:240px;min-height:0;margin:20px auto;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%}
+.scene-game .reaction-splash{inset:10%;font-size:80px}
+.scene-game .symbol-field{position:relative;display:block;height:280px}
+.direction-command{font-family:'Lilita One',sans-serif;font-size:clamp(36px,10vw,58px);text-align:center;margin:18px 0}

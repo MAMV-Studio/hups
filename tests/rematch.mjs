@@ -1,15 +1,15 @@
 import ts from 'typescript';import fs from 'node:fs';import assert from 'node:assert/strict';
 const compile=p=>ts.transpileModule(fs.readFileSync(p,'utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022}}).outputText;
 const uri=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
-let state={version:30,length:8,code:'1234',seed:123,created:Date.now(),start:1,players:[{id:'host',token:'h',name:'A',scores:Array(8).fill(500)},{id:'guest',token:'g',name:'B',scores:[500]}]},rev=0;
+let state={version:31,length:8,code:'1234',seed:123,created:Date.now(),start:1,players:[{id:'host',token:'h',name:'A',scores:Array(8).fill(500)},{id:'guest',token:'g',name:'B',scores:[500]}]},rev=0;
 globalThis.__store = {
  async create(code,data) {state=structuredClone(data);rev=0;return true;},
  async read(code) {return {data:structuredClone(state),revision:rev};},
  async save(code,data,revision) {if(revision!==rev)return false;state=structuredClone(data);rev++;return true;}
 };
-const source=compile('app/api/challenge/route.ts').replace("import { recordRoomAccounts, roomAccountId } from '../../../server/room-accounts';","const recordRoomAccounts=async()=>{}, roomAccountId=async()=>{};").replace("'../../../libgame'",JSON.stringify(uri(compile('libgame.ts')))).replace("import { challengeStore } from '../../../server/challenge-store';","const challengeStore=()=>globalThis.__store;");
+const source=compile('app/api/challenge/route.ts').replace("import { recordRoomAccounts, roomAccountId, roomAppearance } from '../../../server/room-accounts';","const recordRoomAccounts=async()=>{}, roomAccountId=async()=>{}, roomAppearance=async()=>({avatar:0,accessory:'none'});").replace("'../../../libgame'",JSON.stringify(uri(compile('libgame.ts')))).replace("import { challengeStore } from '../../../server/challenge-store';","const challengeStore=()=>globalThis.__store;");
 const {POST}=await import(uri(source));
-const call=async(token,action,extra={})=>{const r=await POST(new Request('http://test/api',{method:'POST',body:JSON.stringify({token,action,code:'1234',version:30,...extra})}));return [r.status,await r.json()]};
+const call=async(token,action,extra={})=>{const r=await POST(new Request('http://test/api',{method:'POST',body:JSON.stringify({token,action,code:'1234',version:31,...extra})}));return [r.status,await r.json()]};
 
 assert.equal((await call('g','poll',{version:7}))[0],426);
 state.players[1].scores=Array(8).fill(400);
@@ -37,7 +37,7 @@ await call('g','poll');assert.equal(state.players.length,1);assert.equal(state.p
 console.log('PASS: guest proposes, both accept, one declines, absent player timeout, preserved code, live scores, stale prefixes and version mismatch.');
 
 const [created,newRoom]=await call(null,'create',{name:'Testi'});
-assert.equal(created,200);assert.match(newRoom.code,/^[1-9][0-9]{3}$/);assert.equal(newRoom.state.version,30);
+assert.equal(created,200);assert.match(newRoom.code,/^[1-9][0-9]{3}$/);assert.equal(newRoom.state.version,31);
 const joined=await call(null,'join',{code:newRoom.code,name:'Toinen'});assert.equal(joined[0],200);assert.equal(joined[1].state.players.length,2);
 console.log('PASS: four-digit creation and two-player join.');
 

@@ -14,7 +14,7 @@ const extraGame=uri(compile('app/extra-games.tsx').replace("'react'",JSON.string
 const parkGames=uri(compile('app/park-games.tsx').replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'../tasks'",JSON.stringify(tasks)));
 const logic=uri(compile('play-logic.ts'));
 const tactile=uri(compile('app/tactile-games.tsx').replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'./characters'",JSON.stringify(characters)).replace("'../play-logic'",JSON.stringify(logic)));
-const src=compile('app/minigame.tsx').replace("'./puzzle-games'",JSON.stringify(uri('export function PuzzleGame(){return null;}'))).replace("'./tactile-games'",JSON.stringify(tactile)).replace("'./park-games'",JSON.stringify(parkGames)).replace("'./extra-games'",JSON.stringify(extraGame)).replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'../tasks'",JSON.stringify(tasks)).replace("'../libgame'",JSON.stringify(lib)).replace("'./picture-games'",JSON.stringify(pictures)).replace("'./characters'",JSON.stringify(characters)).replace("'./task-look'",JSON.stringify(look));
+const src=compile('app/minigame.tsx').replace("'./christmas-games'",JSON.stringify(uri('export function ChristmasGame(){return null;}'))).replace("'./puzzle-games'",JSON.stringify(uri('export function PuzzleGame(){return null;}'))).replace("'./tactile-games'",JSON.stringify(tactile)).replace("'./park-games'",JSON.stringify(parkGames)).replace("'./extra-games'",JSON.stringify(extraGame)).replace("'react'",JSON.stringify(hooks)).replace('"react/jsx-runtime"',runtime).replace("'../tasks'",JSON.stringify(tasks)).replace("'../libgame'",JSON.stringify(lib)).replace("'./picture-games'",JSON.stringify(pictures)).replace("'./characters'",JSON.stringify(characters)).replace("'./task-look'",JSON.stringify(look));
 const {default:Minigame}=await import(uri(src)),{makeTask}=await import(tasks);
 function flatten(n){if(!n)return [];if(Array.isArray(n))return n.flatMap(flatten);if(typeof n!=='object')return [];return [n,...flatten(n.props?.children)];}
 function text(n){if(n==null)return '';if(Array.isArray(n))return n.map(text).join('');if(typeof n==='object')return text(n.props?.children);return String(n);}
@@ -48,9 +48,9 @@ for(const id of ['sort','descend']){
  clock+=1000;order.forEach(v=>click(n=>text(n)===String(v)));assert.equal(calls.length,1);
 }
 init('alternate');
-function side(i){const buttons=render().filter(n=>n.type==='button'&&String(n.props.className||'').includes(i===0?'your-turn':'__unused'));const target=render().find(n=>n.type==='button'&&text(n).includes(i===0?'VASEN':'OIKEA'));target.props.onPointerDown({preventDefault(){}});}
-side(0);side(0);assert.equal(h.states[5],0);assert.equal(calls.length,0);clock+=1000;for(let i=0;i<6;i++)side(i%2);assert.equal(calls.length,1);
-console.log('PASS: wrong number-order and alternating-tap answers reset progress and can be retried.');
+function side(i){const buttons=render().filter(n=>n.type==='button'&&String(n.props.className||'').includes(i===0?'your-turn':'__unused'));const target=render().find(n=>n.type==='button'&&text(n).includes(i===0?'VASEN':'OIKEA'));target.props.onClick();}
+side(0);side(0);assert.equal(h.states[5],0);assert.equal(calls.length,0);clock+=1000;for(const direction of task.data.directions)side(direction);assert.equal(calls.length,1);
+console.log('PASS: wrong number-order and direction-word answers reset progress and can be retried.');
 
 // Run the actual mounted task timer against a monotonic fake clock.
 const realInterval=globalThis.setInterval,realClear=globalThis.clearInterval;

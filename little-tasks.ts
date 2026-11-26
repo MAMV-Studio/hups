@@ -1,5 +1,7 @@
 import {random,shuffle} from './libgame';
 export const kidCatalog=[
+ {id:'xmasgifts',title:'Lahjat säkkeihin!',group:'colors'},
+ {id:'xmastree',title:'Koristellaan kuusi!',group:'find'},
  {id:'pair',title:'Etsi oikea pari!',group:'find'},
  {id:'memorypairs',title:'Etsi kuvaparit!',group:'find'},
  {id:'parcel',title:'Kenelle yllätys?',group:'find'},
