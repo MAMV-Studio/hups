@@ -1,0 +1,13 @@
+/* Keep the navigation short, including its lower inset. */
+.bottom-nav{min-height:0;height:auto;padding:3px 8px max(4px,calc(env(safe-area-inset-bottom) - 20px))}
+.bottom-nav button{min-height:40px;gap:2px}
+.bottom-nav button span{font-size:20px}
+.daily-page>.primary+p{margin-top:23px;line-height:1.5}
+.scene-account .account-characters+.reward-progress{margin-top:16px;margin-bottom:24px}
+.home-pilot{height:145px}
+.home-pilot>.character{width:128px;height:128px;left:calc(50% - 64px);bottom:0}
+.home-pilot .pilot-friend{width:98px;height:98px;bottom:0;rotate:0deg}
+.home-pilot .friend-left{left:0;right:auto}
+.home-pilot .friend-right{right:0;left:auto}
+.character-picker button .is-dressed .char-art{inset:0!important;animation:none}
+.is-dressed .char-art{clip-path:inset(2%)}

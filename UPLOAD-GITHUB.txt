@@ -1,17 +1,17 @@
-Hups 64 – käyttöönotto
+Hups 67 – testikierros
 
 1. Pura ZIP ja päivitä tiedostot nykyiseen GitHub-repositorioon.
-   Lisää myös uusi app/update-64.css-tiedosto.
-2. Odota Vercelin julkaisun valmistumista ja päivitä pelisivu.
-   Yläpalkissa pitää lukea VERSIO 64.
-3. Jos version 63 korjattu supabase/joulu-63.sql on jo ajettu,
-   tietokantaan ei tarvita uutta muutosta. Muussa tapauksessa aja
-   paketissa oleva korjattu SQL Supabasen SQL Editorissa.
-4. Käynnistä uusi kaverihaaste. Kaikkien osallistujien tulee käyttää versiota 64.
+   Lisää myös app/testikierros-kansio ja app/review.css.
+2. Odota Vercelin julkaisun valmistumista. Pelissä näkyy VERSIO 67.
+3. Avaa Hupsin /tilastot-sivu ja kirjaudu nykyisellä ylläpitosalasanalla.
+4. Paina Pelaa kaikki pelit ja kirjaa korjaukset.
+5. Valitse Hups tai Pikkuhups. Pelit tulevat järjestyksessä.
+6. Kirjaa huomiot pelin alla. Pelaa uudelleen, ohita tai tallenna ja jatka.
+7. Lataa kaikki muistiinpanot -painike tallentaa Hups-testihuomiot.txt-tiedoston.
+   Voit lähettää tiedoston keskusteluun korjauksia varten.
 
-Joulupelit on poistettu Hupsista ja Pikkuhupsista.
-Etusivun ja haastelinkin valitsimessa ovat kuusi alkuperäistä hahmoa.
-Jouluhahmot avataan ja valitaan Oma Hups -sivulla. Valittu jouluhahmo
-näkyy edelleen omana pelihahmona myös etusivulla ja peleissä.
-Oma Hupsin elementtejä ja alapalkin kuvakkeita on pienennetty.
-Nimikenttien fontti ehkäisee mobiiliselaimen automaattista zoomausta.
+Muistiinpanot ja eteneminen tallentuvat automaattisesti samaan selaimeen.
+Jatka samalla laitteella, selaimella ja peliosoitteella. Selaimen tietojen
+poistaminen poistaa paikalliset merkinnät, joten lataa tiedosto talteen.
+Testikierros on olemassa olevan ylläpitokirjautumisen takana.
+Tietokantaan ei tarvita uutta muutosta tätä versiota varten.
