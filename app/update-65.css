@@ -1,0 +1,13 @@
+/* Square atlas cells preserve the shape of both original and Christmas characters. */
+.scene-account .account-characters button{height:94px;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.scene-account .account-characters button .character{width:64px;height:64px;flex:0 0 64px;border-radius:12px;overflow:hidden}
+.scene-account .account-characters button .char-art{inset:0!important;animation:none;filter:none}
+.scene-account .profile-preview{width:115px;height:115px}
+.character-accessory.accessory-bow{left:43%;top:4%;width:31%;height:auto;font-size:0;line-height:0;rotate:-12deg;filter:drop-shadow(0 2px 1px #49253f55)}
+.character-accessory.accessory-bow img{display:block;width:100%;height:auto}
+.char-1>.accessory-bow{left:36%;top:3%}.char-2>.accessory-bow{left:55%;top:9%}.char-3>.accessory-bow{left:38%;top:11%}.char-4>.accessory-bow{left:46%;top:8%}.char-5>.accessory-bow{left:52%;top:6%}
+.char-6>.accessory-bow,.char-7>.accessory-bow,.char-8>.accessory-bow{top:8%;left:38%}
+.reward-list .reward-bow{display:block;width:39px;height:31px;object-fit:contain;margin:0 auto}
+.bottom-nav{padding-top:3px;padding-bottom:calc(3px + env(safe-area-inset-bottom));background:#2d2039;border-top-color:#a489bc66}
+.bottom-nav button{min-height:38px;padding:2px 1px;gap:1px;font-size:10px}
+.bottom-nav button span{font-size:18px}
