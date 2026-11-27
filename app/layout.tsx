@@ -10,6 +10,7 @@ import './update-63.css';
 import './update-64.css';
 import './update-65.css';
 import './update-66.css';
+import './update-68.css';
 import './review.css';
 export const metadata={title:'Hups! — pienet pelit, iso ilo',description:'Yli sata pientä taitopeliä puhelimelle. Haasta itsesi ja kaverisi.',applicationName:'Hups!',manifest:'/manifest.webmanifest',icons:{icon:[{url:'/hups-favicon-32.png',sizes:'32x32',type:'image/png'},{url:'/hups-icon-192.png',sizes:'192x192',type:'image/png'}],apple:[{url:'/hups-apple-touch-icon.png',sizes:'180x180',type:'image/png'}]}};
 export const viewport={width:'device-width',initialScale:1,viewportFit:'cover',themeColor:'#141418'};

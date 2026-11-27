@@ -11,3 +11,5 @@ taskActions.colorhunt='Siniset poks!';
 taskActions.movinghunt='Poksauta siniset karkulaiset!';taskActions.movingcenter='Nappaa liikkuva napakymppi!';taskActions.movingspot='Mihin karkulainen katosi?';
 
 Object.assign(taskActions,{colorsort:'Pallot omiin koreihin!',syllables:'Kuuntele sana mielessäsi!',coderoute:'Ohjaa hahmo tähdelle!',memorypairs:'Etsi samat kuvaparit!',parcel:'Kenelle paketti kuuluu?',speedlights:'Pysy valojen vauhdissa!',pipes:'Maali virtaamaan!',majority:'Mitä on eniten?',slide:'Punainen palikka ulos!',onestroke:'Koko kuvio yhdellä vedolla!',cups:'Missä pallo piilee?',bisect:'Jaa kuvio puoliksi!',tilt:'Kuula maaliin!'});
+
+taskActions.piecefill='Täytä kuvio paloilla!';

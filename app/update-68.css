@@ -1,0 +1,57 @@
+.home-pilot{width:min(100%,280px);isolation:isolate}
+.home-pilot>.character{width:145px;height:145px;left:calc(50% - 72.5px);z-index:2}
+.home-pilot .pilot-friend{width:114px;height:114px;bottom:0;z-index:1}
+.home-pilot .friend-left{left:8%}
+.home-pilot .friend-right{right:8%}
+.home-pilot .pilot-ground{z-index:0}
+
+.parcel-friends button{aspect-ratio:1;display:grid;place-items:center}
+.parcel-friends .character,.parcel-friends .puzzle-kid-face{width:100%;height:auto;aspect-ratio:1}
+.parcel-stage>svg{aspect-ratio:1;width:100%;height:auto;display:block}
+.slide-block .slide-face{position:relative;width:auto;height:100%;aspect-ratio:1;max-height:none}
+.slide-face .char-art{inset:0;animation:none}
+.majority-options .majority-winner{outline:3px solid #eaffb4;outline-offset:3px}
+.majority-options .majority-other{opacity:.55}
+.majority-options .majority-wrong{outline:3px solid #ff849e;outline-offset:3px}
+
+.cups-stage,.picture-memory,.gone-model,.symbol-field,.alternate-taps,.scattered-count,.number-path,.review-memory-grid,.fill-frame{
+ border:2px solid #a487c3;border-radius:21px;background:#31253d;
+}
+.picture-memory,.gone-model,.alternate-taps,.review-memory-grid{padding:10px}
+.number-path,.scattered-count{position:relative;display:block;aspect-ratio:1;min-height:0}
+.number-path button,.scattered-count i{position:absolute;transform:translate(-50%,-50%);margin:0}
+.number-path button{width:clamp(38px,13vw,55px);height:auto;aspect-ratio:1;min-height:0;border-radius:50%;padding:0;color:#281936;box-shadow:inset 0 -4px #0002}
+.scattered-count i{width:clamp(17px,6vw,30px);height:auto;aspect-ratio:1;border-radius:50%}
+.symbol-field span{font-size:clamp(19px,7vw,34px)}
+.color-options button{font-size:clamp(13px,3.6vw,19px);min-height:54px;padding-inline:4px}
+.review-memory-grid{grid-template-columns:repeat(4,1fr)}
+.review-memory-grid button.lit{background:#d0f882;box-shadow:inset 0 0 0 2px #faffd7,0 0 10px #c7fa6366}
+.splash-reaction .reaction-splash b{scale:.68}
+
+.fill-frame{padding:10px}
+.fill-board{display:grid}
+.fill-board button{min-width:0;min-height:0;padding:0;border:1px solid #6d587b;border-radius:5px;background:#22192d;box-shadow:inset 0 -3px #0002}
+.fill-board .fill-outside{visibility:hidden}
+.fill-tray{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:12px 0}
+.fill-tray button,.fill-rotate{border:1px solid #9879b5;background:#41304f;border-radius:12px;color:#fff0ff;padding:8px;min-height:44px}
+.fill-tray button{touch-action:none}
+.fill-tray button[aria-pressed=true]{outline:2px solid #d6ff86}
+.fill-tray button:disabled{opacity:.25}
+.fill-tile{display:inline-grid;font-size:clamp(12px,4.1vw,20px);gap:1px;pointer-events:none}
+.fill-tile i{border-radius:4px;box-shadow:inset 0 -3px #0002}
+.fill-rotate{display:block;margin:auto}
+.fill-ghost{position:fixed;z-index:20;pointer-events:none;opacity:.85}
+.scene-game .reaction.splash-reaction{width:min(55vw,195px);height:min(55vw,195px)}
+.scene-game .splash-reaction>span{font-size:49px}
+.parcel-stage>svg{max-height:none}
+.sequence-answer.color-slots small,.color-pad small,.color-pad b{display:none}
+.sequence-answer:not(.color-slots) .sequence-slot{border-radius:13px}
+.sequence-answer:not(.color-slots){gap:7px}
+.scene-game .gone-options button{font-size:clamp(26px,8vw,40px)}
+.scene-game .number-path button:disabled{opacity:.35}
+.scene-game:has(.memory-target) .hidden-pictures{border:2px solid #a487c3;border-radius:21px;background:#31253d;padding:8px}
+.scene-game .missing-row span{border-color:#bd94e6;background:#73549b}
+.scene-game .missing-row span.hole{background:#443254;border-style:dashed;color:#dcfb9d}
+.puzzle-piecefill.puzzle-solved .fill-board button:not(.fill-outside){animation:fill-pop .42s ease-out}
+@keyframes fill-pop{45%{filter:brightness(1.35);scale:1.06}100%{filter:none;scale:1}}
+@media(prefers-reduced-motion:reduce){.puzzle-piecefill.puzzle-solved .fill-board button{animation:none}}

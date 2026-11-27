@@ -1,11 +1,12 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {random,shuffle} from '../libgame';
-import {Character} from './characters';
+import {PieceFill} from './piece-fill';
+import {Character,characters} from './characters';
 import {codeLayout,codeDirections,codeStep,memoryLayout,majorityLayout,parcelLayout,cupMoves,cupPositions,lightSeries,pipeLayout,pipeRoute,turnPorts,slideLayout,moveBlock,slideMinimum,lineGraph,polygon,clipPolygon,splitRatio,windingMaze,moveMarble,inkColors,P,Block} from '../puzzle-logic';
 type Props={seed:number,easy:boolean,kids:boolean,ms:number,blocked:()=>boolean,finish:(score:number,text:string)=>void};
 const names=['Vieterö','Pörhö','Moukku','Löllö','Nuppu','Töppö','Lankakerä','Ilmapallo'];
-function Face({id,kids=false}:{id:number,kids?:boolean}){return id<6?kids?<span className="puzzle-kid-face" role="img" aria-label={['Kuje','Kieppi','Hupsu','Räyhä','Tassu','Hauva'][id]} style={{backgroundImage:`url('/little-friend-${id}.png')`}}/>:<Character id={id}/>:<span className="puzzle-object" aria-label={names[id]}>{['🧶','🎈'][id-6]}</span>;}
+function Face({id,kids=false}:{id:number,kids?:boolean}){return id<6?kids?<span className="puzzle-kid-face" role="img" aria-label={['Kuje','Kerä','Salama','Räyhä','Tassu','Hauva'][id]} style={{backgroundImage:`url('/little-friend-${id}.png')`}}/>:<Character id={id}/>:<span className="puzzle-object" aria-label={names[id]}>{['🧶','🎈'][id-6]}</span>;}
 export function PuzzleGame({id,seed=1,level='normal',kids=false,avatar=0,onFinish}:{id:string,seed?:number,level?:string,kids?:boolean,avatar?:number,onFinish:(score:number,text:string)=>void}){
  const easy=level==='easy'||kids,[ms,setMs]=useState(0),[ready,setReady]=useState(id!=='tilt'),[result,setResult]=useState<{score:number,text:string}|null>(null);const done=useRef(false),callback=useRef(onFinish),started=useRef(0),delay=useRef<any>(null);callback.current=onFinish;
  const wait=id==='cups'?6500:0,limit=kids?Infinity:id==='majority'||id==='cups'?5000:id==='bisect'?15000:id==='coderoute'||(id==='slide'&&!easy&&seed%3===1)?45000:30000;
@@ -15,9 +16,10 @@ export function PuzzleGame({id,seed=1,level='normal',kids=false,avatar=0,onFinis
  const p:Props={seed,easy,kids,ms,blocked:()=>done.current||!ready,finish:(score,text)=>finish(id==='speedlights'||id==='slide'||id==='bisect'?score:score/(1+Math.max(0,ms-wait)/45000),text)};
  return <div className={'puzzle-game puzzle-'+id+(kids?' puzzle-kids':'')+(result&&result.score>0?' puzzle-solved':'')}>
  {!kids&&ready&&<div className="puzzle-clock"><span>{ms<wait?'Seuraa tarkasti…':Math.max(0,Math.ceil((limit-Math.max(0,ms-wait))/1000))+' s'}</span><i style={{width:Math.max(0,100*(1-Math.max(0,ms-wait)/limit))+'%'}}/></div>}
+ {id==='piecefill'&&<PieceFill {...p}/>}
  {id==='colorsort'&&<ColorSort {...p}/>}
  {id==='coderoute'&&<CodeRoute {...p} avatar={avatar}/>}
- {id==='memorypairs'&&<Memory {...p}/>}{id==='parcel'&&<Parcel {...p}/>}{id==='speedlights'&&<Lights {...p}/>}{id==='pipes'&&<Pipes {...p}/>}{id==='majority'&&<Majority {...p}/>}{id==='slide'&&<Slide {...p}/>}{id==='onestroke'&&<OneStroke {...p}/>}{id==='cups'&&<Cups {...p}/>}{id==='bisect'&&<Bisect {...p}/>}{id==='tilt'&&<Tilt {...p} active={ready} onStart={()=>setReady(true)}/>}
+ {id==='memorypairs'&&<Memory {...p}/>}{id==='parcel'&&<Parcel {...p}/>}{id==='speedlights'&&<Lights {...p}/>}{id==='pipes'&&<Pipes {...p} avatar={avatar}/>}{id==='majority'&&<Majority {...p}/>}{id==='slide'&&<Slide {...p}/>}{id==='onestroke'&&<OneStroke {...p}/>}{id==='cups'&&<Cups {...p}/>}{id==='bisect'&&<Bisect {...p}/>}{id==='tilt'&&<Tilt {...p} active={ready} onStart={()=>setReady(true)}/>}
  </div>;
 }
 export function Memory(p:Props){const pairs=p.kids?4:p.easy?6:8,layout=useMemo(()=>memoryLayout(p.seed,pairs),[p.seed,pairs]);const [open,setOpen]=useState<number[]>([]),[matched,setMatched]=useState<number[]>([]),[tries,setTries]=useState(0);const current=useRef<number[]>([]),found=useRef(new Set<number>()),lock=useRef(false),attempts=useRef(0),timeout=useRef<any>(null);useEffect(()=>()=>clearTimeout(timeout.current),[]);
@@ -25,10 +27,10 @@ export function Memory(p:Props){const pairs=p.kids?4:p.easy?6:8,layout=useMemo((
  return <><p className="puzzle-instruction">Etsi kaksi täysin samaa kuvaa.</p><div className="memory-board" style={{gridTemplateColumns:'repeat(4,1fr)'}}>{layout.map((v,i)=>{const visible=open.includes(i)||matched.includes(v);return <button key={i} aria-label={visible?names[v]:`Käännä kortti ${i+1}`} aria-pressed={visible} className={(visible?'revealed ':'')+(matched.includes(v)?'matched':'')} onClick={()=>pick(i)}>{visible?<Face id={v} kids={p.kids}/>:<span className="card-back">?</span>}</button>;})}</div><p className="puzzle-note">{matched.length} / {pairs} paria{!p.kids&&` · ${tries} yritystä`}</p></>;
 }
 export function Parcel(p:Props){const n=p.kids?2:p.easy?3:4,layout=useMemo(()=>parcelLayout(p.seed,n),[p.seed,n]),[hint,setHint]=useState(''),[show,setShow]=useState(false);const answer=layout.paths[layout.target].at(-1)!,gap=260/n,x=(i:number)=>20+gap/2+i*gap;const d=(a:number[])=>a.map((v,i)=>{
-  const y=40+i*38;
-  return i?`C${x(a[i-1])},${y-21} ${x(v)},${y-17} ${x(v)},${y}`:`M${x(v)},${y}`;
+  const y=40+i*48;
+  return i?`C${x(a[i-1])},${y+(i%2?9:-35)} ${x(v)},${y-(i%2?80:20)} ${x(v)},${y}`:`M${x(v)},${y}`;
  }).join(' ');
- return <><p className="puzzle-instruction">Seuraa paketin narua. Kenelle yllätys kuuluu?</p><div className="parcel-stage"><svg viewBox="0 0 300 260" aria-label="Risteilevät pakettinarut">{layout.paths.map((a,i)=><path key={i} d={d(a)} fill="none" stroke="#bba3d9" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round"/>)}{show&&<path d={d(layout.paths[layout.target])} fill="none" stroke="#d3ff80" strokeWidth="8" className="parcel-trace"/>}<text x={x(layout.target)} y="30" textAnchor="middle" fontSize="32">🎁</text>{layout.paths.map((_,i)=><circle key={i} cx={x(i)} cy="242" r="5" fill="#f4c8e9"/>)}</svg><div className="parcel-friends" style={{gridTemplateColumns:`repeat(${n},1fr)`}}>{Array.from({length:n},(_,i)=><button key={i} aria-label={`Paketti hahmolle ${names[i]}`} onClick={()=>{if(p.blocked())return;if(i===answer){setShow(true);p.finish(1000,'Paketti löysi oikean kaverin!');}else setHint('Hupsista, seuraa narua uudelleen!');}}><Face id={i} kids={p.kids}/>{show&&i===answer&&<span className="gift-reward">{['🎈','🧶','🍪','⭐'][i]}</span>}</button>)}</div></div><p role="status" className="puzzle-note">{hint||'Katse seuraa, sormi valitsee.'}</p></>;
+ return <><p className="puzzle-instruction">Seuraa paketin narua. Kenelle yllätys kuuluu?</p><div className="parcel-stage"><svg viewBox="0 0 300 310" aria-label="Risteilevät pakettinarut">{layout.paths.map((a,i)=><path key={i} d={d(a)} fill="none" stroke="#bba3d9" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round"/>)}{show&&<path d={d(layout.paths[layout.target])} fill="none" stroke="#d3ff80" strokeWidth="8" className="parcel-trace"/>}<text x={x(layout.target)} y="30" textAnchor="middle" fontSize="32">🎁</text>{layout.paths.map((_,i)=><circle key={i} cx={x(i)} cy="288" r="5" fill="#f4c8e9"/>)}</svg><div className="parcel-friends" style={{gridTemplateColumns:`repeat(${n},1fr)`}}>{Array.from({length:n},(_,i)=><button key={i} aria-label={`Paketti hahmolle ${names[i]}`} onClick={()=>{if(p.blocked())return;if(i===answer){setShow(true);p.finish(1000,'Paketti löysi oikean kaverin!');}else setHint('Hupsista, seuraa narua uudelleen!');}}><Face id={i} kids={p.kids}/>{show&&i===answer&&<span className="gift-reward">{['🎈','🧶','🍪','⭐'][i]}</span>}</button>)}</div></div><p role="status" className="puzzle-note">{hint||'Katse seuraa, sormi valitsee.'}</p></>;
 }
 export function Lights(p:Props){const series=useMemo(()=>lightSeries(p.seed),[p.seed]),[hits,setHits]=useState(0),consumed=useRef(0),hitsRef=useRef(0);
  const flashMs=450;
@@ -38,13 +40,13 @@ export function Lights(p:Props){const series=useMemo(()=>lightSeries(p.seed),[p.
  function hit(i:number){if(p.blocked()||!expected||expected.at>p.ms)return;if(expected.key!==i){p.finish(Math.min(1000,hitsRef.current*25),`Vauhti vei mukanaan! ${hitsRef.current} oikeaa valoa.`);return;}consumed.current++;hitsRef.current++;setHits(hitsRef.current);}
  return <><p className="puzzle-instruction">Paina valot syttymisjärjestyksessä. Tahti kiihtyy!</p><strong className="light-count">{hits}</strong><div className="speed-pads">{['#bc9ae7','#83deea','#f5a4c8','#d2f574'].map((c,i)=><button key={i} aria-label={['Violetti valo','Sininen valo','Vaaleanpunainen valo','Vihreä valo'][i]} className={lit.has(i)?'lit':''} style={{'--ink':c} as React.CSSProperties} onPointerDown={e=>{e.preventDefault();hit(i);}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();hit(i);}}}></button>)}</div><p className="puzzle-note">Väärä painallus päättää pelin. Kerätyt pisteet säilyvät.</p></>;
 }
-export function Pipes(p:Props){const initial=useMemo(()=>pipeLayout(p.seed,p.easy),[p.seed,p.easy]),[cells,setCells]=useState(initial.cells),[route,setRoute]=useState<number[]|null>(null);const current=useRef(initial.cells);
+export function Pipes(p:Props & {avatar?:number}){const paint=characters[p.avatar??0]?.color??'#82dfea';const initial=useMemo(()=>pipeLayout(p.seed,p.easy),[p.seed,p.easy]),[cells,setCells]=useState(initial.cells),[route,setRoute]=useState<number[]|null>(null);const current=useRef(initial.cells);
  function turn(i:number){if(p.blocked()||route)return;const next=current.current.map((v,j)=>j===i?{...v,turn:(v.turn+1)%4}:v);current.current=next;setCells(next);const path=pipeRoute(next);if(path){setRoute(path);p.finish(1000,'Maali löysi reitin — spläts!');}}
  return <><p className="puzzle-instruction">Käännä putkia napauttamalla. Yhdistä maali ylhäältä alas!</p><div className="pipe-layout"><div className="pipe-terminals">
  <svg className="pipe-inlet" viewBox="0 0 64 58" role="img" aria-label="Maalikannu ja putken lähtö">
-  <path d="M32 33v25" stroke="#9e7cbb" strokeWidth="15"/><path d="M32 33v25" stroke="#82dfea" strokeWidth="8"/>
+  <path d="M32 33v25" stroke="#9e7cbb" strokeWidth="15"/><path d="M32 33v25" stroke={paint} strokeWidth="8"/>
   <path d="M13 14q-9-13 19-13t19 13" fill="none" stroke="#e9c7f4" strokeWidth="3"/>
-  <path d="M10 14h44l-6 26H16Z" fill="#82dfea" stroke="#e9c7f4" strokeWidth="3"/>
+  <path d="M10 14h44l-6 26H16Z" fill={paint} stroke="#e9c7f4" strokeWidth="3"/>
   <path d="M13 21h38" stroke="#d6fbff" strokeWidth="4" strokeLinecap="round"/>
  </svg></div><div className="pipe-board">{cells.map((c,i)=>{
   const ports=turnPorts(c.ports,c.turn);
@@ -58,16 +60,16 @@ export function Pipes(p:Props){const initial=useMemo(()=>pipeLayout(p.seed,p.eas
    <svg viewBox="0 0 70 70">
     <path d={outline} fill="none" stroke="#9e7cbb" strokeWidth="20" strokeLinejoin="round"/>
     <path d={outline} fill="none" stroke="#392741" strokeWidth="10" strokeLinejoin="round"/>
-    {index>=0&&<path className="pipe-paint" pathLength="1" style={{animationDelay:`${index*.14}s`}} d={`M${edge(inlet)} L35 35 L${edge(outlet)}`} fill="none" stroke="#82dfea" strokeWidth="10" strokeLinejoin="round"/>}
+    {index>=0&&<path className="pipe-paint" pathLength="1" style={{animationDelay:`${index*.14}s`}} d={`M${edge(inlet)} L35 35 L${edge(outlet)}`} fill="none" stroke={paint} strokeWidth="10" strokeLinejoin="round"/>}
    </svg>
   </button>;
  })}</div><div className="pipe-terminals">
  <svg className="pipe-outlet" viewBox="0 0 64 32" role="img" aria-label="Putken ulostulo">
-  <path d="M32 0v16" stroke="#9e7cbb" strokeWidth="15"/><path d="M32 0v16" stroke="#82dfea" strokeWidth="8"/>
-  <path d="m24 18 8 8 8-8" fill="none" stroke="#82dfea" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+  <path d="M32 0v16" stroke="#9e7cbb" strokeWidth="15"/><path d="M32 0v16" stroke={paint} strokeWidth="8"/>
+  <path d="m24 18 8 8 8-8" fill="none" stroke={paint} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
  </svg></div></div></>;
 }
-export function Majority(p:Props){const m=useMemo(()=>majorityLayout(p.seed,p.easy),[p.seed,p.easy]),[chosen,setChosen]=useState(-1);return <><p className="puzzle-instruction">Mitä väriä on eniten? Arvioi nopeasti!</p><div className={'majority-field '+(chosen>=0?'sorted':'')}>{m.items.map((v,i)=><span key={i} style={{color:inkColors[v],rotate:((i*37+p.seed)%50-25)+'deg'}}>{m.shape}</span>)}</div><div className="majority-options">{m.counts.map((n,i)=><button key={i} style={{background:inkColors[i]}} aria-label={['Sininen','Vaaleanpunainen','Vihreä'][i]} onClick={()=>{if(p.blocked())return;setChosen(i);p.finish(i===m.winner?1000:0,`Eniten oli ${['sinisiä','vaaleanpunaisia','vihreitä'][m.winner]}: ${m.counts[m.winner]}.`);}}>{m.shape}{chosen>=0&&<small>{n}</small>}</button>)}</div></>;
+export function Majority(p:Props){const m=useMemo(()=>majorityLayout(p.seed,p.easy),[p.seed,p.easy]),[chosen,setChosen]=useState(-1);return <><p className="puzzle-instruction">Mitä väriä on eniten? Arvioi nopeasti!</p><div className={'majority-field '+(chosen>=0?'sorted':'')}>{m.items.map((v,i)=><span key={i} style={{color:inkColors[v],rotate:((i*37+p.seed)%50-25)+'deg'}}>{m.shape}</span>)}</div><div className="majority-options">{m.counts.map((n,i)=><button key={i} className={chosen<0?undefined:i===m.winner?'majority-winner':i===chosen?'majority-wrong':'majority-other'} style={{background:inkColors[i]}} aria-label={['Sininen','Vaaleanpunainen','Vihreä'][i]} onClick={()=>{if(p.blocked())return;setChosen(i);p.finish(i===m.winner?1000:0,`Eniten oli ${['sinisiä','vaaleanpunaisia','vihreitä'][m.winner]}: ${m.counts[m.winner]}.`);}}>{m.shape}{chosen>=0&&<small>{n}{i===m.winner?' ✓':i===chosen?' ×':''}</small>}</button>)}</div></>;
 }
 export function Slide(p:Props){const initial=useMemo(()=>slideLayout(p.seed,p.easy),[p.seed,p.easy]),minimum=useMemo(()=>slideMinimum(initial),[initial]),[blocks,setBlocks]=useState(initial),[selected,setSelected]=useState(0),[moves,setMoves]=useState(0),[offset,setOffset]=useState(0),[escaped,setEscaped]=useState(false);const current=useRef(initial),moved=useRef(0),drag=useRef<{id:number,pointer:number,start:number,cell:number,delta:number}|null>(null);
  const size=initial[0].grid??4,unit=100/size;

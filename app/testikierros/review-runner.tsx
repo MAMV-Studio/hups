@@ -16,14 +16,14 @@ class ReviewBoundary extends Component<{children:ReactNode,onError:(message:stri
  componentDidCatch(error:Error){this.props.onError(error.message);}
  render(){return this.state.error?<p role="alert">Peli pysähtyi virheeseen. Kirjaa huomiot alle tai ohita peli.</p>:this.props.children;}
 }
-const storageKey='hups-game-review-v1';
+const storageKey='hups-game-review-v68';
 const blank:Review={mode:'hups',cursors:{hups:0,pikkuhups:0},entries:{}};
 function catalog(mode:Mode){return mode==='hups'?taskCatalog:kidCatalog;}
 export function ReviewRunner(){
  const [review,setReview]=useState<Review>(blank),[ready,setReady]=useState(false),[stage,setStage]=useState<'intro'|'countdown'|'play'|'notes'>('intro'),[attempt,setAttempt]=useState(0),[count,setCount]=useState(3),[storageMessage,setStorageMessage]=useState('');
  const latest=useRef(review),finished=useRef(false);
  const games=catalog(review.mode),cursor=Math.min(review.cursors[review.mode],games.length),meta=games[cursor],key=review.mode+':'+(meta?.id||'complete'),entry=review.entries[key]||{note:''};
- const seed=67000+cursor*7919,task=meta&&review.mode==='hups'?makeTask(meta.id,seed):null;
+ const seed=68000+cursor*7919,task=meta&&review.mode==='hups'?makeTask(meta.id,seed):null;
  function save(next:Review){latest.current=next;setReview(next);try{localStorage.setItem(storageKey,JSON.stringify(next));setStorageMessage('Tallennettu tähän selaimeen.');}catch{setStorageMessage('Tallennus selaimeen epäonnistui. Lataa muistiinpanot talteen ennen poistumista.');}}
  useEffect(()=>{
   try{
@@ -48,10 +48,10 @@ export function ReviewRunner(){
   setStage('intro');setAttempt(n=>n+1);window.scrollTo({top:0,behavior:'instant'});
  }
  function exportNotes(){
-  const lines=['HUPS – PELIEN TESTIKIERROS','Versio 67',new Date().toLocaleString('fi-FI'),''];
+  const lines=['HUPS – PELIEN TESTIKIERROS','Versio 68',new Date().toLocaleString('fi-FI'),''];
   for(const mode of ['hups','pikkuhups'] as Mode[]){lines.push(mode==='hups'?'HUPS':'PIKKUHUPS','');for(const [i,game] of catalog(mode).entries()){
    const item=latest.current.entries[mode+':'+game.id];
-   lines.push(`${i+1}. ${game.title} (${game.id})`,`Tila: ${item?.status==='played'?'Pelattu':item?.status==='skipped'?'Ohitettu':'Kesken / testaamatta'}`,`Testisiemen: ${67000+i*7919}`);
+   lines.push(`${i+1}. ${game.title} (${game.id})`,`Tila: ${item?.status==='played'?'Pelattu':item?.status==='skipped'?'Ohitettu':'Kesken / testaamatta'}`,`Testisiemen: ${68000+i*7919}`);
    if(item?.result)lines.push('Tulos: '+item.result);
    lines.push('Korjattavaa: '+(item?.note||'—'),'');
   }}
@@ -59,7 +59,7 @@ export function ReviewRunner(){
  }
  if(!ready)return <main className="phone"><p>Ladataan testikierrosta…</p></main>;
  return <main className={'phone review-page scene-game'+(review.mode==='pikkuhups'?' review-kids':'')}>
- <header className="top"><a href="/tilastot">← Ylläpitoon</a><span>TESTIKIERROS · 67</span></header>
+ <header className="top"><a href="/tilastot">← Ylläpitoon</a><span>TESTIKIERROS · 68</span></header>
  <nav className="review-modes" aria-label="Testattava peli">{(['hups','pikkuhups'] as Mode[]).map(mode=><button key={mode} aria-pressed={review.mode===mode} onClick={()=>open(mode,review.cursors[mode])}>{mode==='hups'?'Hups':'Pikkuhups'} · {Object.keys(review.entries).filter(k=>k.startsWith(mode+':')&&review.entries[k].status).length}/{catalog(mode).length}</button>)}</nav>
  <button className="textbutton" onClick={exportNotes}>Lataa kaikki muistiinpanot ↓</button>
  <p className="review-storage" role="status">{storageMessage||'Muistiinpanot ja eteneminen tallentuvat tähän selaimeen.'}</p>

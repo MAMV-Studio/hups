@@ -33,8 +33,8 @@ init('pictures');
 const good=task.data.second.filter(p=>task.data.first.some(v=>v.name===p.name)),bad=task.data.second.filter(p=>!task.data.first.some(v=>v.name===p.name));
 [bad[0],...good.slice(0,2)].forEach(p=>click(n=>n.props['aria-label']===p.name));assert.equal(calls.length,0);assert.deepEqual(h.states[2],[]);
 clock+=1000;good.forEach(p=>click(n=>n.props['aria-label']===p.name));assert.equal(calls.length,1);
-init('gridmemory');const cells=task.data.cells,badCell=[0,1,2,3,4,5,6,7,8].find(i=>!cells.includes(i));
-[cells[0],cells[1],badCell].forEach(i=>click(n=>n.props['aria-label']===`Ruutu ${i+1}`));assert.equal(calls.length,0);assert.deepEqual(h.states[1],[]);
+init('gridmemory');const cells=task.data.cells,badCell=Array.from({length:16},(_,i)=>i).find(i=>!cells.includes(i));
+[...cells.slice(0,-1),badCell].forEach(i=>click(n=>n.props['aria-label']===`Ruutu ${i+1}`));assert.equal(calls.length,0);assert.deepEqual(h.states[1],[]);
 clock+=1000;cells.forEach(i=>click(n=>n.props['aria-label']===`Ruutu ${i+1}`));assert.equal(calls.length,1);
 for(const id of ['circle','line','pictures','gridmemory','colors','picorder','numsequence','reversepics']){init(id);assert.ok(!render().some(n=>n.type==='button'&&text(n).includes('Valmis')));}
 init('circle');const svg=render().find(n=>n.type==='svg'&&n.props['aria-label']==='Piirtoalue');

@@ -5,7 +5,7 @@ import {beginCount} from './play-counter';
 import {PuzzleGame} from './puzzle-games';
 import {TactileGame} from './tactile-games';
 import {kidChallenge,kidDeck,kidCatalog} from '../little-tasks';
-export const littleFriends=[{name:'Kuje',color:'#ffac71'},{name:'Kieppi',color:'#c5a0ee'},{name:'Hupsu',color:'#98e1b2'},{name:'Räyhä',color:'#8fdbb3'},{name:'Tassu',color:'#8edeea'},{name:'Hauva',color:'#f5d37d'}];
+export const littleFriends=[{name:'Kuje',color:'#ffac71'},{name:'Kerä',color:'#c5a0ee'},{name:'Salama',color:'#98e1b2'},{name:'Räyhä',color:'#8fdbb3'},{name:'Tassu',color:'#8edeea'},{name:'Hauva',color:'#f5d37d'}];
 export function LittleCharacter({id=0}:{id?:number}){return <span className="little-character" role="img" aria-label={littleFriends[id%6].name} style={{backgroundImage:`url('/little-friend-${id%6}.png')`}}/>;}
 export function LittleHups({onExit,musicButton,onPlayingChange,reviewId,reviewSeed=1,onReviewFinish}:{onExit:()=>void,musicButton?:React.ReactNode,onPlayingChange?:(playing:boolean)=>void,reviewId?:string,reviewSeed?:number,onReviewFinish?:()=>void}){
  const [friend,setFriend]=useState(0),[group,setGroup]=useState('all'),[playing,setPlaying]=useState(!!reviewId),[seed,setSeed]=useState(reviewSeed),[turn,setTurn]=useState(0),[celebrate,setCelebrate]=useState(false),[hint,setHint]=useState(''),[popped,setPopped]=useState<number[]>([]),[hatched,setHatched]=useState(false);
@@ -33,6 +33,6 @@ export function LittleHups({onExit,musicButton,onPlayingChange,reviewId,reviewSe
 }
 
 function CharacterParty({friend}:{friend:number}){
- const lines=['Poks! Yllätys sinulle!','Kieppi ja kuperkeikka!','Tähtitulta!','RÄYH! Hih hih!','Tassut yhteen!','Koppi! Häntä heiluu!'];
+ const lines=['Poks! Yllätys sinulle!','Hups, lanka meni solmuun!','Salamavauhtia!','RÄYH! Hih hih!','Tassut yhteen!','Koppi! Häntä heiluu!'];
  return <div className={'character-party party-friend-'+friend} aria-label={lines[friend]}><LittleCharacter id={friend}/><span className="party-prop" aria-hidden="true">{['🎈','🧶','🔥','💨','✦','⚽'][friend]}</span><div className="party-confetti" aria-hidden="true">{Array.from({length:14},(_,i)=><i key={i} style={{'--i':i} as React.CSSProperties}>✦</i>)}</div><p>{lines[friend]}</p></div>;
 }
