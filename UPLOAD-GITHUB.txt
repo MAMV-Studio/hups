@@ -1,8 +1,9 @@
-Hups 67 – testikierros
+Hups 68
 
 1. Pura ZIP ja päivitä tiedostot nykyiseen GitHub-repositorioon.
-   Lisää myös app/testikierros-kansio ja app/review.css.
-2. Odota Vercelin julkaisun valmistumista. Pelissä näkyy VERSIO 67.
+   Lisää myös app/piece-fill.tsx ja app/update-68.css.
+   Korvaa public-kansion little-friend-1.png ja little-friend-2.png.
+2. Odota Vercelin julkaisun valmistumista. Pelissä näkyy VERSIO 68.
 3. Avaa Hupsin /tilastot-sivu ja kirjaudu nykyisellä ylläpitosalasanalla.
 4. Paina Pelaa kaikki pelit ja kirjaa korjaukset.
 5. Valitse Hups tai Pikkuhups. Pelit tulevat järjestyksessä.
@@ -15,3 +16,6 @@ Jatka samalla laitteella, selaimella ja peliosoitteella. Selaimen tietojen
 poistaminen poistaa paikalliset merkinnät, joten lataa tiedosto talteen.
 Testikierros on olemassa olevan ylläpitokirjautumisen takana.
 Tietokantaan ei tarvita uutta muutosta tätä versiota varten.
+
+Kaveripelit käyttävät uutta peliversiota. Päivittäkää sivu ja luokaa uusi koodi.
+Versiolla 68 on oma testikierros. Säilytä version 67 viety palautetiedosto.
