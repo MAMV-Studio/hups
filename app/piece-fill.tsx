@@ -5,6 +5,7 @@ import type {PointerEvent} from 'react';
 import {random,shuffle} from '../libgame';
 
 type Cell = [number,number];
+type Drag = {id:number;pointer:number;startX:number;startY:number;grabX:number;grabY:number};
 const colors=['#80dce9','#f7a9d2','#c5ef85','#ffca73','#be9be8'];
 const easyBoards=[['AAB.','ACBB','.CCB'],['.ABB','AABB','ACCC']];
 const boards=[['AA.B','ACBB','ACDB','.CDD','..D.'],['.AAB','CAAB','CCDB','CCDE','..EE'],['AA..','CAB.','CABB','CDDB','.DD.']];
@@ -39,8 +40,8 @@ export function PieceFill({seed,easy,blocked,finish}:{seed:number,easy:boolean,b
  const [placed,setPlaced]=useState<Record<number,Cell>>({});
  const [selected,setSelected]=useState<number|null>(null);
  const [hint,setHint]=useState('');
- const [ghost,setGhost]=useState<{id:number,x:number,y:number}|null>(null);
- const drag=useRef<{id:number,pointer:number,x:number,y:number}|null>(null);
+ const [ghost,setGhost]=useState<{id:number,x:number,y:number,cellWidth:number,cellHeight:number}|null>(null);
+ const drag=useRef<Drag|null>(null);
  const draggedPiece=useRef<number|null>(null);
  const board=useRef<HTMLDivElement>(null);
  const width=game.rows[0].length,height=game.rows.length;
@@ -64,23 +65,37 @@ export function PieceFill({seed,easy,blocked,finish}:{seed:number,easy:boolean,b
   setHint('');
   if(Object.keys(next).length===pieces.length)finish(1000,'Kuvio täyttyi. Pala paikalleen!');
  }
+ function dragPosition(active:Drag,event:PointerEvent<HTMLButtonElement>){
+  const rect=board.current?.getBoundingClientRect();
+  if(!rect||!rect.width||!rect.height)return null;
+  const cellWidth=rect.width/width,cellHeight=rect.height/height;
+  return {
+   rect,cellWidth,cellHeight,
+   x:event.clientX-active.grabX*cellWidth,
+   y:event.clientY-active.grabY*cellHeight,
+  };
+ }
  function pointerUp(event:PointerEvent<HTMLButtonElement>){
   const active=drag.current;
   if(!active||active.pointer!==event.pointerId)return;
   drag.current=null;
   setGhost(null);
-  if(Math.hypot(active.x-event.clientX,active.y-event.clientY)<8)return;
+  if(Math.hypot(active.startX-event.clientX,active.startY-event.clientY)<8)return;
   draggedPiece.current=active.id;
-  const rect=board.current?.getBoundingClientRect();
-  if(!rect)return;
-  const x=Math.floor((event.clientX-rect.left)/rect.width*width);
-  const y=Math.floor((event.clientY-rect.top)/rect.height*height);
-  drop(active.id,x,y);
+  const position=dragPosition(active,event);
+  if(!position)return;
+  const {rect,x,y,cellWidth,cellHeight}=position;
+  drop(active.id,Math.round((x-rect.left)/cellWidth),Math.round((y-rect.top)/cellHeight));
  }
- function tile(shape:Cell[],color:string){
+ function clearDrag(event:PointerEvent<HTMLButtonElement>){
+  if(drag.current?.pointer!==event.pointerId)return;
+  drag.current=null;
+  setGhost(null);
+ }
+ function tile(shape:Cell[],color:string,cellWidth?:number,cellHeight?:number){
   const columns=Math.max(...shape.map(([x])=>x))+1;
   const rows=Math.max(...shape.map(([,y])=>y))+1;
-  return <span className="fill-tile" style={{gridTemplateColumns:`repeat(${columns},1em)`,gridTemplateRows:`repeat(${rows},1em)`}}>
+  return <span className="fill-tile" style={{gridTemplateColumns:`repeat(${columns},${cellWidth?cellWidth+'px':'1em'})`,gridTemplateRows:`repeat(${rows},${cellHeight?cellHeight+'px':'1em'})`}}>
    {shape.map(([x,y])=><i key={`${x},${y}`} style={{gridColumn:x+1,gridRow:y+1,background:color}}/>)}
   </span>;
  }
@@ -104,21 +119,32 @@ export function PieceFill({seed,easy,blocked,finish}:{seed:number,easy:boolean,b
     onClick={()=>{if(draggedPiece.current===piece.id){draggedPiece.current=null;return;}
      if(!blocked()&&!placed[piece.id])setSelected(piece.id);}}
     onPointerDown={event=>{
-     if(blocked()||drag.current)return;
+     if(event.button!==0||blocked()||drag.current)return;
+     const art=event.currentTarget.querySelector('.fill-tile')?.getBoundingClientRect();
+     if(!art||!art.width||!art.height)return;
+     event.preventDefault();
+     const columns=Math.max(...piece.shape.map(([x])=>x))+1;
+     const rows=Math.max(...piece.shape.map(([,y])=>y))+1;
+     const grabX=Math.max(0,Math.min(1,(event.clientX-art.left)/art.width))*columns;
+     const grabY=Math.max(0,Math.min(1,(event.clientY-art.top)/art.height))*rows;
      draggedPiece.current=null;
      event.currentTarget.setPointerCapture(event.pointerId);
-     drag.current={id:piece.id,pointer:event.pointerId,x:event.clientX,y:event.clientY};
+     drag.current={id:piece.id,pointer:event.pointerId,startX:event.clientX,startY:event.clientY,grabX,grabY};
      setSelected(piece.id);
     }}
     onPointerMove={event=>{
-     if(drag.current?.pointer===event.pointerId&&Math.hypot(drag.current.x-event.clientX,drag.current.y-event.clientY)>=8)setGhost({id:piece.id,x:event.clientX,y:event.clientY});
+     const active=drag.current;
+     if(!active||active.pointer!==event.pointerId)return;
+     if(Math.hypot(active.startX-event.clientX,active.startY-event.clientY)<8)return;
+     const position=dragPosition(active,event);
+     if(position)setGhost({id:piece.id,...position});
     }}
-    onPointerUp={pointerUp} onPointerCancel={()=>{drag.current=null;setGhost(null);}}>
+    onPointerUp={pointerUp} onPointerCancel={clearDrag} onLostPointerCapture={clearDrag}>
     {tile(piece.shape,piece.color)}
    </button>)}
   </div>
   {!easy&&<button className="fill-rotate" disabled={selected===null||blocked()} onClick={()=>setPieces(pieces.map(piece=>piece.id===selected?{...piece,shape:rotate(piece.shape)}:piece))}>↻ Käännä palaa</button>}
   <p className="puzzle-note" role="status">{hint||`${Object.keys(placed).length} / ${pieces.length} palaa`}</p>
-  {ghost&&<div className="fill-ghost" style={{left:ghost.x,top:ghost.y}}>{tile(pieces.find(piece=>piece.id===ghost.id)!.shape,colors[ghost.id])}</div>}
+  {ghost&&<div className="fill-ghost" style={{left:ghost.x,top:ghost.y}}>{tile(pieces.find(piece=>piece.id===ghost.id)!.shape,colors[ghost.id],ghost.cellWidth,ghost.cellHeight)}</div>}
  </>;
 }

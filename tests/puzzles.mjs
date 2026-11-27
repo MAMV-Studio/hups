@@ -129,32 +129,70 @@ assert.equal(calls[0][0],1000);
 console.log('PASS: color sorting rejects a wrong basket and finishes after all nine balls are sorted.');
 
 render('ColorSort',true);
-const basketNodes=[0,1,2].map(index=>({dataset:{sortBasket:String(index)}}));
-let basketUnderPointer=0;
-const previousDocument=Object.getOwnPropertyDescriptor(globalThis,'document');
-Object.defineProperty(globalThis,'document',{configurable:true,value:{
- elementFromPoint:()=>({closest:()=>basketNodes[basketUnderPointer]}),
-}});
-try{
- const basketRef=nodes(render('ColorSort')).find(node=>node.props.className==='color-sort-baskets').props.ref;
- basketRef.current={contains:node=>basketNodes.includes(node)};
- for(let index=0;index<9;index++){
-  const options=buttons(render('ColorSort'));
-  basketUnderPointer=options.slice(9).findIndex(basket=>ballColor(basket)===ballColor(options[index]));
-  const event={pointerId:index+1,button:0,clientX:20,clientY:20,preventDefault(){},currentTarget:{
-   setPointerCapture(){},
-   getBoundingClientRect(){return {left:0,top:0,width:40,height:40};},
-  }};
-  options[index].props.onPointerDown(event);
-  assert.equal(buttons(render('ColorSort'))[index].props.className,'sort-held');
-  const ball=buttons(render('ColorSort'))[index];
-  ball.props.onPointerMove({...event,clientX:120,clientY:200});
-  ball.props.onPointerUp({...event,clientX:120,clientY:200});
-  assert.equal(buttons(render('ColorSort'))[index].props.className,'sort-placed');
+const basketNodes=[0,1,2].map(index=>({
+ dataset:{sortBasket:String(index)},
+ getBoundingClientRect:()=>({left:index*80,right:index*80+75,top:160,bottom:235}),
+}));
+const basketRef=nodes(render('ColorSort')).find(node=>node.props.className==='color-sort-baskets').props.ref;
+basketRef.current={querySelectorAll:()=>basketNodes};
+for(let index=0;index<9;index++){
+ const options=buttons(render('ColorSort'));
+ const basket=options.slice(9).findIndex(option=>ballColor(option)===ballColor(options[index]));
+ const event={pointerId:index+1,button:0,clientX:20,clientY:20,preventDefault(){},currentTarget:{
+  setPointerCapture(){},
+  getBoundingClientRect(){return {left:0,top:0,width:40,height:40};},
+ }};
+ options[index].props.onPointerDown(event);
+ assert.equal(buttons(render('ColorSort'))[index].props.className,'sort-held');
+ const ball=buttons(render('ColorSort'))[index];
+ if(index===0){
+  ball.props.onPointerUp(event);
+  assert.equal(buttons(render('ColorSort'))[index].props['aria-pressed'],true);
+  buttons(render('ColorSort'))[9+basket].props.onClick();
+ }else{
+  const end={...event,clientX:basket*80+25,clientY:200};
+  ball.props.onPointerMove(end);
+  ball.props.onPointerUp(end);
  }
- assert.equal(calls.length,1);
-}finally{
- if(previousDocument)Object.defineProperty(globalThis,'document',previousDocument);
- else delete globalThis.document;
+ assert.equal(buttons(render('ColorSort'))[index].props.className,'sort-placed');
 }
+assert.equal(calls.length,1);
 console.log('PASS: pointer drag sorts all nine balls across all three rows.');
+
+// Grab a tile away from its top-left corner and use the board-sized preview
+// to place it. The pointer alone is over a different column at release.
+const pieceModule=await import(uri(compile('app/piece-fill.tsx')
+ .replace("'react'",JSON.stringify(hooks))
+ .replace('"react/jsx-runtime"',runtime)
+ .replace("'../libgame'",JSON.stringify(lib))
+ +'\nexport {layout};'));
+const stage=pieceModule.layout(20,true);
+const renderFill=()=>{h.si=0;h.ri=0;return pieceModule.PieceFill({...p,seed:20,easy:true});};
+h.states=[];h.refs=[];calls=[];
+const firstRender=renderFill();
+const cellSize=50;
+nodes(firstRender).find(node=>node.props.className==='fill-board').props.ref.current={
+ getBoundingClientRect:()=>({left:10,top:100,width:stage.rows[0].length*cellSize,height:stage.rows.length*cellSize}),
+};
+const labels=[...new Set(stage.cells.map(c=>c.label))].filter(label=>label!=='.');
+for(const piece of stage.pieces){
+ const cells=stage.cells.filter(c=>c.label===labels[piece.id]);
+ const col=Math.min(...cells.map(c=>c.x)),row=Math.min(...cells.map(c=>c.y));
+ const columns=Math.max(...piece.shape.map(([x])=>x))+1;
+ const rows=Math.max(...piece.shape.map(([,y])=>y))+1;
+ const trayButton=()=>buttons(renderFill()).find(b=>b.props['aria-label']===`Pala ${piece.id+1}`);
+ const event={
+  pointerId:piece.id+1,button:0,clientX:(columns-.5)*20,clientY:390,preventDefault(){},
+  currentTarget:{setPointerCapture(){},querySelector:()=>({
+   getBoundingClientRect:()=>({left:0,top:380,width:columns*20,height:rows*20}),
+  })},
+ };
+ trayButton().props.onPointerDown(event);
+ const end={...event,clientX:10+(col+columns-.5)*cellSize,clientY:100+(row+.5)*cellSize};
+ trayButton().props.onPointerMove(end);
+ assert.ok(nodes(renderFill()).some(node=>node.props.className==='fill-ghost'));
+ trayButton().props.onPointerUp(end);
+ assert.equal(trayButton().props.disabled,true);
+}
+assert.equal(calls.length,1);
+console.log('PASS: all puzzle pieces snap into place from an off-center finger grip.');

@@ -1,6 +1,6 @@
 {
   "name": "hups",
-  "version": "68.0.0",
+  "version": "68.2.0",
   "private": true,
   "type": "module",
   "engines": {

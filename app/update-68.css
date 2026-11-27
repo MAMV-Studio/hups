@@ -34,7 +34,8 @@
 .fill-board .fill-outside{visibility:hidden}
 .fill-tray{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:12px 0}
 .fill-tray button,.fill-rotate{border:1px solid #9879b5;background:#41304f;border-radius:12px;color:#fff0ff;padding:8px;min-height:44px}
-.fill-tray button{touch-action:none}
+.puzzle-piecefill .fill-tray button,.scene-game .play-stage .fill-tray button{touch-action:none}
+.fill-ghost .fill-tile{gap:0;vertical-align:top}
 .fill-tray button[aria-pressed=true]{outline:2px solid #d6ff86}
 .fill-tray button:disabled{opacity:.25}
 .fill-tile{display:inline-grid;font-size:clamp(12px,4.1vw,20px);gap:1px;pointer-events:none}

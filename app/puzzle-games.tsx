@@ -190,7 +190,7 @@ export function ColorSort(p:Props){
  const [returning,setReturning]=useState<{index:number,x:number,y:number}|null>(null);
  const [hint,setHint]=useState('');
  const placed=useRef<number[]>([]);
- const pointer=useRef<{id:number,index:number,x:number,y:number}|null>(null);
+ const pointer=useRef<{id:number,index:number,x:number,y:number,startX:number,startY:number}|null>(null);
  const baskets=useRef<HTMLDivElement>(null);
 
  function drop(index:number,basket:number){
@@ -204,16 +204,16 @@ export function ColorSort(p:Props){
  }
 
  return <div className="color-sort">
-  <p className="puzzle-instruction">Vedä pallot samanvärisiin koreihin.</p>
+  <p className="puzzle-instruction">Vedä pallo koriin tai napauta palloa ja samanväristä koria.</p>
   <div className="color-sort-balls">
    {balls.map((color,index)=><button type="button" key={index} disabled={sorted.includes(index)||p.blocked()} aria-label={`${sortColors[color].name} pallo ${index+1}`} aria-pressed={selected===index} className={sorted.includes(index)?'sort-placed':drag&&selected===index?'sort-held':returning?.index===index?'sort-returning':undefined} style={{'--sort-color':sortColors[color].color,'--return-x':returning?.index===index?returning.x+'px':undefined,'--return-y':returning?.index===index?returning.y+'px':undefined} as React.CSSProperties}
-    onClick={event=>{if(event.detail===0)setSelected(index);}}
+    onClick={event=>{if(event.detail===0&&!p.blocked())setSelected(index);}}
     onPointerDown={event=>{
      if(event.button!==0||pointer.current||p.blocked())return;
      event.preventDefault();
      event.currentTarget.setPointerCapture(event.pointerId);
      const rect=event.currentTarget.getBoundingClientRect();
-     pointer.current={id:event.pointerId,index,x:rect.left+rect.width/2,y:rect.top+rect.height/2};
+     pointer.current={id:event.pointerId,index,x:rect.left+rect.width/2,y:rect.top+rect.height/2,startX:event.clientX,startY:event.clientY};
      setReturning(null);
      setSelected(index);
      setDrag({x:event.clientX,y:event.clientY});
@@ -228,8 +228,13 @@ export function ColorSort(p:Props){
      if(!active||event.pointerId!==active.id)return;
      pointer.current=null;
      setDrag(null);
-     const target=document.elementFromPoint(event.clientX,event.clientY)?.closest<HTMLElement>('[data-sort-basket]');
-     const basket=target&&baskets.current?.contains(target)?Number(target.dataset.sortBasket):null;
+     // Use the visible basket bounds even if Safari's hit test still sees the captured ball.
+     const target=Array.from(baskets.current?.querySelectorAll<HTMLButtonElement>('[data-sort-basket]')??[]).find(button=>{
+      const rect=button.getBoundingClientRect();
+      return event.clientX>=rect.left&&event.clientX<=rect.right&&event.clientY>=rect.top&&event.clientY<=rect.bottom;
+     });
+     if(!target&&Math.hypot(event.clientX-active.startX,event.clientY-active.startY)<10)return;
+     const basket=target?Number(target.dataset.sortBasket):null;
      if(basket!==balls[index])setReturning({index,x:event.clientX-active.x,y:event.clientY-active.y});
      if(basket!==null)drop(index,basket);
      else setSelected(null);
